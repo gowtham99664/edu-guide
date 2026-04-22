@@ -7,7 +7,10 @@ export default function Scholarships() {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [page, setPage] = useState(1)
+  const [expanded, setExpanded] = useState({})
   const PER_PAGE = 15
+
+  const toggle = (id) => setExpanded(p => ({ ...p, [id]: !p[id] }))
 
   const filtered = useMemo(() => {
     return scholarships.filter(s => {
@@ -38,76 +41,80 @@ export default function Scholarships() {
         <p>Comprehensive database of Central Government, State Government, Private/Corporate, and International scholarships — {scholarships.length}+ entries. Filter by type or search by name, provider, or course.</p>
       </div>
 
-      {/* Disclaimer */}
       <div className="card" style={{ background: '#fff8e1', borderLeft: '4px solid #f9a825', marginBottom: '1.5rem' }}>
         <p style={{ margin: 0, fontSize: '0.92rem', lineHeight: 1.6 }}>
           <strong>Disclaimer:</strong> Scholarship amounts, eligibility criteria, and application deadlines change annually. Always verify from the official scholarship portal before applying. For government scholarships, the <strong>National Scholarship Portal (scholarships.gov.in)</strong> is the primary source.
         </p>
       </div>
 
-      {/* Filters */}
       <div className="filters-bar">
         <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search by name, provider, course, eligibility..."
-            value={search}
-            onChange={e => { setSearch(e.target.value); setPage(1); }}
-          />
+          <input type="text" placeholder="Search by name, provider, course, eligibility..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); setExpanded({}) }} />
         </div>
         <div className="filter-group">
           <label>Type</label>
-          <select className="filter-select" value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1); }}>
+          <select className="filter-select" value={typeFilter} onChange={e => { setTypeFilter(e.target.value); setPage(1); setExpanded({}) }}>
             <option value="">All Types</option>
             {types.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
         {(search || typeFilter) && (
-          <button className="filter-btn clear" onClick={() => { setSearch(''); setTypeFilter(''); setPage(1); }}>Clear</button>
+          <button className="filter-btn clear" onClick={() => { setSearch(''); setTypeFilter(''); setPage(1); setExpanded({}) }}>Clear</button>
         )}
       </div>
 
       <div className="results-count">Showing <strong>{paginated.length}</strong> of <strong>{filtered.length}</strong> scholarships</div>
 
-      {/* Scholarship Cards */}
       <div className="card-grid">
-        {paginated.map(s => (
-          <div key={s.id} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                <h3 style={{ margin: '0 0 6px', fontSize: '0.98rem', flex: 1 }}>{s.name}</h3>
-                <span style={{ fontWeight: 700, color: 'var(--success)', fontSize: '0.88rem', whiteSpace: 'nowrap' }}>{s.amount}</span>
+        {paginated.map(s => {
+          const isOpen = expanded[s.id]
+          return (
+            <div key={s.id} className={`card${isOpen ? ' acc-open' : ''}`}>
+              <div className="acc-header" onClick={() => toggle(s.id)}>
+                <div className="acc-header-info">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                    <h3 style={{ flex: 1 }}>{s.name}</h3>
+                    <span style={{ fontWeight: 700, color: 'var(--success)', fontSize: '0.86rem', whiteSpace: 'nowrap' }}>{s.amount}</span>
+                  </div>
+                  <div className="acc-badges">
+                    <span className={typeBadge(s.type)}>{s.type}</span>
+                  </div>
+                  <p className="acc-subtitle" style={{ marginTop: 4 }}>{s.provider}</p>
+                </div>
+                <span className="acc-chevron">{isOpen ? '−' : '+'}</span>
               </div>
-              <span className={typeBadge(s.type)}>{s.type}</span>
-            </div>
 
-            <div style={{ padding: '12px 16px', flex: 1 }}>
-              <div className="info-row"><span className="info-label">Provider:</span><span className="info-value"><strong>{s.provider}</strong></span></div>
-              <div className="info-row"><span className="info-label">Eligibility:</span><span className="info-value">{s.eligibility}</span></div>
-              {s.courses && s.courses.length > 0 && (
-                <div className="info-row">
-                  <span className="info-label">Courses:</span>
-                  <span className="info-value" style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                    {s.courses.map(c => <span key={c} className="badge badge-info">{c}</span>)}
-                  </span>
+              {isOpen && (
+                <div className="acc-body">
+                  <div className="info-row">
+                    <span className="acc-detail-label">Eligibility:</span>
+                    <span className="acc-detail-value">{s.eligibility}</span>
+                  </div>
+                  {s.courses && s.courses.length > 0 && (
+                    <div className="info-row">
+                      <span className="acc-detail-label">Courses:</span>
+                      <span className="acc-detail-value" style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                        {s.courses.map(c => <span key={c} className="badge badge-info">{c}</span>)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="info-row">
+                    <span className="acc-detail-label">Apply By:</span>
+                    <span className="acc-detail-value">{s.period}</span>
+                  </div>
+                  {s.highlights && <div className="acc-highlight">{s.highlights}</div>}
+                  {s.website && (
+                    <div style={{ marginTop: 12 }}>
+                      <a href={s.website} target="_blank" rel="noopener noreferrer" className="filter-btn" style={{ fontSize: '0.82rem', textDecoration: 'none' }}>Apply / Know More</a>
+                    </div>
+                  )}
                 </div>
               )}
-              <div className="info-row"><span className="info-label">Apply By:</span><span className="info-value">{s.period}</span></div>
-              {s.highlights && (
-                <div style={{ marginTop: 8, fontSize: '0.84rem', color: '#1e40af', background: '#eff6ff', padding: '6px 10px', borderRadius: 6 }}>
-                  {s.highlights}
-                </div>
-              )}
             </div>
-
-            <div style={{ padding: '10px 16px', borderTop: '1px solid var(--border)' }}>
-              <a href={s.website} target="_blank" rel="noopener noreferrer" className="filter-btn" style={{ fontSize: '0.82rem', textDecoration: 'none' }}>Apply / Know More</a>
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="pagination">
           <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>&laquo; Prev</button>

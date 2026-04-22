@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { api } from '../utils/api'
@@ -38,7 +38,6 @@ const GOALS = [
   'Pursue Architecture (B.Arch)',
   'Become a Teacher / Professor',
   'Start My Own Business / Startup',
-  'Other (describe in skills)',
 ]
 
 const SKILL_OPTIONS = [
@@ -49,6 +48,111 @@ const SKILL_OPTIONS = [
   'Drawing / Sketching', 'Communication Skills', 'Leadership',
   'Public Speaking', 'Research & Writing', 'Problem Solving',
 ]
+
+/* Searchable single-select dropdown */
+function SearchableSelect({ options, value, onChange, placeholder }) {
+  const [query, setQuery] = useState('')
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const filtered = options.filter(o => o.toLowerCase().includes(query.toLowerCase()))
+  const isCustom = value && !options.includes(value)
+
+  return (
+    <div className="searchable-select" ref={ref}>
+      <input
+        className="form-input"
+        value={open ? query : (value || '')}
+        placeholder={placeholder}
+        onFocus={() => { setOpen(true); setQuery(value && options.includes(value) ? '' : (value || '')) }}
+        onChange={e => { setQuery(e.target.value); onChange(e.target.value); setOpen(true) }}
+      />
+      {open && (
+        <div className="ss-dropdown">
+          {filtered.length > 0 ? filtered.map(o => (
+            <div
+              key={o}
+              className={`ss-option${value === o ? ' selected' : ''}`}
+              onClick={() => { onChange(o); setOpen(false); setQuery('') }}
+            >{o}</div>
+          )) : (
+            query.length > 0 ? (
+              <div className="ss-option ss-custom" onClick={() => { setOpen(false) }}>
+                Use: "{query}"
+              </div>
+            ) : (
+              <div className="ss-empty">No options found</div>
+            )
+          )}
+        </div>
+      )}
+      {value && (
+        <span className="ss-clear" onClick={() => { onChange(''); setQuery('') }}>&times;</span>
+      )}
+    </div>
+  )
+}
+
+/* Searchable multi-select dropdown */
+function SearchableMultiSelect({ options, selected, onToggle, placeholder }) {
+  const [query, setQuery] = useState('')
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const filtered = options.filter(o => o.toLowerCase().includes(query.toLowerCase()))
+
+  return (
+    <div className="searchable-select searchable-multi" ref={ref}>
+      <div className="sm-input-wrap" onClick={() => setOpen(true)}>
+        {selected.length > 0 && (
+          <div className="sm-tags">
+            {selected.map(s => (
+              <span key={s} className="sm-tag">
+                {s}
+                <span className="sm-tag-remove" onClick={(e) => { e.stopPropagation(); onToggle(s) }}>&times;</span>
+              </span>
+            ))}
+          </div>
+        )}
+        <input
+          className="sm-search-input"
+          value={query}
+          placeholder={selected.length === 0 ? placeholder : 'Search more...'}
+          onChange={e => { setQuery(e.target.value); setOpen(true) }}
+          onFocus={() => setOpen(true)}
+        />
+      </div>
+      {open && (
+        <div className="ss-dropdown">
+          {filtered.length > 0 ? filtered.map(o => (
+            <div
+              key={o}
+              className={`ss-option${selected.includes(o) ? ' selected' : ''}`}
+              onClick={() => { onToggle(o); setQuery('') }}
+            >
+              <span className="ss-check">{selected.includes(o) ? '\u2713' : ''}</span>
+              {o}
+            </div>
+          )) : (
+            <div className="ss-empty">No options found</div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function BuildProfile() {
   const { user, token } = useAuth()
@@ -61,7 +165,6 @@ export default function BuildProfile() {
 
   useEffect(() => {
     if (!user) { navigate('/login'); return }
-    // Load existing profile
     api.get('/api/profile', token).then(data => {
       if (data.profile) {
         setForm({
@@ -106,7 +209,7 @@ export default function BuildProfile() {
 
       {saved && (
         <div className="alert alert-success">
-          ✅ Profile saved! Redirecting to your AI-powered path planner...
+          Profile saved! Redirecting to your AI-powered path planner...
         </div>
       )}
       {error && <div className="alert alert-error">{error}</div>}
@@ -118,21 +221,13 @@ export default function BuildProfile() {
             <span className="section-num">1</span>
             Highest Educational Qualification
           </h2>
-          <div className="qual-grid">
-            {QUALIFICATIONS.map(q => (
-              <button
-                key={q}
-                type="button"
-                className={`qual-btn${form.highest_qualification === q ? ' selected' : ''}`}
-                onClick={() => setForm(f => ({ ...f, highest_qualification: q }))}
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-          {form.highest_qualification && (
-            <p className="selected-label">Selected: <strong>{form.highest_qualification}</strong></p>
-          )}
+          <p className="section-desc">Select from the list or type your own qualification.</p>
+          <SearchableSelect
+            options={QUALIFICATIONS}
+            value={form.highest_qualification}
+            onChange={v => setForm(f => ({ ...f, highest_qualification: v }))}
+            placeholder="Search or type your qualification..."
+          />
         </div>
 
         {/* Goal */}
@@ -141,28 +236,13 @@ export default function BuildProfile() {
             <span className="section-num">2</span>
             Your Career / Education Goal
           </h2>
-          <div className="goal-grid">
-            {GOALS.map(g => (
-              <button
-                key={g}
-                type="button"
-                className={`goal-btn${form.goal === g ? ' selected' : ''}`}
-                onClick={() => setForm(f => ({ ...f, goal: g }))}
-              >
-                {g}
-              </button>
-            ))}
-          </div>
-          <div className="form-group" style={{marginTop: '16px'}}>
-            <label className="form-label">Or describe your own goal:</label>
-            <input
-              className="form-input"
-              type="text"
-              value={GOALS.includes(form.goal) ? '' : form.goal}
-              onChange={e => setForm(f => ({ ...f, goal: e.target.value }))}
-              placeholder="e.g. Become a Chartered Accountant, Pursue Fine Arts..."
-            />
-          </div>
+          <p className="section-desc">Select a goal or type your own career aspiration.</p>
+          <SearchableSelect
+            options={GOALS}
+            value={form.goal}
+            onChange={v => setForm(f => ({ ...f, goal: v }))}
+            placeholder="Search or type your goal..."
+          />
         </div>
 
         {/* Skills */}
@@ -171,36 +251,32 @@ export default function BuildProfile() {
             <span className="section-num">3</span>
             Your Current Skill Set
           </h2>
-          <p className="section-desc">Select all that apply — these help the AI tailor your roadmap.</p>
-          <div className="skills-grid">
-            {SKILL_OPTIONS.map(skill => (
-              <button
-                key={skill}
-                type="button"
-                className={`skill-chip${selectedSkills.includes(skill) ? ' selected' : ''}`}
-                onClick={() => toggleSkill(skill)}
-              >
-                {selectedSkills.includes(skill) ? '✓ ' : ''}{skill}
-              </button>
-            ))}
-          </div>
+          <p className="section-desc">Select multiple skills or search to find specific ones.</p>
+          <SearchableMultiSelect
+            options={SKILL_OPTIONS}
+            selected={selectedSkills}
+            onToggle={toggleSkill}
+            placeholder="Search and select skills..."
+          />
           <div className="form-group" style={{marginTop: '16px'}}>
-            <label className="form-label">Additional skills (optional):</label>
-            <input
+            <label className="form-label">Additional skills not in the list (optional):</label>
+            <textarea
               className="form-input"
-              type="text"
-              value={form.skills}
+              rows={2}
+              value={form.skills.split(', ').filter(s => !SKILL_OPTIONS.includes(s)).join(', ')}
               onChange={e => {
-                setForm(f => ({ ...f, skills: e.target.value }))
+                const custom = e.target.value
+                const fromChips = selectedSkills.filter(s => SKILL_OPTIONS.includes(s)).join(', ')
+                setForm(f => ({ ...f, skills: [fromChips, custom].filter(Boolean).join(', ') }))
               }}
-              placeholder="e.g. Mathematics, Python, Leadership..."
+              placeholder="e.g. Robotics, Public Policy, Music..."
             />
           </div>
         </div>
 
         <div className="profile-actions">
           <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-            {loading ? <><span className="spinner" /> Saving...</> : '💾 Save Profile & Plan My Path'}
+            {loading ? <><span className="spinner" /> Saving...</> : 'Save Profile & Plan My Path'}
           </button>
         </div>
       </form>

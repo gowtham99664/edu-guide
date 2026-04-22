@@ -9,12 +9,21 @@ import secrets
 import base64
 import os
 import json
+import random
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from datetime import datetime, timedelta
 import httpx
+from dotenv import load_dotenv
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+
+# ─── Load .env ─────────────────────────────────────────────────────────────────
+load_dotenv()
 
 # ─── Config ────────────────────────────────────────────────────────────────────
 SECRET_KEY = os.environ.get("SECRET_KEY", "eduguide-super-secret-2024-change-in-prod")
@@ -22,6 +31,15 @@ MASTER_ENCRYPTION_KEY = os.environ.get("MASTER_KEY", "eduguide-master-aes-key-32
 ALGORITHM = "HS256"
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://eduguide-ollama:11434")
 OLLAMA_MODEL = "qwen2.5:1.5b"
+
+# ─── SMTP Config ───────────────────────────────────────────────────────────────
+SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
+SMTP_EMAIL = os.environ.get("SMTP_EMAIL", "")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+SMTP_FROM_NAME = os.environ.get("SMTP_FROM_NAME", "Vidya Maarg")
+OTP_EXPIRY_MINUTES = int(os.environ.get("OTP_EXPIRY_MINUTES", 5))
+OTP_LENGTH = int(os.environ.get("OTP_LENGTH", 6))
 
 DB_CONFIG = {
     "host": os.environ.get("DB_HOST", "eduguide-db"),
@@ -134,13 +152,23 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_roadmaps_user ON roadmaps(user_id);
         CREATE INDEX IF NOT EXISTS idx_milestones_roadmap ON milestones(roadmap_id);
         CREATE INDEX IF NOT EXISTS idx_milestones_user ON milestones(user_id);
+        CREATE TABLE IF NOT EXISTS email_otps (
+            id SERIAL PRIMARY KEY,
+            email TEXT NOT NULL,
+            otp_code TEXT NOT NULL,
+            verified BOOLEAN DEFAULT FALSE,
+            attempts INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT NOW(),
+            expires_at TIMESTAMP NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_email_otps_email ON email_otps(email);
     """)
     conn.commit()
     cur.close()
     conn.close()
 
 # ─── App ────────────────────────────────────────────────────────────────────────
-app = FastAPI(title="EduGuide India API", version="2.0.0")
+app = FastAPI(title="Vidya Maarg API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -178,6 +206,10 @@ class ProfileRequest(BaseModel):
     goal: str
     skills: str
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
 class PlanRequest(BaseModel):
     highest_qualification: str
     goal: str
@@ -196,10 +228,157 @@ class SaveRoadmapRequest(BaseModel):
     model: str = ""
     milestones: List[dict] = []
 
+class SendOtpRequest(BaseModel):
+    email: str
+
+class VerifyOtpRequest(BaseModel):
+    email: str
+    otp: str
+
+# ─── Email OTP Helper ──────────────────────────────────────────────────────────
+def generate_otp() -> str:
+    """Generate a random numeric OTP."""
+    return ''.join([str(random.randint(0, 9)) for _ in range(OTP_LENGTH)])
+
+def send_otp_email(to_email: str, otp_code: str) -> bool:
+    """Send OTP via Gmail SMTP. Returns True on success."""
+    if not SMTP_EMAIL or not SMTP_PASSWORD:
+        print("[OTP] SMTP not configured. OTP:", otp_code)
+        return False
+
+    subject = f"Vidya Maarg - Your Verification Code: {otp_code}"
+    html_body = f"""
+    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+        <div style="background: linear-gradient(135deg, #2563eb, #7c3aed); padding: 32px; text-align: center;">
+             <h1 style="color: white; margin: 0; font-size: 24px;">Vidya Maarg</h1>
+            <p style="color: #dbeafe; margin: 8px 0 0; font-size: 14px;">Your Education Companion</p>
+        </div>
+        <div style="padding: 32px;">
+            <h2 style="color: #1e293b; margin: 0 0 8px; font-size: 20px;">Email Verification</h2>
+            <p style="color: #64748b; font-size: 15px; line-height: 1.6;">
+                Use the following code to verify your email address. This code is valid for <strong>{OTP_EXPIRY_MINUTES} minutes</strong>.
+            </p>
+            <div style="background: #f1f5f9; border: 2px dashed #3b82f6; border-radius: 10px; padding: 20px; text-align: center; margin: 24px 0;">
+                <span style="font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #1e40af;">{otp_code}</span>
+            </div>
+            <p style="color: #94a3b8; font-size: 13px; text-align: center;">
+                If you didn't request this code, please ignore this email.
+            </p>
+        </div>
+        <div style="background: #f8fafc; padding: 16px 32px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #94a3b8; font-size: 12px; margin: 0;">Vidya Maarg &mdash; Empowering Education Decisions</p>
+        </div>
+    </div>
+    """
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = f"{SMTP_FROM_NAME} <{SMTP_EMAIL}>"
+    msg["To"] = to_email
+    msg.attach(MIMEText(f"Your Vidya Maarg verification code is: {otp_code}\nValid for {OTP_EXPIRY_MINUTES} minutes.", "plain"))
+    msg.attach(MIMEText(html_body, "html"))
+
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            server.sendmail(SMTP_EMAIL, to_email, msg.as_string())
+        return True
+    except Exception as e:
+        print(f"[OTP] Failed to send email: {e}")
+        return False
+
 # ─── Routes ─────────────────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+# ─── OTP Endpoints ──────────────────────────────────────────────────────────────
+@app.post("/api/send-otp")
+def send_otp(req: SendOtpRequest, db=Depends(get_db)):
+    """Send a 6-digit OTP to the given email address."""
+    email = req.email.lower().strip()
+    if not email or '@' not in email:
+        raise HTTPException(400, "Invalid email address")
+
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Check if email is already registered
+    cur.execute("SELECT id FROM users WHERE email = %s", (email,))
+    if cur.fetchone():
+        raise HTTPException(409, "Email already registered. Please login instead.")
+
+    # Rate limit: max 5 OTPs per email in last 15 minutes
+    cur.execute("""
+        SELECT COUNT(*) as cnt FROM email_otps
+        WHERE email = %s AND created_at > NOW() - INTERVAL '15 minutes'
+    """, (email,))
+    count = cur.fetchone()["cnt"]
+    if count >= 5:
+        raise HTTPException(429, "Too many OTP requests. Please wait 15 minutes.")
+
+    # Generate and store OTP
+    otp_code = generate_otp()
+    expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRY_MINUTES)
+
+    cur.execute("""
+        INSERT INTO email_otps (email, otp_code, expires_at)
+        VALUES (%s, %s, %s)
+    """, (email, otp_code, expires_at))
+    db.commit()
+
+    # Send email
+    sent = send_otp_email(email, otp_code)
+
+    if not sent and SMTP_EMAIL and SMTP_PASSWORD:
+        raise HTTPException(500, "Failed to send OTP email. Please try again.")
+
+    return {
+        "message": "OTP sent to your email address" if sent else "SMTP not configured. Check server logs for OTP.",
+        "email": email,
+        "expires_in_minutes": OTP_EXPIRY_MINUTES,
+        "otp_sent": sent,
+    }
+
+@app.post("/api/verify-otp")
+def verify_otp(req: VerifyOtpRequest, db=Depends(get_db)):
+    """Verify the OTP code for an email address."""
+    email = req.email.lower().strip()
+    otp = req.otp.strip()
+
+    if not otp or len(otp) != OTP_LENGTH:
+        raise HTTPException(400, f"OTP must be {OTP_LENGTH} digits")
+
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Get the latest unexpired, unverified OTP for this email
+    cur.execute("""
+        SELECT * FROM email_otps
+        WHERE email = %s AND verified = FALSE AND expires_at > NOW()
+        ORDER BY created_at DESC LIMIT 1
+    """, (email,))
+    record = cur.fetchone()
+
+    if not record:
+        raise HTTPException(400, "No valid OTP found. Please request a new one.")
+
+    # Check max attempts (5 attempts per OTP)
+    if record["attempts"] >= 5:
+        raise HTTPException(429, "Too many wrong attempts. Please request a new OTP.")
+
+    # Increment attempt count
+    cur.execute("UPDATE email_otps SET attempts = attempts + 1 WHERE id = %s", (record["id"],))
+    db.commit()
+
+    if record["otp_code"] != otp:
+        remaining = 4 - record["attempts"]
+        raise HTTPException(400, f"Invalid OTP. {remaining} attempt(s) remaining.")
+
+    # Mark as verified
+    cur.execute("UPDATE email_otps SET verified = TRUE WHERE id = %s", (record["id"],))
+    db.commit()
+
+    return {"message": "Email verified successfully", "email": email, "verified": True}
 
 @app.post("/api/register", status_code=201)
 def register(req: RegisterRequest, db=Depends(get_db)):
@@ -207,7 +386,18 @@ def register(req: RegisterRequest, db=Depends(get_db)):
         raise HTTPException(400, "Passwords do not match")
     if len(req.password) < 8:
         raise HTTPException(400, "Password must be at least 8 characters")
+
     cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Check if email was verified via OTP
+    cur.execute("""
+        SELECT id FROM email_otps
+        WHERE email = %s AND verified = TRUE AND expires_at > NOW() - INTERVAL '30 minutes'
+        ORDER BY created_at DESC LIMIT 1
+    """, (req.email.lower(),))
+    if not cur.fetchone():
+        raise HTTPException(400, "Email not verified. Please verify your email with OTP first.")
+
     cur.execute("SELECT id FROM users WHERE email = %s", (req.email.lower(),))
     if cur.fetchone():
         raise HTTPException(409, "Email already registered")
@@ -264,6 +454,20 @@ def get_me(current=Depends(get_current_user), db=Depends(get_db)):
         "phone": decrypt_field(user["phone"]),
         "profile": dict(profile) if profile else None,
     }
+
+@app.post("/api/change-password")
+def change_password(req: ChangePasswordRequest, current=Depends(get_current_user), db=Depends(get_db)):
+    if len(req.new_password) < 8:
+        raise HTTPException(400, "New password must be at least 8 characters")
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT password_hash FROM users WHERE id = %s", (int(current["sub"]),))
+    user = cur.fetchone()
+    if not user or not verify_password(req.current_password, user["password_hash"]):
+        raise HTTPException(401, "Current password is incorrect")
+    cur.execute("UPDATE users SET password_hash = %s WHERE id = %s",
+                (hash_password(req.new_password), int(current["sub"])))
+    db.commit()
+    return {"message": "Password changed successfully"}
 
 @app.post("/api/profile")
 def save_profile(req: ProfileRequest, current=Depends(get_current_user), db=Depends(get_db)):

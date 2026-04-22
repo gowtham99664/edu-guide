@@ -1,11 +1,17 @@
 import { useState, useMemo } from 'react'
 import internships from '../data/internships'
 
+const PER_PAGE = 15
+
 export default function Internships() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [search, setSearch] = useState('')
+  const [expanded, setExpanded] = useState({})
+  const [page, setPage] = useState(1)
 
   const totalAll = internships.reduce((s, c) => s + c.entries.length, 0)
+
+  const toggle = (key) => setExpanded(p => ({ ...p, [key]: !p[key] }))
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
@@ -19,7 +25,24 @@ export default function Internships() {
     })).filter(cat => cat.entries.length > 0)
   }, [search, selectedCategory])
 
-  const totalEntries = filtered.reduce((sum, c) => sum + c.entries.length, 0)
+  // Flatten all entries for pagination
+  const allEntries = useMemo(() => {
+    const result = []
+    filtered.forEach(cat => {
+      cat.entries.forEach((entry, i) => {
+        result.push({ ...entry, _catId: cat.id, _catIcon: cat.icon, _catName: cat.category, _catDesc: cat.description, _key: `${cat.id}_${i}` })
+      })
+    })
+    return result
+  }, [filtered])
+
+  const totalEntries = allEntries.length
+  const totalPages = Math.ceil(totalEntries / PER_PAGE)
+  const paginated = allEntries.slice((page - 1) * PER_PAGE, page * PER_PAGE)
+
+  // Reset page when filters change
+  const updateCategory = (cat) => { setSelectedCategory(cat); setPage(1); setExpanded({}) }
+  const updateSearch = (val) => { setSearch(val); setPage(1); setExpanded({}) }
 
   return (
     <div>
@@ -28,96 +51,84 @@ export default function Internships() {
         <p>Discover government, research, corporate, international, and NGO internships — {totalAll}+ opportunities listed. Filter by category or search by name, organization, or eligibility.</p>
       </div>
 
-      {/* Disclaimer */}
       <div className="card" style={{ background: '#fff8e1', borderLeft: '4px solid #f9a825', marginBottom: '1.5rem' }}>
         <p style={{ margin: 0, fontSize: '0.92rem', lineHeight: 1.6 }}>
-          <strong>Disclaimer:</strong> Internship availability, stipend amounts, eligibility criteria, and application deadlines change frequently. Always verify from the official organization website before applying. We have compiled this to the best of our knowledge, but there may be deviations.
+          <strong>Disclaimer:</strong> Internship availability, stipend amounts, eligibility criteria, and application deadlines change frequently. Always verify from the official organization website before applying.
         </p>
       </div>
 
-      {/* Category filter pills */}
       <div className="filters-bar" style={{ flexWrap: 'wrap', marginBottom: '1rem' }}>
-        <button
-          className={`filter-btn${selectedCategory === 'all' ? ' active' : ''}`}
-          onClick={() => { setSelectedCategory('all'); }}
-        >
-          All Categories
-        </button>
+        <button className={`filter-btn${selectedCategory === 'all' ? ' active' : ''}`} onClick={() => updateCategory('all')}>All Categories</button>
         {internships.map(cat => (
-          <button
-            key={cat.id}
-            className={`filter-btn${selectedCategory === cat.id ? ' active' : ''}`}
-            onClick={() => setSelectedCategory(cat.id)}
-          >
+          <button key={cat.id} className={`filter-btn${selectedCategory === cat.id ? ' active' : ''}`} onClick={() => updateCategory(cat.id)}>
             {cat.icon || ''} {cat.category}
           </button>
         ))}
       </div>
 
-      {/* Search */}
       <div className="filters-bar">
         <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search internships, organizations, eligibility..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
+          <input type="text" placeholder="Search internships, organizations, eligibility..." value={search} onChange={e => updateSearch(e.target.value)} />
         </div>
-        {search && (
-          <button className="filter-btn clear" onClick={() => setSearch('')}>Clear</button>
-        )}
+        {search && <button className="filter-btn clear" onClick={() => updateSearch('')}>Clear</button>}
       </div>
 
-      <div className="results-count">Showing <strong>{totalEntries}</strong> internship(s)</div>
+      <div className="results-count">Showing <strong>{paginated.length}</strong> of <strong>{totalEntries}</strong> internship(s)</div>
 
-      {/* Internship Listings */}
-      {filtered.map(cat => (
-        <div key={cat.id} style={{ marginBottom: '2rem' }}>
-          <h2 style={{ borderBottom: '2px solid var(--primary-light)', paddingBottom: 8, marginBottom: '1rem', fontSize: '1.15rem' }}>
-            {cat.icon} {cat.category}
-          </h2>
-          {cat.description && <p style={{ color: 'var(--text-light)', marginBottom: '1rem', fontSize: '0.9rem' }}>{cat.description}</p>}
-
-          <div className="card-grid">
-            {cat.entries.map((entry, i) => (
-              <div key={i} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)', background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', borderRadius: 'var(--radius) var(--radius) 0 0' }}>
-                  <h3 style={{ margin: '0 0 2px', fontSize: '1rem', color: 'var(--primary-dark)' }}>{entry.name}</h3>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>{entry.org}</div>
-                </div>
-
-                <div style={{ padding: '12px 16px', flex: 1 }}>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+      <div className="card-grid">
+        {paginated.map(entry => {
+          const isOpen = expanded[entry._key]
+          return (
+            <div key={entry._key} className={`card${isOpen ? ' acc-open' : ''}`}>
+              <div className="acc-header" onClick={() => toggle(entry._key)}>
+                <div className="acc-header-info">
+                  <h3>{entry.name}</h3>
+                  <p>{entry.org}</p>
+                  <div className="acc-badges">
                     <span className="badge badge-primary">{entry.duration}</span>
                     {entry.stipend && <span className="badge badge-success">{entry.stipend}</span>}
                     {entry.period && <span className="badge badge-warning">{entry.period}</span>}
                   </div>
+                </div>
+                <span className="acc-chevron">{isOpen ? '−' : '+'}</span>
+              </div>
+
+              {isOpen && (
+                <div className="acc-body">
                   <div className="info-row">
-                    <span className="info-label">Eligibility:</span>
-                    <span className="info-value">{entry.eligibility}</span>
+                    <span className="acc-detail-label">Eligibility:</span>
+                    <span className="acc-detail-value">{entry.eligibility}</span>
                   </div>
-                  {entry.highlights && (
-                    <div style={{ marginTop: 8, fontSize: '0.84rem', color: '#1e40af', background: '#eff6ff', padding: '6px 10px', borderRadius: 6 }}>
-                      {entry.highlights}
+                  {entry.highlights && <div className="acc-highlight">{entry.highlights}</div>}
+                  {entry.website && (
+                    <div className="acc-footer">
+                      <a href={entry.website} target="_blank" rel="noopener noreferrer" className="filter-btn" style={{ fontSize: '0.82rem', textDecoration: 'none' }}>Apply / Know More</a>
                     </div>
                   )}
                 </div>
-
-                <div style={{ padding: '10px 16px', borderTop: '1px solid var(--border)' }}>
-                  <a href={entry.website} target="_blank" rel="noopener noreferrer" className="filter-btn" style={{ fontSize: '0.82rem', textDecoration: 'none' }}>Apply / Know More</a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
+              )}
+            </div>
+          )
+        })}
+      </div>
 
       {totalEntries === 0 && (
         <div className="card" style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-light)' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🔍</div>
           <h3 style={{ margin: '0 0 8px' }}>No internships found</h3>
           <p style={{ margin: 0 }}>Try a different search term or category.</p>
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>&laquo; Prev</button>
+          {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => {
+            const p = page <= 5 ? i + 1 : page + i - 4
+            if (p > totalPages || p < 1) return null
+            return <button key={p} className={page === p ? 'active' : ''} onClick={() => setPage(p)}>{p}</button>
+          })}
+          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Next &raquo;</button>
         </div>
       )}
 

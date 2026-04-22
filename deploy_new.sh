@@ -1,10 +1,19 @@
 #!/bin/bash
-# EduGuide India - Full Deployment Script
+# ============================================================
+#  EduGuide India — Full Stack Deploy Script
+#  Usage: bash /opt/edu-guide/deploy.sh
+#  Builds and deploys: PostgreSQL, Ollama, Backend, Frontend
+#  Frontend: http://10.127.248.85:1206
+#  Backend:  http://10.127.248.85:1207
+#  API Docs: http://10.127.248.85:1207/docs
+# ============================================================
+
 set -e
 
 PROJECT_DIR="/opt/edu-guide"
 FRONTEND_PORT=1206
 BACKEND_PORT=1207
+VM_IP="10.127.248.85"
 
 echo "======================================================"
 echo " EduGuide India - Full Stack Deployment"
@@ -53,7 +62,7 @@ for i in $(seq 1 30); do
 done
 
 # ── 4. Pull Qwen model ────────────────────────────────────
-echo "[4/7] Pulling Qwen2.5:1.5b model (this may take a few minutes)..."
+echo "[4/7] Pulling Qwen2.5:1.5b model (this may take a few minutes on first run)..."
 docker exec eduguide-ollama ollama pull qwen2.5:1.5b
 echo "      Qwen model ready!"
 
@@ -66,14 +75,6 @@ docker run -d \
   --name eduguide-backend \
   --network eduguide-network \
   --restart unless-stopped \
-  -e DB_HOST=eduguide-db \
-  -e DB_PORT=5432 \
-  -e DB_NAME=eduguide_db \
-  -e DB_USER=eduguide \
-  -e DB_PASS=EduGuide2024Secure \
-  -e OLLAMA_URL=http://eduguide-ollama:11434 \
-  -e SECRET_KEY="eduguide-jwt-secret-change-in-prod-2024" \
-  -e MASTER_KEY="eduguide-aes-master-key-32bytesXXX" \
   -p ${BACKEND_PORT}:8000 \
   eduguide-backend
 echo "      Backend started on port $BACKEND_PORT"
@@ -93,7 +94,7 @@ echo "      Frontend started on port $FRONTEND_PORT"
 
 # ── 7. Verify ─────────────────────────────────────────────
 echo "[7/7] Verifying deployment..."
-sleep 4
+sleep 5
 
 FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${FRONTEND_PORT}/ 2>/dev/null || echo "000")
 BACKEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${BACKEND_PORT}/health 2>/dev/null || echo "000")
@@ -103,11 +104,13 @@ echo ""
 echo "======================================================"
 echo " Deployment Summary"
 echo "======================================================"
-echo " Frontend  http://10.127.248.85:${FRONTEND_PORT}    [$FRONTEND_STATUS]"
-echo " Backend   http://10.127.248.85:${BACKEND_PORT}     [$BACKEND_STATUS]"
-echo " Ollama    http://10.127.248.85:11434        [$OLLAMA_STATUS]"
+echo " Frontend  http://${VM_IP}:${FRONTEND_PORT}    [$FRONTEND_STATUS]"
+echo " Backend   http://${VM_IP}:${BACKEND_PORT}     [$BACKEND_STATUS]"
+echo " Ollama    http://${VM_IP}:11434        [$OLLAMA_STATUS]"
+echo " API Docs  http://${VM_IP}:${BACKEND_PORT}/docs"
 echo ""
-echo " API Docs  http://10.127.248.85:${BACKEND_PORT}/docs"
+echo " .env file: $PROJECT_DIR/backend/.env"
+echo " Update SMTP_EMAIL and SMTP_PASSWORD for OTP emails"
 echo "======================================================"
 
 docker ps --filter "name=eduguide" --filter "name=edu-guide" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"

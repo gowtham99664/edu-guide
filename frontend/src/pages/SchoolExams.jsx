@@ -1,7 +1,18 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import schoolEntranceExams from '../data/schoolEntranceExams'
 
+const PER_PAGE = 15
+
 export default function SchoolExams() {
+  const [expanded, setExpanded] = useState({})
+  const [page, setPage] = useState(1)
+
+  const toggle = (id) => setExpanded(p => ({ ...p, [id]: !p[id] }))
+
+  const totalPages = Math.ceil(schoolEntranceExams.length / PER_PAGE)
+  const paginated = schoolEntranceExams.slice((page - 1) * PER_PAGE, page * PER_PAGE)
+
   return (
     <div>
       <div className="section-header">
@@ -9,44 +20,105 @@ export default function SchoolExams() {
         <p>Entrance exams for Navodaya Vidyalaya, Sainik Schools, Military Schools, Residential Schools (AP/TS Gurukul), Olympiads, Scholarships (NTSE, NMMS), and more.</p>
       </div>
 
+      <div className="results-count">Showing <strong>{paginated.length}</strong> of <strong>{schoolEntranceExams.length}</strong> exams</div>
+
       <div className="card-grid">
-        {schoolEntranceExams.map(exam => (
-          <div key={exam.id} className="card exam-card">
-            <div className="exam-name">{exam.name}</div>
-            <div className="exam-body">{exam.conductedBy}</div>
-            <p style={{fontSize:'0.85rem', marginBottom:6}}><strong>For:</strong> {exam.forClass}</p>
-            <p style={{fontSize:'0.85rem', marginBottom:6, color:'var(--text-light)'}}>{exam.eligibility?.substring(0, 150)}{exam.eligibility?.length > 150 ? '...' : ''}</p>
-            <div className="exam-meta">
-              <span className="badge badge-primary">{exam.forClass}</span>
-              {exam.frequency && <span className="badge badge-success">{exam.frequency}</span>}
-              {exam.statesCovered && <span className="badge badge-info">{exam.statesCovered}</span>}
-            </div>
+        {paginated.map(exam => {
+          const isOpen = expanded[exam.id]
+          return (
+            <div key={exam.id} className={`card exam-card${isOpen ? ' acc-open' : ''}`}>
+              <div className="acc-header" onClick={() => toggle(exam.id)}>
+                <div className="acc-header-info">
+                  <h3>{exam.name}</h3>
+                  <p>{exam.conductedBy}</p>
+                  <div className="acc-badges">
+                    <span className="badge badge-primary">{exam.forClass}</span>
+                    {exam.frequency && <span className="badge badge-success">{exam.frequency}</span>}
+                    {exam.statesCovered && <span className="badge badge-info">{exam.statesCovered}</span>}
+                  </div>
+                </div>
+                <span className="acc-chevron">{isOpen ? '−' : '+'}</span>
+              </div>
 
-            <div style={{marginTop:16, paddingTop:12, borderTop:'1px solid var(--border)'}}>
-              <h4 style={{fontSize:'0.9rem', marginBottom:6}}>Exam Pattern:</h4>
-              <p style={{fontSize:'0.85rem'}}>{exam.examPattern}</p>
-
-              {exam.syllabus && (
-                <div style={{marginTop:8}}>
-                  <h4 style={{fontSize:'0.9rem', marginBottom:4}}>Syllabus Highlights:</h4>
-                  {Object.entries(exam.syllabus).map(([key, val]) => (
-                    <div key={key} style={{marginBottom:6}}>
-                      <strong style={{fontSize:'0.8rem', textTransform:'capitalize'}}>{key.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ')}:</strong>
-                      {Array.isArray(val) && <ul style={{paddingLeft:16, fontSize:'0.8rem'}}>{val.slice(0, 4).map((v, i) => <li key={i}>{v}</li>)}{val.length > 4 && <li>+{val.length - 4} more topics...</li>}</ul>}
+              {isOpen && (
+                <div className="acc-body">
+                  {exam.eligibility && (
+                    <div className="info-row">
+                      <span className="acc-detail-label">Eligibility:</span>
+                      <span className="acc-detail-value">{exam.eligibility}</span>
                     </div>
-                  ))}
+                  )}
+
+                  {exam.examPattern && (
+                    <div className="info-row">
+                      <span className="acc-detail-label">Exam Pattern:</span>
+                      <span className="acc-detail-value">{exam.examPattern}</span>
+                    </div>
+                  )}
+
+                  {exam.syllabus && (
+                    <div style={{marginTop: 8}}>
+                      <span className="acc-detail-label">Syllabus Highlights:</span>
+                      {Object.entries(exam.syllabus).map(([key, val]) => (
+                        <div key={key} style={{marginBottom: 6, marginLeft: 4}}>
+                          <strong style={{fontSize: '0.82rem', textTransform: 'capitalize'}}>{key.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ')}:</strong>
+                          {Array.isArray(val) && (
+                            <ul style={{paddingLeft: 16, fontSize: '0.82rem', margin: '2px 0'}}>
+                              {val.slice(0, 4).map((v, i) => <li key={i}>{v}</li>)}
+                              {val.length > 4 && <li>+{val.length - 4} more topics...</li>}
+                            </ul>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {exam.schools && (
+                    <div className="info-row">
+                      <span className="acc-detail-label">Schools:</span>
+                      <span className="acc-detail-value">{exam.schools}</span>
+                    </div>
+                  )}
+
+                  {exam.scholarship && (
+                    <div className="info-row">
+                      <span className="acc-detail-label">Scholarship:</span>
+                      <span className="acc-detail-value" style={{color: 'var(--success)'}}>{exam.scholarship}</span>
+                    </div>
+                  )}
+
+                  {exam.applicationPeriod && (
+                    <div className="info-row">
+                      <span className="acc-detail-label">Application:</span>
+                      <span className="acc-detail-value">{exam.applicationPeriod} | <strong>Exam:</strong> {exam.examMonth}</span>
+                    </div>
+                  )}
+
+                  {exam.website && (
+                    <a href={exam.website} target="_blank" rel="noopener noreferrer" className="acc-link">Official Website &rarr;</a>
+                  )}
+
+                  {exam.importantNotes && (
+                    <div className="acc-note">{exam.importantNotes}</div>
+                  )}
                 </div>
               )}
-
-              {exam.schools && <p style={{fontSize:'0.85rem', marginTop:8}}><strong>Schools:</strong> {exam.schools.substring(0, 200)}{exam.schools.length > 200 ? '...' : ''}</p>}
-              {exam.scholarship && <p style={{fontSize:'0.85rem', marginTop:4, color:'var(--success)'}}><strong>Scholarship:</strong> {exam.scholarship}</p>}
-              {exam.applicationPeriod && <p style={{fontSize:'0.85rem', marginTop:4}}><strong>Application:</strong> {exam.applicationPeriod} | <strong>Exam:</strong> {exam.examMonth}</p>}
-              {exam.website && <p style={{marginTop:8}}><a href={exam.website} target="_blank" rel="noopener noreferrer" style={{fontWeight:600}}>Official Website &rarr;</a></p>}
-              {exam.importantNotes && <p style={{fontSize:'0.8rem', marginTop:8, padding:8, background:'#fffbeb', borderRadius:6}}>{exam.importantNotes}</p>}
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>&laquo; Prev</button>
+          {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => {
+            const p = page <= 5 ? i + 1 : page + i - 4
+            if (p > totalPages || p < 1) return null
+            return <button key={p} className={page === p ? 'active' : ''} onClick={() => setPage(p)}>{p}</button>
+          })}
+          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Next &raquo;</button>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,29 +1,43 @@
+import { useState } from 'react'
 import { preparationTimeline } from '../data/careerPaths'
 
 export default function Timeline() {
+  const [expanded, setExpanded] = useState({})
+  const toggle = (i) => setExpanded(p => ({ ...p, [i]: !p[i] }))
+
   return (
     <div>
       <div className="section-header">
         <h1>Preparation Timeline</h1>
-        <p>Grade-wise guide on what to focus, which exams to prepare for, and how to build your academic profile from Class 6 to post-graduation.</p>
+        <p>Grade-wise guide on what to focus, which exams to prepare for, and how to build your academic profile from Class 6 to post-graduation. Click any stage to see details.</p>
       </div>
 
       <div className="timeline">
-        {preparationTimeline.map((item, i) => (
-          <div key={i} className="timeline-item">
-            <div className="card" style={{borderLeft: '4px solid var(--primary)'}}>
-              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12}}>
-                <h3>{item.grade}</h3>
-                <span className="badge badge-primary">{item.title}</span>
+        {preparationTimeline.map((item, i) => {
+          const isOpen = expanded[i]
+          return (
+            <div key={i} className={`timeline-item${isOpen ? ' acc-open' : ''}`}>
+              <div className="card" style={{borderLeft: '4px solid var(--primary)'}}>
+                <div className="acc-header" onClick={() => toggle(i)} style={{padding: '12px 16px'}}>
+                  <div style={{display:'flex', alignItems:'center', gap: 12, flex: 1}}>
+                    <h3 style={{margin: 0}}>{item.grade}</h3>
+                    <span className="badge badge-primary">{item.title}</span>
+                  </div>
+                  <span className="acc-chevron">{isOpen ? '−' : '+'}</span>
+                </div>
+                {isOpen && (
+                  <div className="acc-body">
+                    <ul style={{paddingLeft: 20, margin: 0}}>
+                      {item.activities.map((a, j) => (
+                        <li key={j} style={{marginBottom: 6, fontSize:'0.9rem'}}>{a}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
-              <ul style={{paddingLeft: 20}}>
-                {item.activities.map((a, j) => (
-                  <li key={j} style={{marginBottom: 6, fontSize:'0.9rem'}}>{a}</li>
-                ))}
-              </ul>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       <div className="card" style={{marginTop:32, background:'#f0fdf4', borderColor:'#86efac'}}>

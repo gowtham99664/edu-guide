@@ -13,7 +13,7 @@ const allExams = [...engineeringExams, ...medicalExams, ...lawExams, ...manageme
 /* ── Pathway tree data ── */
 const afterTenthStreams = [
   {
-    id: 'mpc', name: 'MPC / PCM', full: 'Maths, Physics, Chemistry', color: '#2563eb',
+    id: 'mpc', name: 'MPC / PCM', full: 'Maths, Physics, Chemistry', color: '#2563eb', icon: '🔢',
     courses: [
       { name: 'B.Tech / B.E. (4 yrs)', eligibility: 'Class 12 with PCM, min 75% (65% SC/ST). Age: no limit for most.', exams: 'JEE Main, JEE Advanced, BITSAT, VITEEE, SRMJEEE, COMEDK, MHT CET, KCET, AP/TS EAMCET, WBJEE, KEAM, GUJCET, UPCET, CUET', colleges: 'IITs, NITs, IIITs, BITS, VIT, SRM, State Engg Colleges' },
       { name: 'B.Arch (5 yrs)', eligibility: 'Class 12 with PCM, min 50%. Maths mandatory.', exams: 'NATA, JEE Main Paper 2A', colleges: 'SPA Delhi, IIT Roorkee/Kharagpur, NIT Trichy, CEPT' },
@@ -30,7 +30,7 @@ const afterTenthStreams = [
     ]
   },
   {
-    id: 'bipc', name: 'BiPC / PCB', full: 'Biology, Physics, Chemistry', color: '#dc2626',
+    id: 'bipc', name: 'BiPC / PCB', full: 'Biology, Physics, Chemistry', color: '#dc2626', icon: '🧬',
     courses: [
       { name: 'MBBS (5.5 yrs)', eligibility: 'Class 12 with PCB, min 50% (40% SC/ST). Age: 17-25 at admission.', exams: 'NEET UG (only exam)', colleges: 'AIIMS (23), JIPMER, CMC Vellore, AFMC, Govt & Pvt Medical Colleges' },
       { name: 'BDS (Dental) (5 yrs)', eligibility: 'Class 12 with PCB, min 50%. NEET qualified.', exams: 'NEET UG', colleges: 'Maulana Azad Dental, Manipal, SDM, Govt Dental Colleges' },
@@ -49,13 +49,13 @@ const afterTenthStreams = [
     ]
   },
   {
-    id: 'mbipc', name: 'MBiPC / PCMB', full: 'Maths, Biology, Physics, Chemistry', color: '#7c3aed',
+    id: 'mbipc', name: 'MBiPC / PCMB', full: 'Maths, Biology, Physics, Chemistry', color: '#7c3aed', icon: '🔬',
     courses: [
       { name: 'All MPC courses + All BiPC courses', eligibility: 'Keeps both Engineering AND Medical paths open. Heavy workload in Class 11-12.', exams: 'JEE + NEET + all exams from both streams', colleges: 'All colleges from both MPC and BiPC streams' },
     ]
   },
   {
-    id: 'commerce', name: 'Commerce (CEC/MEC)', full: 'Accountancy, Business Studies, Economics', color: '#d97706',
+    id: 'commerce', name: 'Commerce (CEC/MEC)', full: 'Accountancy, Business Studies, Economics', color: '#d97706', icon: '💰',
     courses: [
       { name: 'B.Com (Hons) (3 yrs)', eligibility: 'Class 12 Commerce, min 50-60%.', exams: 'CUET UG, DU JAT', colleges: 'SRCC, Hindu College, Christ, St. Xavier\'s, Loyola, State Universities' },
       { name: 'BBA / BMS (3 yrs)', eligibility: 'Class 12 any stream (Commerce preferred). Min 50%.', exams: 'CUET, DU JAT, IPMAT, SET, Christ entrance', colleges: 'IIM Indore (IPM), DU, Christ, Symbiosis, NMIMS, Shaheed Sukhdev College' },
@@ -71,7 +71,7 @@ const afterTenthStreams = [
     ]
   },
   {
-    id: 'arts', name: 'Arts / Humanities (HEC)', full: 'History, Pol Sci, Geography, Psychology, Sociology, Languages', color: '#0d9488',
+    id: 'arts', name: 'Arts / Humanities (HEC)', full: 'History, Pol Sci, Geography, Psychology, Sociology, Languages', color: '#0d9488', icon: '🎨',
     courses: [
       { name: 'BA (Hons) (3 yrs)', eligibility: 'Class 12 any stream.', exams: 'CUET UG', colleges: 'DU, JNU, BHU, Jadavpur, Presidency, HCU, JMI, AMU, Christ, St. Xaviers' },
       { name: 'BA LLB (5 yrs)', eligibility: 'Class 12 any stream, min 45%.', exams: 'CLAT, AILET, LSAT India, State LAWCETs', colleges: '23+ NLUs, DU Law Faculty, ILS Pune, GLC Mumbai' },
@@ -97,7 +97,7 @@ const afterTenthStreams = [
     ]
   },
   {
-    id: 'vocational', name: 'Vocational / Diploma / ITI', full: 'Polytechnic, ITI, Skill courses', color: '#059669',
+    id: 'vocational', name: 'Vocational / Diploma / ITI', full: 'Polytechnic, ITI, Skill courses', color: '#059669', icon: '🔧',
     courses: [
       { name: 'Polytechnic Diploma (3 yrs)', eligibility: 'Class 10 passed.', exams: 'State POLYCET / DET', colleges: 'Govt Polytechnics in every state. Lateral entry to B.Tech 2nd year after diploma.' },
       { name: 'ITI (Industrial Training, 1-2 yrs)', eligibility: 'Class 8/10 depending on trade.', exams: 'State ITI entrance / merit based', colleges: 'Govt & Pvt ITIs. Trades: Fitter, Electrician, Welder, Mechanic, COPA, etc.' },
@@ -136,6 +136,19 @@ export default function Home() {
   const toggleCourse = (key) => setOpenCourses(p => ({...p, [key]: !p[key]}))
   const toggleGradCourse = (i) => setOpenGradCourse(p => ({...p, [i]: !p[i]}))
 
+  const expandAllStreams = () => {
+    const all = {}
+    afterTenthStreams.forEach(s => { all[s.id] = true })
+    setOpenStreams(all)
+  }
+  const collapseAllStreams = () => { setOpenStreams({}); setOpenCourses({}) }
+  const expandAllGrad = () => {
+    const all = {}
+    afterGradPaths.forEach((_, i) => { all[i] = true })
+    setOpenGradCourse(all)
+  }
+  const collapseAllGrad = () => setOpenGradCourse({})
+
   const categories = [
     { icon: '🏫', title: 'School Entrance Exams', desc: 'Navodaya, Sainik, NTSE & more', link: '/school-exams', count: schoolEntranceExams.length, countLabel: 'exams' },
     { icon: '📝', title: 'Entrance Exams', desc: 'JEE, NEET, CLAT, CAT & 100+ exams', link: '/entrance-exams', count: allExams.length, countLabel: 'exams' },
@@ -152,7 +165,7 @@ export default function Home() {
   return (
     <div>
       <div className="hero">
-        <h1>EduPathway India - Your Complete Education Guide</h1>
+        <h1>Vidya Maarg — Your Complete Education Guide</h1>
         <p>From school entrance exams to post-graduation — explore every pathway, entrance exam, college, and career option across all states and union territories.</p>
         <div className="hero-cards">
           {categories.map(c => (
@@ -222,6 +235,10 @@ export default function Home() {
         <div className="td-vline"></div>
 
         {/* ── LEVEL 2: 6 Streams ── */}
+        <div className="td-controls">
+          <button className="td-ctrl-btn" onClick={expandAllStreams}>Expand All Streams</button>
+          <button className="td-ctrl-btn" onClick={collapseAllStreams}>Collapse All</button>
+        </div>
         <div className="td-level td-level-streams">
           <div className="td-hline-wrap"><div className="td-hline"></div></div>
           <div className="td-children">
@@ -229,6 +246,7 @@ export default function Home() {
               <div key={stream.id} className="td-branch">
                 <div className="td-connector"></div>
                 <div className={'td-node td-node-stream' + (openStreams[stream.id] ? ' td-node-open' : '')} style={{'--sc': stream.color}} onClick={() => toggleStream(stream.id)}>
+                  <span className="td-stream-icon">{stream.icon}</span>
                   <strong>{stream.name}</strong>
                   <div className="td-node-sub">{stream.full}</div>
                   <div className="td-node-count">{stream.courses.length} courses {openStreams[stream.id] ? '▲' : '▼'}</div>
@@ -274,6 +292,10 @@ export default function Home() {
         <div className="td-vline"></div>
 
         {/* ── LEVEL 2b: Post-grad paths ── */}
+        <div className="td-controls">
+          <button className="td-ctrl-btn" onClick={expandAllGrad}>Expand All PG Paths</button>
+          <button className="td-ctrl-btn" onClick={collapseAllGrad}>Collapse All</button>
+        </div>
         <div className="td-level td-level-postgrad">
           <div className="td-hline-wrap"><div className="td-hline"></div></div>
           <div className="td-children">
@@ -314,41 +336,41 @@ export default function Home() {
       </div>
 
       <div className="card-grid">
-        <div className="card">
-          <h3 style={{color: 'var(--primary-dark)', marginBottom: 12}}>Engineering (B.Tech/B.E.)</h3>
-          <p style={{fontSize:'0.9rem', color:'var(--text-light)', marginBottom:12}}>National: JEE Main, JEE Advanced, BITSAT, CUET | State: KCET, MHT CET, AP/TS EAMCET, WBJEE, KEAM, COMEDK</p>
-          <p style={{fontSize:'0.85rem'}}>Top Colleges: 23 IITs | 31 NITs | 26 IIITs | BITS Pilani | VIT | SRM</p>
-          <Link to="/entrance-exams?category=Engineering" style={{display:'inline-block', marginTop:12, fontWeight:600}}>Explore Engineering Exams &rarr;</Link>
+        <div className="card qa-card">
+          <h3>Engineering (B.Tech/B.E.)</h3>
+          <p className="qa-card-exams">National: JEE Main, JEE Advanced, BITSAT, CUET | State: KCET, MHT CET, AP/TS EAMCET, WBJEE, KEAM, COMEDK</p>
+          <p className="qa-card-colleges">Top Colleges: 23 IITs | 31 NITs | 26 IIITs | BITS Pilani | VIT | SRM</p>
+          <Link to="/entrance-exams?category=Engineering" className="qa-card-link">Explore Engineering Exams &rarr;</Link>
         </div>
-        <div className="card">
-          <h3 style={{color: 'var(--primary-dark)', marginBottom: 12}}>Medical (MBBS/BDS/AYUSH)</h3>
-          <p style={{fontSize:'0.9rem', color:'var(--text-light)', marginBottom:12}}>NEET UG is the ONLY exam for all medical admissions in India (since 2016)</p>
-          <p style={{fontSize:'0.85rem'}}>Top Colleges: AIIMS (23) | JIPMER | CMC Vellore | AFMC | State Medical Colleges</p>
-          <Link to="/entrance-exams?category=Medical" style={{display:'inline-block', marginTop:12, fontWeight:600}}>Explore Medical Exams &rarr;</Link>
+        <div className="card qa-card">
+          <h3>Medical (MBBS/BDS/AYUSH)</h3>
+          <p className="qa-card-exams">NEET UG is the ONLY exam for all medical admissions in India (since 2016)</p>
+          <p className="qa-card-colleges">Top Colleges: AIIMS (23) | JIPMER | CMC Vellore | AFMC | State Medical Colleges</p>
+          <Link to="/entrance-exams?category=Medical" className="qa-card-link">Explore Medical Exams &rarr;</Link>
         </div>
-        <div className="card">
-          <h3 style={{color: 'var(--primary-dark)', marginBottom: 12}}>MBA/Management</h3>
-          <p style={{fontSize:'0.9rem', color:'var(--text-light)', marginBottom:12}}>CAT, XAT, MAT, CMAT, SNAP, NMAT, IIFT, TISSNET + State CETs</p>
-          <p style={{fontSize:'0.85rem'}}>Top Colleges: 21 IIMs | XLRI | FMS Delhi | ISB | SPJIMR | JBIMS</p>
-          <Link to="/entrance-exams?category=Management" style={{display:'inline-block', marginTop:12, fontWeight:600}}>Explore MBA Exams &rarr;</Link>
+        <div className="card qa-card">
+          <h3>MBA/Management</h3>
+          <p className="qa-card-exams">CAT, XAT, MAT, CMAT, SNAP, NMAT, IIFT, TISSNET + State CETs</p>
+          <p className="qa-card-colleges">Top Colleges: 21 IIMs | XLRI | FMS Delhi | ISB | SPJIMR | JBIMS</p>
+          <Link to="/entrance-exams?category=Management" className="qa-card-link">Explore MBA Exams &rarr;</Link>
         </div>
-        <div className="card">
-          <h3 style={{color: 'var(--primary-dark)', marginBottom: 12}}>Law (LLB/BA LLB)</h3>
-          <p style={{fontSize:'0.9rem', color:'var(--text-light)', marginBottom:12}}>CLAT (23 NLUs), AILET (NLU Delhi), LSAT India, MH CET Law, State LAWCETs</p>
-          <p style={{fontSize:'0.85rem'}}>Top Colleges: NLSIU Bangalore | NALSAR | NLU Delhi | NUJS Kolkata</p>
-          <Link to="/entrance-exams?category=Law" style={{display:'inline-block', marginTop:12, fontWeight:600}}>Explore Law Exams &rarr;</Link>
+        <div className="card qa-card">
+          <h3>Law (LLB/BA LLB)</h3>
+          <p className="qa-card-exams">CLAT (23 NLUs), AILET (NLU Delhi), LSAT India, MH CET Law, State LAWCETs</p>
+          <p className="qa-card-colleges">Top Colleges: NLSIU Bangalore | NALSAR | NLU Delhi | NUJS Kolkata</p>
+          <Link to="/entrance-exams?category=Law" className="qa-card-link">Explore Law Exams &rarr;</Link>
         </div>
-        <div className="card">
-          <h3 style={{color: 'var(--primary-dark)', marginBottom: 12}}>Design & Architecture</h3>
-          <p style={{fontSize:'0.9rem', color:'var(--text-light)', marginBottom:12}}>NID DAT, NIFT Entrance, UCEED, CEED, NATA, JEE Main Paper 2</p>
-          <p style={{fontSize:'0.85rem'}}>Top Colleges: NID | NIFT | SPA Delhi | IIT B.Des | Srishti</p>
-          <Link to="/entrance-exams?category=Design" style={{display:'inline-block', marginTop:12, fontWeight:600}}>Explore Design Exams &rarr;</Link>
+        <div className="card qa-card">
+          <h3>Design & Architecture</h3>
+          <p className="qa-card-exams">NID DAT, NIFT Entrance, UCEED, CEED, NATA, JEE Main Paper 2</p>
+          <p className="qa-card-colleges">Top Colleges: NID | NIFT | SPA Delhi | IIT B.Des | Srishti</p>
+          <Link to="/entrance-exams?category=Design" className="qa-card-link">Explore Design Exams &rarr;</Link>
         </div>
-        <div className="card">
-          <h3 style={{color: 'var(--primary-dark)', marginBottom: 12}}>Scholarships & Cutoffs</h3>
-          <p style={{fontSize:'0.9rem', color:'var(--text-light)', marginBottom:12}}>Central & State scholarships, NIRF rankings, latest cutoff data for all major exams</p>
-          <p style={{fontSize:'0.85rem'}}>NSP, Post Matric, Merit-cum-Means, Minority, SC/ST/OBC scholarships</p>
-          <Link to="/scholarships" style={{display:'inline-block', marginTop:12, fontWeight:600}}>Explore Scholarships &rarr;</Link>
+        <div className="card qa-card">
+          <h3>Scholarships & Cutoffs</h3>
+          <p className="qa-card-exams">Central & State scholarships, NIRF rankings, latest cutoff data for all major exams</p>
+          <p className="qa-card-colleges">NSP, Post Matric, Merit-cum-Means, Minority, SC/ST/OBC scholarships</p>
+          <Link to="/scholarships" className="qa-card-link">Explore Scholarships &rarr;</Link>
         </div>
       </div>
 
@@ -356,8 +378,8 @@ export default function Home() {
         <div className="section-header">
           <h1>Important Notes for Students (2025)</h1>
         </div>
-        <div className="card" style={{background: '#fffbeb', borderColor: '#fbbf24'}}>
-          <ul style={{paddingLeft: 20, lineHeight: 2}}>
+        <div className="card notes-card">
+          <ul>
             <li><strong>NEET UG</strong> is the single entrance exam for ALL MBBS, BDS, AYUSH, Veterinary admissions. No separate AIIMS/JIPMER exams anymore.</li>
             <li><strong>CUET UG</strong> is mandatory for ALL Central University admissions (DU, JNU, BHU, JMI, AMU, etc.) from 2022 onwards.</li>
             <li><strong>JEE Main</strong> is conducted twice a year (Jan & Apr). Best score counts. Top 2.5 lakh qualify for JEE Advanced.</li>

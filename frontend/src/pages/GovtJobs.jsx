@@ -4,9 +4,12 @@ import { centralGovtJobs, majorPSUs, stateJobsMap, northeastOtherGovtJobs } from
 const allCourses = centralGovtJobs.map(c => c.course)
 
 export default function GovtJobs() {
-  const [mode, setMode] = useState('central') // 'central' | 'state' | 'psus'
+  const [mode, setMode] = useState('central')
   const [selectedState, setSelectedState] = useState('')
   const [selectedCourse, setSelectedCourse] = useState('')
+  const [expandedPsu, setExpandedPsu] = useState({})
+
+  const togglePsu = (i) => setExpandedPsu(p => ({ ...p, [i]: !p[i] }))
 
   const filteredCentral = selectedCourse
     ? centralGovtJobs.filter(c => c.course === selectedCourse)
@@ -33,27 +36,20 @@ export default function GovtJobs() {
         <p>Explore central government jobs, state government jobs, and major PSUs — filtered by your course/qualification. Data covers 15+ qualifications and 25+ major PSUs.</p>
       </div>
 
-      {/* Disclaimer */}
       <div className="card" style={{ background: '#fff8e1', borderLeft: '4px solid #f9a825', marginBottom: '1.5rem' }}>
         <p style={{ margin: 0, fontSize: '0.92rem', lineHeight: 1.6 }}>
-          <strong>Disclaimer:</strong> Government job eligibility, recruitment processes, and salary structures change frequently. Please verify all information from official websites (UPSC, respective PSC, PSU/organization portals) before applying. We have made our best effort to compile accurate information, but there may be deviations.
+          <strong>Disclaimer:</strong> Government job eligibility, recruitment processes, and salary structures change frequently. Please verify all information from official websites (UPSC, respective PSC, PSU/organization portals) before applying.
         </p>
       </div>
 
-      {/* Tab bar using filter-btn pills */}
       <div className="filters-bar" style={{ marginBottom: '1.5rem' }}>
         {tabs.map(t => (
-          <button
-            key={t.id}
-            className={`filter-btn${mode === t.id ? ' active' : ''}`}
-            onClick={() => { setMode(t.id); setSelectedCourse(''); setSelectedState(''); }}
-          >
+          <button key={t.id} className={`filter-btn${mode === t.id ? ' active' : ''}`} onClick={() => { setMode(t.id); setSelectedCourse(''); setSelectedState(''); setExpandedPsu({}) }}>
             {t.label}
           </button>
         ))}
       </div>
 
-      {/* Course filter (central & state) */}
       {mode !== 'psus' && (
         <div className="filters-bar">
           <div className="filter-group">
@@ -184,7 +180,6 @@ export default function GovtJobs() {
                 </div>
               ))}
 
-              {/* Northeast grouped display */}
               {selectedState === 'assam' && northeastOtherGovtJobs && (
                 <div style={{ marginTop: '1.5rem' }}>
                   <h3 style={{ marginBottom: '1rem' }}>Other North-East States</h3>
@@ -211,7 +206,7 @@ export default function GovtJobs() {
         </div>
       )}
 
-      {/* ===== MAJOR PSUs ===== */}
+      {/* ===== MAJOR PSUs (ACCORDION) ===== */}
       {mode === 'psus' && (
         <div>
           <div className="card" style={{ background: '#eff6ff', borderLeft: '4px solid var(--primary)', marginBottom: '1.5rem' }}>
@@ -223,43 +218,53 @@ export default function GovtJobs() {
           <div className="results-count">Showing <strong>{majorPSUs.length}</strong> major PSUs</div>
 
           <div className="card-grid">
-            {majorPSUs.map((psu, i) => (
-              <div key={i} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ background: 'var(--primary)', color: 'white', padding: '12px 16px', borderRadius: 'var(--radius) var(--radius) 0 0' }}>
-                  <h3 style={{ margin: '0 0 2px', fontSize: '1rem' }}>{psu.shortName}</h3>
-                  <small style={{ opacity: 0.85 }}>{psu.sector}</small>
-                </div>
-                <div style={{ padding: 14, flex: 1 }}>
-                  <p style={{ margin: '0 0 6px', fontWeight: 600, fontSize: '0.9rem' }}>{psu.name}</p>
-                  <div className="info-row">
-                    <span className="info-label">HQ:</span>
-                    <span className="info-value">{psu.hq}</span>
+            {majorPSUs.map((psu, i) => {
+              const isOpen = expandedPsu[i]
+              return (
+                <div key={i} className={`card${isOpen ? ' acc-open' : ''}`}>
+                  <div className="acc-header" onClick={() => togglePsu(i)}>
+                    <div className="acc-header-info">
+                      <h3>{psu.shortName}</h3>
+                      <div className="acc-badges">
+                        <span className="badge badge-primary">{psu.sector}</span>
+                      </div>
+                      <p className="acc-subtitle" style={{marginTop: 4}}>{psu.name}</p>
+                    </div>
+                    <span className="acc-chevron">{isOpen ? '−' : '+'}</span>
                   </div>
-                  {psu.centres && (
-                    <div className="info-row">
-                      <span className="info-label">Key Centres:</span>
-                      <span className="info-value" style={{ fontSize: '0.82rem' }}>{psu.centres.join(', ')}</span>
+
+                  {isOpen && (
+                    <div className="acc-body">
+                      <div className="info-row">
+                        <span className="acc-detail-label">HQ:</span>
+                        <span className="acc-detail-value">{psu.hq}</span>
+                      </div>
+                      {psu.centres && (
+                        <div className="info-row">
+                          <span className="acc-detail-label">Key Centres:</span>
+                          <span className="acc-detail-value" style={{ fontSize: '0.84rem' }}>{psu.centres.join(', ')}</span>
+                        </div>
+                      )}
+                      <div className="info-row">
+                        <span className="acc-detail-label">Recruitment:</span>
+                        <span className="acc-detail-value">{psu.recruitment}</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8 }}>
+                        {psu.eligibleDegrees.map(d => <span key={d} className="badge badge-success">{d}</span>)}
+                      </div>
+                      <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                        <a href={psu.website} target="_blank" rel="noopener noreferrer" className="filter-btn" style={{ fontSize: '0.82rem', textDecoration: 'none' }}>Careers</a>
+                        {psu.prevPapersLink && <a href={psu.prevPapersLink} target="_blank" rel="noopener noreferrer" className="filter-btn" style={{ fontSize: '0.82rem', textDecoration: 'none', background: 'transparent', color: 'var(--primary)', border: '1px solid var(--primary)' }}>Papers</a>}
+                      </div>
                     </div>
                   )}
-                  <div className="info-row">
-                    <span className="info-label">Recruitment:</span>
-                    <span className="info-value" style={{ fontSize: '0.85rem' }}>{psu.recruitment}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 8 }}>
-                    {psu.eligibleDegrees.map(d => <span key={d} className="badge badge-success">{d}</span>)}
-                  </div>
                 </div>
-                <div style={{ padding: '10px 16px', borderTop: '1px solid var(--border)', display: 'flex', gap: 8 }}>
-                  <a href={psu.website} target="_blank" rel="noopener noreferrer" className="filter-btn" style={{ fontSize: '0.82rem', textDecoration: 'none' }}>Careers</a>
-                  {psu.prevPapersLink && <a href={psu.prevPapersLink} target="_blank" rel="noopener noreferrer" className="filter-btn" style={{ fontSize: '0.82rem', textDecoration: 'none', background: 'transparent', color: 'var(--primary)', border: '1px solid var(--primary)' }}>Papers</a>}
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}
 
-      {/* Footer Disclaimer */}
       <div className="card" style={{ marginTop: '1.5rem', background: '#fff8e1', borderLeft: '4px solid #f9a825' }}>
         <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>
           We tried our best to gather all information, but there might be some deviations. Kindly check with official government websites, respective PSC portals, and PSU career pages for the most accurate and updated information.
