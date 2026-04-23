@@ -1,61 +1,26 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import schoolEntranceExams from '../data/schoolEntranceExams'
 
-const PER_PAGE = 15
-const ALL_CLASSES = [...new Set(schoolEntranceExams.map(e => e.forClass))].sort()
-const ALL_FREQUENCIES = [...new Set(schoolEntranceExams.map(e => e.frequency).filter(Boolean))]
-
-function getPaginationRange(current, total) {
-  const delta = 2
-  const range = []
-  const left = Math.max(2, current - delta)
-  const right = Math.min(total - 1, current + delta)
-  range.push(1)
-  if (left > 2) range.push('...')
-  for (let i = left; i <= right; i++) range.push(i)
-  if (right < total - 1) range.push('...')
-  if (total > 1) range.push(total)
-  return range
-}
-
 export default function SchoolExams() {
-  const [expanded, setExpanded] = useState({})
-  const [syllabusOpen, setSyllabusOpen] = useState({})
-  const [page, setPage] = useState(1)
-  const [search, setSearch] = useState('')
-  const [classFilter, setClassFilter] = useState('All')
-  const [freqFilter, setFreqFilter] = useState('All')
+  const [examId, setExamId] = useState('')
+  const [forClass, setForClass] = useState('')
 
-  const toggle = (id) => setExpanded(p => ({ ...p, [id]: !p[id] }))
-  const toggleSyllabus = (examId, key) => {
-    const k = `${examId}-${key}`
-    setSyllabusOpen(p => ({ ...p, [k]: !p[k] }))
-  }
+  const classOptions = useMemo(() => {
+    return [...new Set(schoolEntranceExams.map((e) => e.forClass).filter(Boolean))].sort()
+  }, [])
 
-  const filtered = useMemo(() => {
-    return schoolEntranceExams.filter(exam => {
-      const q = search.toLowerCase()
-      const matchesSearch = !q ||
-        exam.name.toLowerCase().includes(q) ||
-        exam.conductedBy?.toLowerCase().includes(q)
-      const matchesClass = classFilter === 'All' || exam.forClass === classFilter
-      const matchesFreq = freqFilter === 'All' || exam.frequency === freqFilter
-      return matchesSearch && matchesClass && matchesFreq
+  const filteredExams = useMemo(() => {
+    return schoolEntranceExams.filter((exam) => {
+      if (examId && exam.id !== examId) return false
+      if (forClass && exam.forClass !== forClass) return false
+      return true
     })
-  }, [search, classFilter, freqFilter])
+  }, [examId, forClass])
 
-  const totalPages = Math.ceil(filtered.length / PER_PAGE)
-  const safePage = Math.min(page, totalPages || 1)
-  const paginated = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
-
-  const handlePageChange = (p) => {
-    if (p >= 1 && p <= totalPages) setPage(p)
+  const clearFilters = () => {
+    setExamId('')
+    setForClass('')
   }
-
-  // Reset page when filters change
-  const updateSearch = (v) => { setSearch(v); setPage(1) }
-  const updateClass = (v) => { setClassFilter(v); setPage(1) }
-  const updateFreq = (v) => { setFreqFilter(v); setPage(1) }
 
   return (
     <div>
@@ -64,138 +29,73 @@ export default function SchoolExams() {
         <p>Entrance exams for Navodaya Vidyalaya, Sainik Schools, Military Schools, Residential Schools (AP/TS Gurukul), Olympiads, Scholarships (NTSE, NMMS), and more.</p>
       </div>
 
-      <div className="pg-toolbar">
-        <div className="pg-search-wrap">
-          <span className="pg-search-icon">🔍</span>
-          <input
-            className="pg-search-input"
-            type="text"
-            placeholder="Search exams by name or conducting body..."
-            value={search}
-            onChange={e => updateSearch(e.target.value)}
-          />
-          {search && <button className="pg-search-clear" onClick={() => updateSearch('')}>✕</button>}
-        </div>
-        <div className="pg-filter-row">
-          <div className="pg-pills">
-            <span className="pg-pill-label">Class:</span>
-            <button className={`pg-pill${classFilter === 'All' ? ' pg-pill-active' : ''}`} onClick={() => updateClass('All')}>All</button>
-            {ALL_CLASSES.map(c => (
-              <button key={c} className={`pg-pill${classFilter === c ? ' pg-pill-active' : ''}`} onClick={() => updateClass(c)}>{c}</button>
+      <div className="filters-bar">
+        <div className="filter-group">
+          <label>Exam</label>
+          <select className="filter-select" value={examId} onChange={(e) => setExamId(e.target.value)}>
+            <option value="">All School Exams</option>
+            {schoolEntranceExams.map((exam) => (
+              <option key={exam.id} value={exam.id}>{exam.name}</option>
             ))}
-          </div>
-          <div className="pg-pills">
-            <span className="pg-pill-label">Frequency:</span>
-            <button className={`pg-pill${freqFilter === 'All' ? ' pg-pill-active' : ''}`} onClick={() => updateFreq('All')}>All</button>
-            {ALL_FREQUENCIES.map(f => (
-              <button key={f} className={`pg-pill${freqFilter === f ? ' pg-pill-active' : ''}`} onClick={() => updateFreq(f)}>{f}</button>
-            ))}
-          </div>
+          </select>
         </div>
+        <div className="filter-group">
+          <label>For Class</label>
+          <select className="filter-select" value={forClass} onChange={(e) => setForClass(e.target.value)}>
+            <option value="">All Classes</option>
+            {classOptions.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+        {(examId || forClass) && <button className="filter-btn clear" onClick={clearFilters}>Clear</button>}
       </div>
 
-      <div className="results-count">
-        Showing <strong>{paginated.length}</strong> of <strong>{filtered.length}</strong> exams
-      </div>
+      <div className="results-count">Showing <strong>{filteredExams.length}</strong> of <strong>{schoolEntranceExams.length}</strong> school exams</div>
 
-      {filtered.length === 0 ? (
-        <div className="empty-state">
-          <h3>No exams found</h3>
-          <p>Try adjusting your search or filter criteria.</p>
-        </div>
-      ) : (
-        <div className="pg-acc-list">
-          {paginated.map(exam => {
-            const isOpen = expanded[exam.id]
-            return (
-              <div key={exam.id} className={`card pg-acc-card${isOpen ? ' acc-open' : ''}`}>
-                <div className="acc-header" onClick={() => toggle(exam.id)}>
-                  <div className="acc-header-info">
-                    <h3>{exam.name}</h3>
-                    <p>{exam.conductedBy}</p>
-                    <div className="acc-badges">
-                      <span className="badge badge-primary">{exam.forClass}</span>
-                      {exam.frequency && <span className="badge badge-success">{exam.frequency}</span>}
-                      {exam.statesCovered && <span className="badge badge-info">{exam.statesCovered}</span>}
+      <div className="card-grid">
+        {filteredExams.map(exam => (
+          <div key={exam.id} className="card exam-card">
+            <div className="exam-name">{exam.name}</div>
+            <div className="exam-body">{exam.conductedBy}</div>
+            <p style={{fontSize:'0.85rem', marginBottom:6}}><strong>For:</strong> {exam.forClass}</p>
+            <p style={{fontSize:'0.85rem', marginBottom:6, color:'var(--text-light)'}}>{exam.eligibility?.substring(0, 150)}{exam.eligibility?.length > 150 ? '...' : ''}</p>
+            <div className="exam-meta">
+              <span className="badge badge-primary">{exam.forClass}</span>
+              {exam.frequency && <span className="badge badge-success">{exam.frequency}</span>}
+              {exam.statesCovered && <span className="badge badge-info">{exam.statesCovered}</span>}
+            </div>
+
+            <div style={{marginTop:16, paddingTop:12, borderTop:'1px solid var(--border)'}}>
+              <h4 style={{fontSize:'0.9rem', marginBottom:6}}>Exam Pattern:</h4>
+              <p style={{fontSize:'0.85rem'}}>{exam.examPattern}</p>
+
+              {exam.syllabus && (
+                <div style={{marginTop:8}}>
+                  <h4 style={{fontSize:'0.9rem', marginBottom:4}}>Syllabus Highlights:</h4>
+                  {Object.entries(exam.syllabus).map(([key, val]) => (
+                    <div key={key} style={{marginBottom:6}}>
+                      <strong style={{fontSize:'0.8rem', textTransform:'capitalize'}}>{key.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ')}:</strong>
+                      {Array.isArray(val) && <ul style={{paddingLeft:16, fontSize:'0.8rem'}}>{val.slice(0, 4).map((v, i) => <li key={i}>{v}</li>)}{val.length > 4 && <li>+{val.length - 4} more topics...</li>}</ul>}
                     </div>
-                  </div>
-                  <span className="acc-chevron">{isOpen ? '−' : '+'}</span>
+                  ))}
                 </div>
+              )}
 
-                {isOpen && (
-                  <div className="acc-body">
-                    {/* Inline metadata row */}
-                    <div className="pg-meta-row">
-                      {exam.eligibility && <span className="pg-meta-tag"><strong>Eligibility:</strong> {exam.eligibility}</span>}
-                      {exam.frequency && <span className="pg-meta-tag"><strong>Frequency:</strong> {exam.frequency}</span>}
-                      {exam.examPattern && <span className="pg-meta-tag"><strong>Pattern:</strong> {exam.examPattern}</span>}
-                      {exam.statesCovered && <span className="pg-meta-tag"><strong>States:</strong> {exam.statesCovered}</span>}
-                    </div>
+              {exam.schools && <p style={{fontSize:'0.85rem', marginTop:8}}><strong>Schools:</strong> {exam.schools.substring(0, 200)}{exam.schools.length > 200 ? '...' : ''}</p>}
+              {exam.scholarship && <p style={{fontSize:'0.85rem', marginTop:4, color:'var(--success)'}}><strong>Scholarship:</strong> {exam.scholarship}</p>}
+              {exam.applicationPeriod && <p style={{fontSize:'0.85rem', marginTop:4}}><strong>Application:</strong> {exam.applicationPeriod} | <strong>Exam:</strong> {exam.examMonth}</p>}
+              {exam.website && <p style={{marginTop:8}}><a href={exam.website} target="_blank" rel="noopener noreferrer" style={{fontWeight:600}}>Official Website &rarr;</a></p>}
+              {exam.importantNotes && <p style={{fontSize:'0.8rem', marginTop:8, padding:8, background:'#fffbeb', borderRadius:6}}>{exam.importantNotes}</p>}
+            </div>
+          </div>
+        ))}
+      </div>
 
-                    {exam.syllabus && (
-                      <div className="pg-acc-section">
-                        <h4 className="pg-acc-section-title">Syllabus Highlights</h4>
-                        {Object.entries(exam.syllabus).map(([key, val]) => {
-                          const syllKey = `${exam.id}-${key}`
-                          const isSubOpen = syllabusOpen[syllKey]
-                          return (
-                            <div key={key} className="pg-syllabus-item">
-                              <button className="pg-syllabus-toggle" onClick={() => toggleSyllabus(exam.id, key)}>
-                                <span className="pg-syllabus-name">
-                                  {key.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ')}
-                                </span>
-                                <span className="acc-chevron pg-syllabus-chevron">{isSubOpen ? '−' : '+'}</span>
-                              </button>
-                              {isSubOpen && Array.isArray(val) && (
-                                <ul className="pg-acc-list-items pg-syllabus-topics">
-                                  {val.map((v, i) => <li key={i}>{v}</li>)}
-                                </ul>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )}
-
-                    <div className="pg-meta-row">
-                      {exam.schools && <span className="pg-meta-tag"><strong>Schools:</strong> {exam.schools}</span>}
-                      {exam.applicationPeriod && <span className="pg-meta-tag"><strong>Apply:</strong> {exam.applicationPeriod}</span>}
-                      {exam.examMonth && <span className="pg-meta-tag"><strong>Exam:</strong> {exam.examMonth}</span>}
-                    </div>
-
-                    {exam.scholarship && (
-                      <div className="pg-scholarship-highlight">
-                        <span className="acc-detail-label">Scholarship:</span>
-                        <span className="acc-detail-value">{exam.scholarship}</span>
-                      </div>
-                    )}
-
-                    {exam.website && (
-                      <a href={exam.website} target="_blank" rel="noopener noreferrer" className="acc-link">Official Website →</a>
-                    )}
-
-                    {exam.importantNotes && (
-                      <div className="acc-note">{exam.importantNotes}</div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button disabled={safePage === 1} onClick={() => handlePageChange(safePage - 1)}>« Prev</button>
-          {getPaginationRange(safePage, totalPages).map((p, i) =>
-            p === '...' ? (
-              <span key={`ellipsis-${i}`} className="pg-pagination-ellipsis">…</span>
-            ) : (
-              <button key={p} className={safePage === p ? 'active' : ''} onClick={() => handlePageChange(p)}>{p}</button>
-            )
-          )}
-          <button disabled={safePage === totalPages} onClick={() => handlePageChange(safePage + 1)}>Next »</button>
+      {filteredExams.length === 0 && (
+        <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
+          <h3>No school exams found</h3>
+          <p style={{ margin: 0, color: 'var(--text-light)' }}>Try selecting a different exam or class filter.</p>
         </div>
       )}
     </div>
