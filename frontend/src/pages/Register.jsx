@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { api } from '../utils/api'
 
 export default function Register() {
   const { register, user } = useAuth()
@@ -12,21 +11,9 @@ export default function Register() {
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [showPw, setShowPw] = useState(false)
-  const [step, setStep] = useState('form')
-  const [otpValues, setOtpValues] = useState(['', '', '', '', '', ''])
-  const [otpLoading, setOtpLoading] = useState(false)
-  const [otpError, setOtpError] = useState('')
-  const [otpSent, setOtpSent] = useState(false)
-  const [resendTimer, setResendTimer] = useState(0)
-  const otpRefs = useRef([])
+  const [done, setDone] = useState(false)
 
   useEffect(() => { if (user) navigate('/') }, [user])
-  useEffect(() => {
-    if (resendTimer > 0) {
-      const t = setTimeout(() => setResendTimer(resendTimer - 1), 1000)
-      return () => clearTimeout(t)
-    }
-  }, [resendTimer])
 
   const validate = () => {
     const e = {}
@@ -42,89 +29,19 @@ export default function Register() {
     return e
   }
 
-  const handleSendOtp = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
     setErrors({})
-    setOtpLoading(true)
-    setOtpError('')
-    const result = await api.post('/api/send-otp', { email: form.email })
-    setOtpLoading(false)
-    if (result.error) {
-      setErrors({ api: result.error })
-    } else {
-      setOtpSent(true)
-      setStep('otp')
-      setResendTimer(60)
-      setOtpValues(['', '', '', '', '', ''])
-      setTimeout(() => otpRefs.current[0]?.focus(), 100)
-    }
-  }
-
-  const handleOtpChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return
-    const newOtp = [...otpValues]
-    newOtp[index] = value.slice(-1)
-    setOtpValues(newOtp)
-    if (value && index < 5) otpRefs.current[index + 1]?.focus()
-  }
-
-  const handleOtpKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !otpValues[index] && index > 0)
-      otpRefs.current[index - 1]?.focus()
-  }
-
-  const handleOtpPaste = (e) => {
-    const paste = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
-    if (paste.length === 6) {
-      setOtpValues(paste.split(''))
-      otpRefs.current[5]?.focus()
-      e.preventDefault()
-    }
-  }
-
-  const handleVerifyOtp = async () => {
-    const otp = otpValues.join('')
-    if (otp.length !== 6) { setOtpError('Please enter the complete 6-digit code'); return }
-    setOtpLoading(true)
-    setOtpError('')
-    const result = await api.post('/api/verify-otp', { email: form.email, otp })
-    setOtpLoading(false)
-    if (result.error) {
-      setOtpError(result.error)
-      setOtpValues(['', '', '', '', '', ''])
-      otpRefs.current[0]?.focus()
-    } else {
-      await completeRegistration()
-    }
-  }
-
-  const completeRegistration = async () => {
     setLoading(true)
-    setErrors({})
     const result = await register(form)
     setLoading(false)
     if (result.error) {
       setErrors({ api: result.error })
-      setStep('form')
     } else {
-      setStep('done')
+      setDone(true)
       setTimeout(() => navigate('/'), 2000)
-    }
-  }
-
-  const handleResendOtp = async () => {
-    if (resendTimer > 0) return
-    setOtpLoading(true)
-    setOtpError('')
-    const result = await api.post('/api/send-otp', { email: form.email })
-    setOtpLoading(false)
-    if (result.error) setOtpError(result.error)
-    else {
-      setResendTimer(60)
-      setOtpValues(['', '', '', '', '', ''])
-      otpRefs.current[0]?.focus()
     }
   }
 
@@ -137,7 +54,6 @@ export default function Register() {
         onChange={e => setForm(p => ({ ...p, [name]: e.target.value }))}
         placeholder={placeholder}
         autoComplete={name === 'password' ? 'new-password' : name === 'confirm_password' ? 'new-password' : name}
-        disabled={step === 'otp'}
         className={errors[name] ? 'input-error' : ''}
       />
       {errors[name] && <span className="field-error">{errors[name]}</span>}
@@ -146,7 +62,6 @@ export default function Register() {
 
   return (
     <div className="login-page">
-      {/* Header - reuse from login */}
       <header className="login-header">
         <div className="login-header-inner">
           <div className="login-logo">
@@ -166,7 +81,6 @@ export default function Register() {
       </header>
 
       <main className="login-main">
-        {/* Left Illustration */}
         <div className="login-illustration">
           <div className="illustration-content">
             <svg viewBox="0 0 600 500" fill="none" xmlns="http://www.w3.org/2000/svg" className="hero-svg">
@@ -201,23 +115,17 @@ export default function Register() {
           </div>
         </div>
 
-        {/* Right: Register Form */}
         <div className="login-form-section register-form-section">
           <div className="login-card register-card">
             <div className="login-card-header">
-              <h2>{step === 'otp' ? 'Verify Email' : step === 'done' ? 'Welcome!' : 'Create Account'}</h2>
-              <p>{step === 'otp'
-                ? `6-digit code sent to ${form.email}`
-                : step === 'done'
-                ? 'Account created successfully!'
-                : 'Join Vidya Maarg'}</p>
+              <h2>{done ? 'Welcome!' : 'Create Account'}</h2>
+              <p>{done ? 'Account created successfully!' : 'Join Vidya Maarg'}</p>
             </div>
 
             {errors.api && <div className="alert-error">{errors.api}</div>}
 
-            {/* Step 1: Form */}
-            {step === 'form' && (
-              <form onSubmit={handleSendOtp} className="login-form register-form">
+            {!done ? (
+              <form onSubmit={handleSubmit} className="login-form register-form">
                 <div className="field-row">
                   {field('first_name', 'First Name', 'text', 'Your Name')}
                   {field('last_name', 'Last Name', 'text', 'Your Surname')}
@@ -249,54 +157,11 @@ export default function Register() {
 
                 {field('confirm_password', 'Confirm Password', 'password', 'Re-enter password')}
 
-                <button type="submit" className="btn-login" disabled={otpLoading}>
-                  {otpLoading ? 'Sending code...' : 'Continue & Verify Email'}
+                <button type="submit" className="btn-login" disabled={loading}>
+                  {loading ? 'Creating account...' : 'Create Account'}
                 </button>
               </form>
-            )}
-
-            {/* Step 2: OTP */}
-            {step === 'otp' && (
-              <div className="otp-section">
-                {otpError && <div className="alert-error">{otpError}</div>}
-                <div className="otp-boxes" onPaste={handleOtpPaste}>
-                  {otpValues.map((val, i) => (
-                    <input
-                      key={i}
-                      ref={el => otpRefs.current[i] = el}
-                      className={`otp-box ${val ? 'filled' : ''}`}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={1}
-                      value={val}
-                      onChange={e => handleOtpChange(i, e.target.value)}
-                      onKeyDown={e => handleOtpKeyDown(i, e)}
-                      autoFocus={i === 0}
-                    />
-                  ))}
-                </div>
-                <button
-                  className="btn-login"
-                  onClick={handleVerifyOtp}
-                  disabled={otpLoading || otpValues.join('').length !== 6}
-                >
-                  {otpLoading ? 'Verifying...' : loading ? 'Creating account...' : 'Verify & Create Account'}
-                </button>
-                <div className="otp-actions">
-                  <span className="otp-timer">
-                    {resendTimer > 0
-                      ? `Resend in ${resendTimer}s`
-                      : <button className="link-btn" onClick={handleResendOtp} disabled={otpLoading}>Resend Code</button>}
-                  </span>
-                  <button className="link-btn" onClick={() => { setStep('form'); setOtpError('') }}>
-                    Change details
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Done */}
-            {step === 'done' && (
+            ) : (
               <div className="done-section">
                 <div className="done-check">&#10003;</div>
                 <h3>Account Created!</h3>
@@ -304,7 +169,7 @@ export default function Register() {
               </div>
             )}
 
-            {step !== 'done' && (
+            {!done && (
               <p className="switch-auth">
                 Already have an account? <Link to="/login">Sign in</Link>
               </p>

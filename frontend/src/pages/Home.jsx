@@ -10,10 +10,10 @@ import { careerPaths } from '../data/careerPaths'
 
 const allExams = [...engineeringExams, ...medicalExams, ...lawExams, ...managementExams, ...designExams, ...architectureExams, ...agricultureExams, ...teachingExams, ...professionalExams, ...researchExams, ...culinaryExams, ...horticultureExams]
 
-/* ── Pathway tree data ── */
+/* ── Pathway data ── */
 const afterTenthStreams = [
   {
-    id: 'mpc', name: 'MPC / PCM', full: 'Maths, Physics, Chemistry', color: '#2563eb', icon: '🔢',
+    id: 'mpc', name: 'MPC / PCM', full: 'Maths, Physics, Chemistry', color: '#2563eb',
     courses: [
       { name: 'B.Tech / B.E. (4 yrs)', eligibility: 'Class 12 with PCM, min 75% (65% SC/ST). Age: no limit for most.', exams: 'JEE Main, JEE Advanced, BITSAT, VITEEE, SRMJEEE, COMEDK, MHT CET, KCET, AP/TS EAMCET, WBJEE, KEAM, GUJCET, UPCET, CUET', colleges: 'IITs, NITs, IIITs, BITS, VIT, SRM, State Engg Colleges' },
       { name: 'B.Arch (5 yrs)', eligibility: 'Class 12 with PCM, min 50%. Maths mandatory.', exams: 'NATA, JEE Main Paper 2A', colleges: 'SPA Delhi, IIT Roorkee/Kharagpur, NIT Trichy, CEPT' },
@@ -23,14 +23,14 @@ const afterTenthStreams = [
       { name: 'B.Sc Nautical Science (3 yrs)', eligibility: 'Class 12 PCM, min 60%. Age: 17-25.', exams: 'IMU CET', colleges: 'IMU Chennai, MERI Mumbai, TS Chanakya' },
       { name: 'BCA (3 yrs)', eligibility: 'Class 12 with Maths (some accept without).', exams: 'CUET, University entrances', colleges: 'Christ, Symbiosis, NIT Trichy (MCA integrated), State Universities' },
       { name: 'B.Sc Aviation (3 yrs)', eligibility: 'Class 12 PCM, min 50%.', exams: 'University entrances', colleges: 'Rajiv Gandhi Aviation University, Amity, Hindustan University' },
-      { name: 'NDA (Army/Navy/Air Force)', eligibility: 'Class 12 PCM (for Navy/AF). Age: 16.5-19.5. Unmarried males & females.', exams: 'NDA Exam (UPSC) + SSB Interview', colleges: 'NDA Khadakwasla → IMA/INA/AFA' },
+      { name: 'NDA (Army/Navy/Air Force)', eligibility: 'Class 12 PCM (for Navy/AF). Age: 16.5-19.5. Unmarried males & females.', exams: 'NDA Exam (UPSC) + SSB Interview', colleges: 'NDA Khadakwasla then IMA/INA/AFA' },
       { name: 'Merchant Navy (DNS/B.Sc Nautical)', eligibility: 'Class 12 PCM, min 60%. Age: 17-25.', exams: 'IMU CET', colleges: 'IMU, TS Chanakya, MERI' },
       { name: 'B.Planning (4 yrs)', eligibility: 'Class 12 with Maths.', exams: 'JEE Main Paper 2B', colleges: 'SPA Delhi/Bhopal/Vijayawada, IIT Kharagpur/Roorkee' },
       { name: 'Integrated M.Sc (5 yrs)', eligibility: 'Class 12 PCM.', exams: 'JAM, IIT entrance, CUET', colleges: 'IITs, Central Universities, NISERs' },
     ]
   },
   {
-    id: 'bipc', name: 'BiPC / PCB', full: 'Biology, Physics, Chemistry', color: '#dc2626', icon: '🧬',
+    id: 'bipc', name: 'BiPC / PCB', full: 'Biology, Physics, Chemistry', color: '#dc2626',
     courses: [
       { name: 'MBBS (5.5 yrs)', eligibility: 'Class 12 with PCB, min 50% (40% SC/ST). Age: 17-25 at admission.', exams: 'NEET UG (only exam)', colleges: 'AIIMS (23), JIPMER, CMC Vellore, AFMC, Govt & Pvt Medical Colleges' },
       { name: 'BDS (Dental) (5 yrs)', eligibility: 'Class 12 with PCB, min 50%. NEET qualified.', exams: 'NEET UG', colleges: 'Maulana Azad Dental, Manipal, SDM, Govt Dental Colleges' },
@@ -49,19 +49,19 @@ const afterTenthStreams = [
     ]
   },
   {
-    id: 'mbipc', name: 'MBiPC / PCMB', full: 'Maths, Biology, Physics, Chemistry', color: '#7c3aed', icon: '🔬',
+    id: 'mbipc', name: 'MBiPC / PCMB', full: 'Maths, Biology, Physics, Chemistry', color: '#7c3aed',
     courses: [
       { name: 'All MPC courses + All BiPC courses', eligibility: 'Keeps both Engineering AND Medical paths open. Heavy workload in Class 11-12.', exams: 'JEE + NEET + all exams from both streams', colleges: 'All colleges from both MPC and BiPC streams' },
     ]
   },
   {
-    id: 'commerce', name: 'Commerce (CEC/MEC)', full: 'Accountancy, Business Studies, Economics', color: '#d97706', icon: '💰',
+    id: 'commerce', name: 'Commerce (CEC/MEC)', full: 'Accountancy, Business Studies, Economics', color: '#d97706',
     courses: [
       { name: 'B.Com (Hons) (3 yrs)', eligibility: 'Class 12 Commerce, min 50-60%.', exams: 'CUET UG, DU JAT', colleges: 'SRCC, Hindu College, Christ, St. Xavier\'s, Loyola, State Universities' },
       { name: 'BBA / BMS (3 yrs)', eligibility: 'Class 12 any stream (Commerce preferred). Min 50%.', exams: 'CUET, DU JAT, IPMAT, SET, Christ entrance', colleges: 'IIM Indore (IPM), DU, Christ, Symbiosis, NMIMS, Shaheed Sukhdev College' },
-      { name: 'CA (Chartered Accountant)', eligibility: 'Can register for CA Foundation after Class 12. Any stream.', exams: 'CA Foundation → Intermediate → Final (ICAI exams)', colleges: 'ICAI - self study + coaching. Can do alongside B.Com.' },
-      { name: 'CS (Company Secretary)', eligibility: 'Can register after Class 12. Any stream.', exams: 'CS Foundation → Executive → Professional (ICSI exams)', colleges: 'ICSI - self study + coaching' },
-      { name: 'CMA (Cost & Management Accountant)', eligibility: 'Can register after Class 12. Any stream.', exams: 'CMA Foundation → Intermediate → Final (ICMAI exams)', colleges: 'ICMAI - self study + coaching' },
+      { name: 'CA (Chartered Accountant)', eligibility: 'Can register for CA Foundation after Class 12. Any stream.', exams: 'CA Foundation, Intermediate, Final (ICAI exams)', colleges: 'ICAI - self study + coaching. Can do alongside B.Com.' },
+      { name: 'CS (Company Secretary)', eligibility: 'Can register after Class 12. Any stream.', exams: 'CS Foundation, Executive, Professional (ICSI exams)', colleges: 'ICSI - self study + coaching' },
+      { name: 'CMA (Cost & Management Accountant)', eligibility: 'Can register after Class 12. Any stream.', exams: 'CMA Foundation, Intermediate, Final (ICMAI exams)', colleges: 'ICMAI - self study + coaching' },
       { name: 'BA LLB / BBA LLB (5 yrs)', eligibility: 'Class 12 any stream, min 45% (40% SC/ST). Age: max 20 (22 SC/ST).', exams: 'CLAT, AILET, LSAT India, MH CET Law, AP/TS LAWCET', colleges: '23 NLUs, DU Law Faculty, ILS Pune, GLC Mumbai, Symbiosis Law' },
       { name: 'B.Com LLB (5 yrs)', eligibility: 'Class 12 Commerce preferred.', exams: 'CLAT, University entrances', colleges: 'GNLU, NLU Jodhpur, Symbiosis' },
       { name: 'BBA LLB (5 yrs)', eligibility: 'Class 12 any stream.', exams: 'CLAT, AILET, University entrances', colleges: 'NLUs, NLSIU, Symbiosis Law' },
@@ -71,7 +71,7 @@ const afterTenthStreams = [
     ]
   },
   {
-    id: 'arts', name: 'Arts / Humanities (HEC)', full: 'History, Pol Sci, Geography, Psychology, Sociology, Languages', color: '#0d9488', icon: '🎨',
+    id: 'arts', name: 'Arts / Humanities', full: 'History, Pol Sci, Geography, Psychology, Sociology, Languages', color: '#0d9488',
     courses: [
       { name: 'BA (Hons) (3 yrs)', eligibility: 'Class 12 any stream.', exams: 'CUET UG', colleges: 'DU, JNU, BHU, Jadavpur, Presidency, HCU, JMI, AMU, Christ, St. Xaviers' },
       { name: 'BA LLB (5 yrs)', eligibility: 'Class 12 any stream, min 45%.', exams: 'CLAT, AILET, LSAT India, State LAWCETs', colleges: '23+ NLUs, DU Law Faculty, ILS Pune, GLC Mumbai' },
@@ -97,307 +97,372 @@ const afterTenthStreams = [
     ]
   },
   {
-    id: 'vocational', name: 'Vocational / Diploma / ITI', full: 'Polytechnic, ITI, Skill courses', color: '#059669', icon: '🔧',
+    id: 'vocational', name: 'Vocational / Diploma', full: 'Polytechnic, ITI, Skill courses', color: '#059669',
     courses: [
       { name: 'Polytechnic Diploma (3 yrs)', eligibility: 'Class 10 passed.', exams: 'State POLYCET / DET', colleges: 'Govt Polytechnics in every state. Lateral entry to B.Tech 2nd year after diploma.' },
       { name: 'ITI (Industrial Training, 1-2 yrs)', eligibility: 'Class 8/10 depending on trade.', exams: 'State ITI entrance / merit based', colleges: 'Govt & Pvt ITIs. Trades: Fitter, Electrician, Welder, Mechanic, COPA, etc.' },
-      { name: 'Diploma in Engineering (3 yrs)', eligibility: 'Class 10 passed.', exams: 'State POLYCET', colleges: 'Govt Polytechnics → Lateral entry to B.Tech 2nd year' },
+      { name: 'Diploma in Engineering (3 yrs)', eligibility: 'Class 10 passed.', exams: 'State POLYCET', colleges: 'Govt Polytechnics, lateral entry to B.Tech 2nd year' },
       { name: 'Diploma in Pharmacy (D.Pharm) (2 yrs)', eligibility: 'Class 12 PCB/PCM.', exams: 'State POLYCET / Pharmacy CET', colleges: 'State Pharmacy Councils, Govt Pharmacy Colleges' },
       { name: 'ANM / GNM Nursing (1.5-3.5 yrs)', eligibility: 'Class 12 (ANM: Class 10 also). Age: 17-35.', exams: 'State Nursing CET', colleges: 'Govt Nursing Schools, District Hospitals' },
     ]
   },
 ]
 
-/* After Graduation cross-paths */
 const afterGradPaths = [
+  // 0 - Management
   { name: 'MBA / PGDM (2 yrs)', eligibility: 'Any Bachelor\'s degree (any stream). Min 50%.', exams: 'CAT, XAT, MAT, CMAT, SNAP, NMAT, IIFT, GMAT', colleges: '21 IIMs, XLRI, FMS Delhi, ISB, MDI, SPJIMR, JBIMS, NMIMS, SIBM' },
-  { name: 'M.Tech / ME (2 yrs)', eligibility: 'B.Tech/B.E. in relevant branch. Min 60%.', exams: 'GATE', colleges: 'IITs, IISc, NITs. Also: PSU recruitment (IOCL, NTPC, BHEL, ONGC) via GATE' },
+  // 1 - Engineering PG
+  { name: 'M.Tech / ME (2 yrs)', eligibility: 'B.Tech/B.E. in relevant branch. Min 60%.', exams: 'GATE (primary), PGCET (Karnataka, AP, TS), CCMT (NIT/IIIT counselling via GATE), IIT-specific written tests (IISc, some IITs for direct admission), BITS HD, University entrance exams', colleges: 'IITs, IISc, NITs, IIITs, BITS (M.E.). Also: PSU recruitment (IOCL, NTPC, BHEL, ONGC, GAIL, BARC) via GATE score', note: 'GATE is the main route but NOT the only one. Some IITs conduct their own written tests + interview. State universities have PGCET. BITS has its own HD entrance.' },
+  // 2 - Law PG (3yr LLB)
   { name: 'LLB (3 yrs) — after ANY graduation', eligibility: 'Any Bachelor\'s degree. Min 45%. No age limit.', exams: 'MH CET Law (3yr), DU LLB entrance, BHU LLB, University entrances', colleges: 'DU Law Faculty, BHU, Symbiosis, GLC Mumbai, ILS Pune, State Law Colleges', note: 'Engineers, Doctors, Commerce, Arts — ALL can do LLB after graduation!' },
-  { name: 'MD / MS (Medical PG, 3 yrs)', eligibility: 'MBBS degree + Internship.', exams: 'NEET PG', colleges: 'AIIMS, PGI, CMC, JIPMER, Govt Medical Colleges' },
-  { name: 'LLM (1-2 yrs)', eligibility: 'LLB/BA LLB degree.', exams: 'CLAT PG, University entrances', colleges: 'NLUs, DU, NLU Delhi, NALSAR' },
-  { name: 'M.Sc (2 yrs)', eligibility: 'B.Sc in relevant subject. Min 50%.', exams: 'IIT JAM, CUET PG, University entrances', colleges: 'IITs, IISc, IISERs, Central & State Universities' },
-  { name: 'MA (2 yrs)', eligibility: 'BA in relevant subject (some accept any grad).', exams: 'CUET PG, University entrances', colleges: 'JNU, DU, BHU, HCU, Jadavpur, AMU' },
-  { name: 'MCA (2 yrs)', eligibility: 'Any graduation with Maths at 12th/grad level. Min 50%.', exams: 'NIMCET, State MCA CET, CUET PG', colleges: 'NIT Trichy/Warangal, JNU, BHU, Anna University' },
-  { name: 'M.Pharm (2 yrs)', eligibility: 'B.Pharm degree.', exams: 'GPAT', colleges: 'NIPER, BITS, Jamia Hamdard, Manipal' },
-  { name: 'UGC NET / CSIR NET (Teaching/Research)', eligibility: 'Master\'s degree with 55%.', exams: 'UGC NET, CSIR NET', colleges: 'Assistant Professor in Universities. JRF for PhD research.' },
-  { name: 'PhD / FPM (3-5 yrs)', eligibility: 'Master\'s degree (PhD). B.Tech+GATE or NET for some.', exams: 'GATE, UGC NET, CSIR NET, JEST, TIFR GS, University entrance', colleges: 'IITs, IISc, IISERs, TIFR, IIMs (FPM), Central Universities' },
-  { name: 'DM / MCh (Super Specialty, 3 yrs)', eligibility: 'MD/MS degree.', exams: 'NEET SS', colleges: 'AIIMS, PGI, NIMHANS, CMC, top medical institutes' },
+  // 3 - Medical PG
+  { name: 'MD / MS (Medical PG, 3 yrs)', eligibility: 'MBBS degree + Internship completion.', exams: 'NEET PG (only exam for all MD/MS admissions)', colleges: 'AIIMS (23), PGI Chandigarh, CMC Vellore, JIPMER, NIMHANS, Govt Medical Colleges' },
+  // 4 - LLM
+  { name: 'LLM (1-2 yrs)', eligibility: 'LLB/BA LLB degree.', exams: 'CLAT PG, AILET PG, University entrances', colleges: 'NLUs, DU, NLU Delhi, NALSAR, NLSIU' },
+  // 5 - M.Sc
+  { name: 'M.Sc (2 yrs)', eligibility: 'B.Sc in relevant subject. Min 50%.', exams: 'IIT JAM, CUET PG, BHU PET, University entrances', colleges: 'IITs, IISc, IISERs, JNU, BHU, DU, Central & State Universities' },
+  // 6 - MA
+  { name: 'MA (2 yrs)', eligibility: 'BA in relevant subject (some accept any grad).', exams: 'CUET PG, JNU entrance, BHU PET, University entrances', colleges: 'JNU, DU, BHU, HCU, Jadavpur, AMU, TISS' },
+  // 7 - MCA
+  { name: 'MCA (2 yrs)', eligibility: 'Any graduation with Maths at 12th/grad level. Min 50%.', exams: 'NIMCET, State MCA CET, CUET PG', colleges: 'NIT Trichy/Warangal/Allahabad, JNU, BHU, Anna University' },
+  // 8 - M.Pharm
+  { name: 'M.Pharm (2 yrs)', eligibility: 'B.Pharm degree. Min 55%.', exams: 'GPAT (primary), NIPER JEE, State PG Pharmacy CET', colleges: 'NIPER (7 campuses), BITS, Jamia Hamdard, Manipal, ICT Mumbai' },
+  // 9 - UGC/CSIR NET
+  { name: 'UGC NET / CSIR NET (Teaching & Research eligibility)', eligibility: 'Master\'s degree with 55% (50% SC/ST/OBC/PwD).', exams: 'UGC NET (Humanities/Social Sci/Commerce), CSIR NET (Science subjects)', colleges: 'Qualifies for Assistant Professor in any University/College. JRF for PhD research funding.', note: 'NET is an eligibility test, not an admission exam. JRF provides Rs. 37,000/month fellowship for PhD.' },
+  // 10 - PhD
+  { name: 'PhD / FPM (3-5 yrs)', eligibility: 'Master\'s degree (PhD). B.Tech+GATE or NET/JRF for some. FPM: any PG or B.Tech with good scores.', exams: 'GATE, UGC NET, CSIR NET, JEST, TIFR GS, NBHM, IIT/IISc written tests, University entrance', colleges: 'IITs, IISc, IISERs, TIFR, HRI, CMI, IIMs (FPM), JNU, Central Universities' },
+  // 11 - Super specialty
+  { name: 'DM / MCh (Super Specialty, 3 yrs)', eligibility: 'MD/MS degree in relevant specialty.', exams: 'NEET SS (only exam)', colleges: 'AIIMS, PGI, NIMHANS, CMC, SGPGI Lucknow, Sanjay Gandhi PGI' },
+  // 12 - DNB
+  { name: 'DNB (Diplomate of National Board, 3 yrs)', eligibility: 'MBBS degree + Internship.', exams: 'NEET PG (counselling via NBE)', colleges: 'NBE-accredited hospitals (Apollo, Fortis, Max, Medanta, Narayana Health, private & corporate hospitals)', note: 'DNB is equivalent to MD/MS. Training happens in accredited hospitals, not just medical colleges.' },
+  // 13 - MFA/Performing Arts
   { name: 'MFA / M.Mus / MA Performing Arts (2 yrs)', eligibility: 'BFA/BPA/BA in relevant art form. Audition/portfolio.', exams: 'University entrance + audition/portfolio', colleges: 'MSU Baroda, BHU, Hyderabad Univ, JJ School of Art, Rabindra Bharati, Kalakshetra' },
+  // 14 - Sports PG
   { name: 'M.P.Ed / M.Sc Sports Science (2 yrs)', eligibility: 'B.P.Ed / B.Sc Sports Science / any graduation with sports background.', exams: 'University entrance + physical fitness', colleges: 'LNIPE Gwalior, NIS Patiala, IGIPESS Delhi, Pune University, State Universities' },
+  // 15 - Film/Mass Comm PG
   { name: 'PG Diploma in Film / Mass Communication (1-2 yrs)', eligibility: 'Any graduation. Age varies.', exams: 'FTII entrance, IIMC entrance, Institute tests', colleges: 'FTII Pune, SRFTI Kolkata, IIMC Delhi, ACJ Chennai, Symbiosis, XIC Mumbai' },
+  // 16 - UPSC Civil Services
+  { name: 'UPSC Civil Services (IAS/IPS/IFS/IRS)', eligibility: 'Any Bachelor\'s degree from a recognized university. Age: 21-32 (Gen), relaxation for SC/ST/OBC. Max 6 attempts (Gen).', exams: 'UPSC CSE: Prelims (June) → Mains (Sep) → Interview (Feb-Apr)', colleges: 'LBSNAA Mussoorie (IAS), SVPNPA Hyderabad (IPS), FSI (IFS). Training after selection.', note: 'India\'s most prestigious exam. ~10 lakh applicants, ~1000 selected. Optional subjects include Maths, Pub Admin, Sociology, History, Geography, etc.' },
+  // 17 - State PSC
+  { name: 'State PSC (State Civil Services)', eligibility: 'Any Bachelor\'s degree. Age varies by state (21-37 typically). Domicile required for most states.', exams: 'State PSC exams: UPPSC, MPPSC, BPSC, TSPSC, APPSC, RPSC, WBPSC, KPSC, TNPSC, GPSC, HPSC, JPSC etc.', colleges: 'State Administrative Training Institutes. Posts: SDM, DSP, BDO, Tehsildar, RTO, etc.' },
+  // 18 - Banking
+  { name: 'Banking (PO/Clerk/SO)', eligibility: 'Any Bachelor\'s degree. Age: 20-30 (PO), varies for Clerk/SO.', exams: 'IBPS PO, IBPS Clerk, IBPS SO, SBI PO, SBI Clerk, RBI Grade B, RBI Assistant, NABARD, SIDBI', colleges: 'Bank training centres after selection. RBI, SBI, PNB, BOB, Canara Bank, etc.', note: 'RBI Grade B is the most prestigious banking exam. SBI PO is the most popular.' },
+  // 19 - SSC
+  { name: 'SSC CGL / SSC CHSL / SSC MTS', eligibility: 'CGL: Any graduation. CHSL: Class 12. MTS: Class 10. Age: 18-32 (varies).', exams: 'SSC CGL (Tier 1+2), SSC CHSL (Tier 1+2), SSC MTS', colleges: 'Central Govt ministries/departments after selection. Posts: Inspector (IT/Customs/CBI), Auditor, Accountant, Tax Asst, LDC, UDC, etc.', note: 'SSC CGL leads to Group B & C posts in Central Govt. One of the largest recruitment exams in India.' },
+  // 20 - Defence (after graduation)
+  { name: 'CDS / SSB (Defence after Graduation)', eligibility: 'Any graduation for IMA/OTA. Engineering degree for TES (some entries). Unmarried. Age: 19-25 (varies by entry).', exams: 'CDS Exam (UPSC) + SSB Interview, AFCAT (Air Force), Indian Navy entrance (various entries)', colleges: 'IMA Dehradun (Army), INA Ezhimala (Navy), AFA Dundigal (Air Force), OTA Chennai (Short Service)', note: 'CDS is for permanent commission. SSC (Short Service Commission) also available. Women eligible for all branches.' },
+  // 21 - M.Des
+  { name: 'M.Des (2 yrs)', eligibility: 'B.Des / B.Arch / B.Tech / any graduation (varies by institute). Portfolio required.', exams: 'CEED (IITs/IISc), NID M.Des entrance, NIFT M.Des entrance, UCEED (for some)', colleges: 'IIT Bombay IDC, IIT Delhi, IIT Guwahati, IIT Hyderabad, IISc, NID (4 campuses), NIFT, DSK ISD Pune' },
+  // 22 - MSW
+  { name: 'MSW (Master of Social Work, 2 yrs)', eligibility: 'Any Bachelor\'s degree. Min 50%.', exams: 'TISS entrance (TISSNET + GD/PI), CUET PG, University entrances', colleges: 'TISS Mumbai/Tuljapur/Guwahati/Hyderabad, DU, JMI, Loyola Chennai, Madras School of Social Work' },
+  // 23 - M.Ed
+  { name: 'M.Ed (Master of Education, 2 yrs)', eligibility: 'B.Ed degree with 50%.', exams: 'State M.Ed CET, CUET PG, University entrances', colleges: 'CIE DU, BHU, Jamia Millia Islamia, State Universities, IGNOU' },
+  // 24 - CA/CS/CMA (can start after grad too)
+  { name: 'CA / CS / CMA (Professional Courses)', eligibility: 'CA: Can register after graduation (skip Foundation, direct Intermediate). CS/CMA: Similar.', exams: 'CA Intermediate + Final (ICAI), CS Executive + Professional (ICSI), CMA Intermediate + Final (ICMAI)', colleges: 'Self-study + coaching. Articleship (CA) under practicing CA for 3 years.', note: 'If you already have a Commerce/relevant graduation, you can skip Foundation and enter at Intermediate level directly.' },
+  // 25 - M.Plan
+  { name: 'M.Plan (Master of Planning, 2 yrs)', eligibility: 'B.Plan / B.Arch / B.Tech (Civil/relevant). Min 55%.', exams: 'GATE (Planning), IIT entrance, CEPT entrance, SPA entrance', colleges: 'SPA Delhi/Bhopal/Vijayawada, IIT Kharagpur/Roorkee, CEPT Ahmedabad' },
+  // 26 - Judiciary
+  { name: 'Judiciary / Judicial Services', eligibility: 'LLB/BA LLB degree. Age: 23-35 (varies by state).', exams: 'State Judicial Service Exam (Prelims + Mains + Interview). Each state conducts separately.', colleges: 'State Judicial Academies. Posts: Civil Judge (Junior Division), Magistrate.', note: 'Path to becoming a Judge. After years of experience, promotion to District Judge, High Court, and potentially Supreme Court.' },
+  // 27 - UPSC other services
+  { name: 'UPSC Other Services (ISS/IES/IFoS/CMS/CAPF)', eligibility: 'Varies: IES (Engineering grad), ISS (Stats PG), IFoS (Science grad), CMS (MBBS), CAPF (Any grad). Age: 21-32.', exams: 'UPSC IES/ISS (Engineering/Statistical Services), UPSC IFoS (Indian Forest Service), UPSC CMS (Combined Medical Services), UPSC CAPF (Central Armed Police Forces)', colleges: 'IGNFA Dehradun (IFoS), respective training academies. Posts: Asst Executive Engineer, Statistical Officer, Forest Officer, Medical Officer, CAPF officer.', note: 'These are separate UPSC exams, NOT through Civil Services. Each has its own eligibility and exam pattern.' },
+  // 28 - Railway
+  { name: 'Railways (RRB NTPC / Group D / JE / ALP)', eligibility: 'NTPC: Any graduation. JE: Engineering diploma/degree. Group D: Class 10. ALP: ITI/Diploma.', exams: 'RRB NTPC, RRB Group D, RRB JE, RRB ALP', colleges: 'Zonal Railway Training Institutes. Posts: Station Master, Goods Guard, Commercial Apprentice, Junior Engineer, Asst Loco Pilot.', note: 'Indian Railways is the largest employer in India. RRB NTPC alone gets 1+ crore applications.' },
+  // 29 - Insurance/PSU
+  { name: 'Insurance & PSU Exams', eligibility: 'Any graduation for most. Engineering degree for Technical PSU posts.', exams: 'LIC AAO/ADO, NIACL AO, UIIC AO, EPFO SSA/EO. PSU: GATE-based (IOCL, NTPC, BHEL, ONGC, GAIL, PGCIL, SAIL)', colleges: 'LIC, GIC, New India Assurance, Oriental Insurance. PSU training centres.', note: 'Engineering PSU recruitment is primarily through GATE score. Non-technical PSUs have their own exams.' },
+  // 30 - PG Diploma Management
+  { name: 'PGDM in Specialized Areas (1-2 yrs)', eligibility: 'Any Bachelor\'s degree. Work experience preferred for some.', exams: 'CAT/XAT/GMAT (for top institutes). Institute-specific tests for others.', colleges: 'ISB Hyderabad (PGP), XLRI (HRM), IRMA (Rural Mgmt), IIMC (Forest Mgmt), MANAGE (Agri), IIFM Bhopal, TISS (HRM/Social Enterprise)' },
+  // 31 - M.Arch
+  { name: 'M.Arch (2 yrs)', eligibility: 'B.Arch degree. Min 55%. Valid GATE score (Architecture).', exams: 'GATE (Architecture & Planning), CEED (some IITs), SPA entrance, Institute tests', colleges: 'SPA Delhi, IIT Roorkee/Kharagpur, CEPT, JJ College of Architecture, NIT Trichy' },
+]
+
+const schoolStages = [
+  { label: 'Nursery', sub: 'Age 2.5-4', num: 1 },
+  { label: 'LKG-UKG', sub: 'Age 4-6', num: 2 },
+  { label: 'Primary 1-5', sub: 'Age 6-11', num: 3 },
+  { label: 'Middle 6-8', sub: 'Age 11-14', num: 4 },
+  { label: 'Secondary 9-10', sub: 'Age 14-16', num: 5 },
 ]
 
 export default function Home() {
-  const [openStreams, setOpenStreams] = useState({})
+  const [activeStream, setActiveStream] = useState('mpc')
   const [openCourses, setOpenCourses] = useState({})
+  const [activeGradTab, setActiveGradTab] = useState(null)
   const [openGradCourse, setOpenGradCourse] = useState({})
 
-  const toggleStream = (id) => setOpenStreams(p => ({...p, [id]: !p[id]}))
   const toggleCourse = (key) => setOpenCourses(p => ({...p, [key]: !p[key]}))
   const toggleGradCourse = (i) => setOpenGradCourse(p => ({...p, [i]: !p[i]}))
 
-  const expandAllStreams = () => {
-    const all = {}
-    afterTenthStreams.forEach(s => { all[s.id] = true })
-    setOpenStreams(all)
-  }
-  const collapseAllStreams = () => { setOpenStreams({}); setOpenCourses({}) }
-  const expandAllGrad = () => {
-    const all = {}
-    afterGradPaths.forEach((_, i) => { all[i] = true })
-    setOpenGradCourse(all)
-  }
-  const collapseAllGrad = () => setOpenGradCourse({})
+  const selectedStream = afterTenthStreams.find(s => s.id === activeStream)
 
-  const categories = [
-    { icon: '🏫', title: 'School Entrance Exams', desc: 'Navodaya, Sainik, NTSE & more', link: '/school-exams', count: schoolEntranceExams.length, countLabel: 'exams' },
-    { icon: '📝', title: 'Entrance Exams', desc: 'JEE, NEET, CLAT, CAT & 100+ exams', link: '/entrance-exams', count: allExams.length, countLabel: 'exams' },
-    { icon: '🎓', title: 'Colleges & Universities', desc: 'IITs, NITs, AIIMS, IIMs & more', link: '/colleges', count: colleges.length, countLabel: 'colleges' },
-    { icon: '🗺️', title: 'State-wise Info', desc: 'All 28 States + 8 UTs covered', link: '/states', count: statesData.length, countLabel: 'states/UTs' },
-    { icon: '🧭', title: 'Career Paths', desc: '15+ career streams explored', link: '/career-paths', count: careerPaths.length, countLabel: 'paths' },
-    { icon: '📅', title: 'Prep Timeline', desc: 'Grade-wise preparation roadmap', link: '/timeline', count: 6, countLabel: 'stages' },
-    { icon: '🎓', title: 'Scholarships', desc: 'Central, Private, NGO & International', link: '/scholarships', count: 40, countLabel: 'scholarships' },
-    { icon: '🏛️', title: 'Government Jobs', desc: 'Central, State & PSU by qualification', link: '/govt-jobs', count: 15, countLabel: 'qualification groups' },
-    { icon: '💼', title: 'Internships', desc: 'Govt, Research, Corporate & International', link: '/internships', count: 50, countLabel: 'opportunities' },
-    { icon: '🔍', title: 'Search Everything', desc: 'Search across all exams & colleges', link: '/search', count: null, countLabel: '' },
+  const quickLinks = [
+    { icon: '~', title: 'School Exams', count: schoolEntranceExams.length, link: '/school-exams' },
+    { icon: '~', title: 'Entrance Exams', count: allExams.length, link: '/entrance-exams' },
+    { icon: '~', title: 'Colleges', count: colleges.length, link: '/colleges' },
+    { icon: '~', title: 'States & UTs', count: statesData.length, link: '/states' },
+    { icon: '~', title: 'Career Paths', count: careerPaths.length, link: '/career-paths' },
+  ]
+
+  const moreLinks = [
+    { title: 'Prep Timeline', desc: 'Grade-wise roadmap', link: '/timeline' },
+    { title: 'Scholarships', desc: '40+ scholarships', link: '/scholarships' },
+    { title: 'Govt Jobs', desc: 'Central, State & PSU', link: '/govt-jobs' },
+    { title: 'Internships', desc: '50+ opportunities', link: '/internships' },
+    { title: 'Search All', desc: 'Exams, colleges & more', link: '/search' },
+  ]
+
+  // Group grad paths for tabbed view
+  const gradGroups = [
+    { id: 'management', label: 'Management & MBA', indices: [0, 1, 24] },
+    { id: 'engineering-pg', label: 'Engineering & Tech PG', indices: [2, 3, 4, 5, 6] },
+    { id: 'law-pg', label: 'Law PG', indices: [7, 8] },
+    { id: 'medical-pg', label: 'Medical PG', indices: [9, 10, 11, 29, 30, 31, 25] },
+    { id: 'science-arts-pg', label: 'Science & Arts PG', indices: [12, 13, 23, 14, 27, 28, 15, 16, 17, 18, 19] },
+    { id: 'research', label: 'Research & Teaching', indices: [20, 21, 26] },
+    { id: 'professional', label: 'Professional Courses', indices: [22] },
   ]
 
   return (
     <div>
-      <div className="hero">
-        <h1>Vidya Maarg — Your Complete Education Guide</h1>
-        <p>From school entrance exams to post-graduation — explore every pathway, entrance exam, college, and career option across all states and union territories.</p>
-        <div className="hero-cards">
-          {categories.map(c => (
-            <Link key={c.link} to={c.link} className="hero-card">
-              <div className="icon">{c.icon}</div>
-              <h3>{c.title}</h3>
-              <p>{c.count ? `${c.count}+ ${c.countLabel} | ` : ''}{c.desc}</p>
+      {/* Hero */}
+      <section className="home-hero">
+        <div className="home-hero-text">
+          <h1>Your Complete Education Guide</h1>
+          <p>From nursery to PhD — explore every pathway, entrance exam, college, and career option across India.</p>
+          <div className="home-hero-actions">
+            <Link to="/build-profile" className="btn btn-primary btn-lg">Build Your Profile</Link>
+            <Link to="/my-path" className="btn btn-outline btn-lg">View My Path</Link>
+          </div>
+        </div>
+        <div className="home-hero-stats">
+          {quickLinks.map(q => (
+            <Link key={q.link} to={q.link} className="home-stat-link">
+              <span className="home-stat-num">{q.count}+</span>
+              <span className="home-stat-label">{q.title}</span>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* DISCLAIMER */}
+      {/* Quick navigation */}
+      <section className="home-nav-grid">
+        {moreLinks.map(l => (
+          <Link key={l.link} to={l.link} className="home-nav-item">
+            <div>
+              <strong>{l.title}</strong>
+              <span>{l.desc}</span>
+            </div>
+          </Link>
+        ))}
+      </section>
+
+      {/* Disclaimer */}
       <div className="disclaimer-bar">
-        <strong>Disclaimer:</strong> We have tried our best to gather all the information, but there might be some deviations. Kindly verify everything — especially fees, eligibility, and dates — directly with the respective colleges, universities, schools, or official exam websites before proceeding. Data is as of 2025.
+        <strong>Disclaimer:</strong> We have tried our best to gather all the information, but there might be some deviations. Kindly verify everything directly with the respective institutions. Data is as of 2025.
       </div>
 
-      {/* ===== AT-A-GLANCE PATHWAY TREE DIAGRAM ===== */}
-      <div className="section-header" style={{marginTop: 8}}>
-        <h1>Complete Education Pathway — Tree Diagram</h1>
-        <p>Click any node to expand. Lines show the flow from school to career.</p>
-      </div>
-
-      <div className="td">
-        {/* ── LEVEL 0: Root ── */}
-        <div className="td-root">
-          <div className="td-node td-node-root">Education Pathway<br/><small>India — Nursery to PhD</small></div>
+      {/* ===== EDUCATION JOURNEY ===== */}
+      <section className="home-section">
+        <div className="home-section-header">
+          <h2>Complete Education Pathway</h2>
+          <p>Explore the full journey from school to career — click on any stage to learn more.</p>
         </div>
-        <div className="td-vline td-vline-root"></div>
 
-        {/* ── LEVEL 1: School Stages (horizontal) ── */}
-        <div className="td-level td-level-school">
-          <div className="td-hline-wrap"><div className="td-hline"></div></div>
-          <div className="td-children">
-            <div className="td-branch">
-              <div className="td-connector"></div>
-              <div className="td-node td-node-nursery">Nursery<br/><small>Age 2.5–4</small></div>
-            </div>
-            <div className="td-branch">
-              <div className="td-connector"></div>
-              <div className="td-node td-node-lkg">LKG–UKG<br/><small>Age 4–6</small></div>
-            </div>
-            <div className="td-branch">
-              <div className="td-connector"></div>
-              <div className="td-node td-node-primary">Primary 1–5<br/><small>Age 6–11</small></div>
-            </div>
-            <div className="td-branch">
-              <div className="td-connector"></div>
-              <div className="td-node td-node-middle">Middle 6–8<br/><small>Age 11–14</small></div>
-            </div>
-            <div className="td-branch">
-              <div className="td-connector"></div>
-              <div className="td-node td-node-secondary">Secondary 9–10<br/><small>Age 14–16</small></div>
-            </div>
+        {/* Phase 1: School Stages */}
+        <div className="ej-phase">
+          <div className="ej-phase-label">Phase 1</div>
+          <h3 className="ej-phase-title">School Education</h3>
+          <div className="ej-stepper">
+            {schoolStages.map((s, i) => (
+              <div key={i} className="ej-step">
+                <div className="ej-step-circle">{s.num}</div>
+                <div className="ej-step-text">
+                  <strong>{s.label}</strong>
+                  <span>{s.sub}</span>
+                </div>
+                {i < schoolStages.length - 1 && <div className="ej-step-line"></div>}
+              </div>
+            ))}
+          </div>
+          <div className="ej-school-exams">
+            <span>Key school-level exams: KVS, JNVST, Sainik AISSEE, NMMS, RIMC, NTSE, Olympiads</span>
+            <Link to="/school-exams">View all school exams</Link>
           </div>
         </div>
 
-        {/* School exams note */}
-        <div className="td-note-bar">
-          <strong>School exams:</strong> KVS, JNVST, Sainik AISSEE, NMMS, RIMC, NTSE, Olympiads
-          <Link to="/school-exams" style={{marginLeft:8, fontWeight:600}}>View all →</Link>
-        </div>
+        {/* Phase 2: After Class 10 */}
+        <div className="ej-phase">
+          <div className="ej-phase-label">Phase 2</div>
+          <h3 className="ej-phase-title">After Class 10 — Choose Your Stream</h3>
+          <p className="ej-phase-desc">Select a stream below to see all available courses, entrance exams, and top colleges.</p>
 
-        {/* ── Big connector: After Class 10 ── */}
-        <div className="td-vline"></div>
-        <div className="td-node td-node-decision">After Class 10 — Choose Your Stream</div>
-        <div className="td-vline"></div>
+          <div className="ej-tabs">
+            {afterTenthStreams.map(s => (
+              <button
+                key={s.id}
+                className={'ej-tab' + (activeStream === s.id ? ' ej-tab-active' : '')}
+                style={activeStream === s.id ? {'--tab-color': s.color} : {}}
+                onClick={() => { setActiveStream(s.id); setOpenCourses({}) }}
+              >
+                <strong>{s.name}</strong>
+                <span>{s.courses.length} courses</span>
+              </button>
+            ))}
+          </div>
 
-        {/* ── LEVEL 2: 6 Streams ── */}
-        <div className="td-controls">
-          <button className="td-ctrl-btn" onClick={expandAllStreams}>Expand All Streams</button>
-          <button className="td-ctrl-btn" onClick={collapseAllStreams}>Collapse All</button>
-        </div>
-        <div className="td-level td-level-streams">
-          <div className="td-hline-wrap"><div className="td-hline"></div></div>
-          <div className="td-children">
-            {afterTenthStreams.map(stream => (
-              <div key={stream.id} className="td-branch">
-                <div className="td-connector"></div>
-                <div className={'td-node td-node-stream' + (openStreams[stream.id] ? ' td-node-open' : '')} style={{'--sc': stream.color}} onClick={() => toggleStream(stream.id)}>
-                  <span className="td-stream-icon">{stream.icon}</span>
-                  <strong>{stream.name}</strong>
-                  <div className="td-node-sub">{stream.full}</div>
-                  <div className="td-node-count">{stream.courses.length} courses {openStreams[stream.id] ? '▲' : '▼'}</div>
+          {selectedStream && (
+            <div className="ej-stream-panel">
+              <div className="ej-stream-header" style={{'--sc': selectedStream.color}}>
+                <div>
+                  <h4>{selectedStream.name}</h4>
+                  <p>{selectedStream.full}</p>
                 </div>
-
-                {/* ── LEVEL 3: Courses under each stream ── */}
-                {openStreams[stream.id] && (
-                  <div className="td-subtree">
-                    <div className="td-vline-sub"></div>
-                    {stream.courses.map((c, i) => {
-                      const key = stream.id + '_' + i
-                      return (
-                        <div key={key} className="td-leaf-row">
-                          <div className="td-leaf-hline" style={{'--sc': stream.color}}></div>
-                          <div className={'td-node td-node-leaf' + (openCourses[key] ? ' td-node-open' : '')} style={{'--sc': stream.color}} onClick={() => toggleCourse(key)}>
-                            <span>{c.name}</span>
-                            <span className="td-expand-icon">{openCourses[key] ? '−' : '+'}</span>
+                <span className="ej-stream-count">{selectedStream.courses.length} courses available</span>
+              </div>
+              <div className="ej-course-list">
+                {selectedStream.courses.map((c, i) => {
+                  const key = selectedStream.id + '_' + i
+                  const isOpen = openCourses[key]
+                  return (
+                    <div key={key} className={'ej-course' + (isOpen ? ' ej-course-open' : '')}>
+                      <div className="ej-course-header" onClick={() => toggleCourse(key)}>
+                        <span className="ej-course-name">{c.name}</span>
+                        <span className="ej-course-toggle">{isOpen ? '−' : '+'}</span>
+                      </div>
+                      {isOpen && (
+                        <div className="ej-course-detail">
+                          <div className="ej-detail-row">
+                            <span className="ej-detail-label">Eligibility</span>
+                            <span className="ej-detail-value">{c.eligibility}</span>
                           </div>
-                          {openCourses[key] && (
-                            <div className="td-leaf-detail" style={{'--sc': stream.color}}>
-                              <div className="tcd-row"><span className="tcd-label">Eligibility:</span> {c.eligibility}</div>
-                              <div className="tcd-row"><span className="tcd-label">Entrance Exams:</span> {c.exams}</div>
-                              <div className="tcd-row"><span className="tcd-label">Top Colleges:</span> {c.colleges}</div>
-                              {c.note && <div className="tcd-note">{c.note}</div>}
-                            </div>
-                          )}
+                          <div className="ej-detail-row">
+                            <span className="ej-detail-label">Entrance Exams</span>
+                            <span className="ej-detail-value">{c.exams}</span>
+                          </div>
+                          <div className="ej-detail-row">
+                            <span className="ej-detail-label">Top Colleges</span>
+                            <span className="ej-detail-value">{c.colleges}</span>
+                          </div>
+                          {c.note && <div className="ej-detail-note">{c.note}</div>}
                         </div>
-                      )
-                    })}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  )
+                })}
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* Phase 3: After Graduation */}
+        <div className="ej-phase">
+          <div className="ej-phase-label">Phase 3</div>
+          <h3 className="ej-phase-title">After Graduation — Higher Studies & Cross Paths</h3>
+          <p className="ej-phase-desc">Any graduate can pursue these paths regardless of their undergraduate stream.</p>
+
+          <div className="ej-tabs">
+            {gradGroups.map(g => (
+              <button
+                key={g.id}
+                className={'ej-tab' + (activeGradTab === g.id ? ' ej-tab-active' : '')}
+                onClick={() => { setActiveGradTab(activeGradTab === g.id ? null : g.id); setOpenGradCourse({}) }}
+              >
+                <strong>{g.label}</strong>
+                <span>{g.indices.length} {g.indices.length === 1 ? 'path' : 'paths'}</span>
+              </button>
             ))}
           </div>
-        </div>
 
-        {/* ── Big connector: After Graduation ── */}
-        <div className="td-vline" style={{marginTop:24}}></div>
-        <div className="td-node td-node-decision">After Graduation — Cross-Eligibility Paths</div>
-        <div className="td-note-bar" style={{fontSize:'0.82rem'}}>
-          Engineers → Law/MBA | Doctors → MBA/Public Health | Arts → Law/MA/M.Ed | Commerce → CA/CS/MBA | ANY grad → LLB/MBA/M.Ed/PhD
-        </div>
-        <div className="td-vline"></div>
-
-        {/* ── LEVEL 2b: Post-grad paths ── */}
-        <div className="td-controls">
-          <button className="td-ctrl-btn" onClick={expandAllGrad}>Expand All PG Paths</button>
-          <button className="td-ctrl-btn" onClick={collapseAllGrad}>Collapse All</button>
-        </div>
-        <div className="td-level td-level-postgrad">
-          <div className="td-hline-wrap"><div className="td-hline"></div></div>
-          <div className="td-children">
-            {afterGradPaths.map((c, i) => (
-              <div key={i} className="td-branch">
-                <div className="td-connector"></div>
-                <div className={'td-node td-node-grad' + (openGradCourse[i] ? ' td-node-open' : '')} onClick={() => toggleGradCourse(i)}>
-                  <span>{c.name}</span>
-                  <span className="td-expand-icon">{openGradCourse[i] ? '−' : '+'}</span>
-                </div>
-                {openGradCourse[i] && (
-                  <div className="td-leaf-detail" style={{'--sc': '#6366f1'}}>
-                    <div className="tcd-row"><span className="tcd-label">Eligibility:</span> {c.eligibility}</div>
-                    <div className="tcd-row"><span className="tcd-label">Entrance Exams:</span> {c.exams}</div>
-                    <div className="tcd-row"><span className="tcd-label">Top Colleges:</span> {c.colleges}</div>
-                    {c.note && <div className="tcd-note">{c.note}</div>}
-                  </div>
-                )}
+          {activeGradTab && (
+            <div className="ej-stream-panel">
+              <div className="ej-course-list">
+                {gradGroups.find(g => g.id === activeGradTab)?.indices.map(idx => {
+                  const c = afterGradPaths[idx]
+                  const isOpen = openGradCourse[idx]
+                  return (
+                    <div key={idx} className={'ej-course' + (isOpen ? ' ej-course-open' : '')}>
+                      <div className="ej-course-header" onClick={() => toggleGradCourse(idx)}>
+                        <span className="ej-course-name">{c.name}</span>
+                        <span className="ej-course-toggle">{isOpen ? '−' : '+'}</span>
+                      </div>
+                      {isOpen && (
+                        <div className="ej-course-detail">
+                          <div className="ej-detail-row">
+                            <span className="ej-detail-label">Eligibility</span>
+                            <span className="ej-detail-value">{c.eligibility}</span>
+                          </div>
+                          <div className="ej-detail-row">
+                            <span className="ej-detail-label">Entrance Exams</span>
+                            <span className="ej-detail-value">{c.exams}</span>
+                          </div>
+                          <div className="ej-detail-row">
+                            <span className="ej-detail-label">Top Colleges</span>
+                            <span className="ej-detail-value">{c.colleges}</span>
+                          </div>
+                          {c.note && <div className="ej-detail-note">{c.note}</div>}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
+      </section>
 
-      </div>
-      {/* ===== END PATHWAY TREE DIAGRAM ===== */}
+      {/* Popular Categories */}
+      <section className="home-section">
+        <div className="home-section-header">
+          <h2>Popular Categories</h2>
+          <p>Jump to the most searched education pathways</p>
+        </div>
+        <div className="home-cat-grid">
+          {[
+            { title: 'Engineering', sub: 'JEE Main, JEE Advanced, BITSAT, CUET', bottom: '23 IITs | 31 NITs | 26 IIITs', link: '/entrance-exams?category=Engineering', color: '#2563eb' },
+            { title: 'Medical', sub: 'NEET UG — the only exam for all medical admissions', bottom: 'AIIMS | JIPMER | CMC Vellore | AFMC', link: '/entrance-exams?category=Medical', color: '#dc2626' },
+            { title: 'MBA / Management', sub: 'CAT, XAT, MAT, CMAT, SNAP, NMAT, IIFT', bottom: '21 IIMs | XLRI | FMS | ISB', link: '/entrance-exams?category=Management', color: '#d97706' },
+            { title: 'Law', sub: 'CLAT, AILET, LSAT India, MH CET Law', bottom: 'NLSIU | NALSAR | NLU Delhi | NUJS', link: '/entrance-exams?category=Law', color: '#7c3aed' },
+            { title: 'Design & Architecture', sub: 'NID DAT, NIFT, UCEED, NATA, JEE Paper 2', bottom: 'NID | NIFT | SPA Delhi | IIT B.Des', link: '/entrance-exams?category=Design', color: '#0d9488' },
+            { title: 'Scholarships', sub: 'Central, State, Private, NGO & International', bottom: 'NSP | Post Matric | Merit-cum-Means', link: '/scholarships', color: '#059669' },
+          ].map(c => (
+            <Link key={c.link} to={c.link} className="home-cat-card">
+              <div className="home-cat-accent" style={{background: c.color}}></div>
+              <div className="home-cat-body">
+                <h3>{c.title}</h3>
+                <p className="home-cat-sub">{c.sub}</p>
+                <p className="home-cat-bottom">{c.bottom}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-      <div className="stats-row">
-        <div className="stat-card"><div className="number">{allExams.length + schoolEntranceExams.length}+</div><div className="label">Entrance Exams</div></div>
-        <div className="stat-card"><div className="number">{colleges.length}+</div><div className="label">Colleges Listed</div></div>
-        <div className="stat-card"><div className="number">{statesData.length}</div><div className="label">States & UTs</div></div>
-        <div className="stat-card"><div className="number">{careerPaths.length}+</div><div className="label">Career Paths</div></div>
-        <div className="stat-card"><div className="number">2025</div><div className="label">Data Updated</div></div>
-      </div>
+      {/* Notes */}
+      <section className="home-section">
+        <div className="home-section-header">
+          <h2>Important Notes for Students (2025)</h2>
+        </div>
+        <div className="home-notes">
+          {[
+            { text: 'NEET UG is the single entrance exam for ALL MBBS, BDS, AYUSH, Veterinary admissions.', tag: 'Medical' },
+            { text: 'CUET UG is mandatory for ALL Central University admissions (DU, JNU, BHU, JMI, AMU) from 2022.', tag: 'Central' },
+            { text: 'JEE Main is conducted twice a year (Jan & Apr). Best score counts. Top 2.5 lakh qualify for JEE Advanced.', tag: 'Engineering' },
+            { text: 'Engineering graduates CAN do Law — 3-year LLB after any graduation.', tag: 'Cross-path' },
+            { text: 'GATE score is valid for 3 years and is used for M.Tech admissions + PSU recruitment.', tag: 'PG' },
+            { text: 'IIM Indore & IIM Rohtak offer 5-year IPM directly after Class 12.', tag: 'MBA' },
+            { text: 'CA Foundation can be registered after Class 12. Many do B.Com + CA simultaneously.', tag: 'Commerce' },
+            { text: 'NDA exam is now open to women as well (Supreme Court order).', tag: 'Defence' },
+          ].map((n, i) => (
+            <div key={i} className="home-note">
+              <span className="home-note-tag">{n.tag}</span>
+              <span>{n.text}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      <div className="section-header">
-        <h1>Quick Access - Popular Categories</h1>
-        <p>Jump to the most searched education pathways</p>
-      </div>
-
-      <div className="card-grid">
-        <div className="card qa-card">
-          <h3>Engineering (B.Tech/B.E.)</h3>
-          <p className="qa-card-exams">National: JEE Main, JEE Advanced, BITSAT, CUET | State: KCET, MHT CET, AP/TS EAMCET, WBJEE, KEAM, COMEDK</p>
-          <p className="qa-card-colleges">Top Colleges: 23 IITs | 31 NITs | 26 IIITs | BITS Pilani | VIT | SRM</p>
-          <Link to="/entrance-exams?category=Engineering" className="qa-card-link">Explore Engineering Exams &rarr;</Link>
-        </div>
-        <div className="card qa-card">
-          <h3>Medical (MBBS/BDS/AYUSH)</h3>
-          <p className="qa-card-exams">NEET UG is the ONLY exam for all medical admissions in India (since 2016)</p>
-          <p className="qa-card-colleges">Top Colleges: AIIMS (23) | JIPMER | CMC Vellore | AFMC | State Medical Colleges</p>
-          <Link to="/entrance-exams?category=Medical" className="qa-card-link">Explore Medical Exams &rarr;</Link>
-        </div>
-        <div className="card qa-card">
-          <h3>MBA/Management</h3>
-          <p className="qa-card-exams">CAT, XAT, MAT, CMAT, SNAP, NMAT, IIFT, TISSNET + State CETs</p>
-          <p className="qa-card-colleges">Top Colleges: 21 IIMs | XLRI | FMS Delhi | ISB | SPJIMR | JBIMS</p>
-          <Link to="/entrance-exams?category=Management" className="qa-card-link">Explore MBA Exams &rarr;</Link>
-        </div>
-        <div className="card qa-card">
-          <h3>Law (LLB/BA LLB)</h3>
-          <p className="qa-card-exams">CLAT (23 NLUs), AILET (NLU Delhi), LSAT India, MH CET Law, State LAWCETs</p>
-          <p className="qa-card-colleges">Top Colleges: NLSIU Bangalore | NALSAR | NLU Delhi | NUJS Kolkata</p>
-          <Link to="/entrance-exams?category=Law" className="qa-card-link">Explore Law Exams &rarr;</Link>
-        </div>
-        <div className="card qa-card">
-          <h3>Design & Architecture</h3>
-          <p className="qa-card-exams">NID DAT, NIFT Entrance, UCEED, CEED, NATA, JEE Main Paper 2</p>
-          <p className="qa-card-colleges">Top Colleges: NID | NIFT | SPA Delhi | IIT B.Des | Srishti</p>
-          <Link to="/entrance-exams?category=Design" className="qa-card-link">Explore Design Exams &rarr;</Link>
-        </div>
-        <div className="card qa-card">
-          <h3>Scholarships & Cutoffs</h3>
-          <p className="qa-card-exams">Central & State scholarships, NIRF rankings, latest cutoff data for all major exams</p>
-          <p className="qa-card-colleges">NSP, Post Matric, Merit-cum-Means, Minority, SC/ST/OBC scholarships</p>
-          <Link to="/scholarships" className="qa-card-link">Explore Scholarships &rarr;</Link>
-        </div>
-      </div>
-
-      <div style={{marginTop: 40}}>
-        <div className="section-header">
-          <h1>Important Notes for Students (2025)</h1>
-        </div>
-        <div className="card notes-card">
-          <ul>
-            <li><strong>NEET UG</strong> is the single entrance exam for ALL MBBS, BDS, AYUSH, Veterinary admissions. No separate AIIMS/JIPMER exams anymore.</li>
-            <li><strong>CUET UG</strong> is mandatory for ALL Central University admissions (DU, JNU, BHU, JMI, AMU, etc.) from 2022 onwards.</li>
-            <li><strong>JEE Main</strong> is conducted twice a year (Jan & Apr). Best score counts. Top 2.5 lakh qualify for JEE Advanced.</li>
-            <li><strong>Engineering graduates CAN do Law</strong> — 3-year LLB after any graduation. Many engineers become successful lawyers.</li>
-            <li><strong>GATE</strong> score is valid for 3 years and is used for M.Tech admissions at IITs/NITs.</li>
-            <li><strong>IIM Indore & IIM Rohtak</strong> offer 5-year IPM (Integrated Program in Management) directly after Class 12.</li>
-            <li><strong>CA Foundation</strong> can be registered after Class 12. Many students do B.Com + CA simultaneously.</li>
-            <li><strong>NDA exam</strong> is now open to women as well (Supreme Court order).</li>
-            <li><strong>KVPY</strong> scholarship has been discontinued from 2022. Replaced by INSPIRE SHE scholarship.</li>
-            <li>Many states (MP, Rajasthan, etc.) now use <strong>JEE Main scores</strong> instead of separate state engineering exams.</li>
-            <li><strong>Tamil Nadu (TNEA)</strong> does NOT have a separate engineering entrance exam — admissions purely on Class 12 marks.</li>
-          </ul>
-        </div>
-      </div>
-
-      {/* BOTTOM DISCLAIMER */}
-      <div className="disclaimer-bar" style={{marginTop: 30}}>
-        <strong>Important:</strong> All information including fees, eligibility criteria, exam patterns, and college details are indicative and based on data available as of 2025. Fees and criteria change every year. Please verify all details from official websites and prospectuses before making any decisions. We are not responsible for any discrepancies.
+      <div className="disclaimer-bar" style={{marginTop: 20}}>
+        <strong>Important:</strong> All information is indicative and based on data as of 2025. Fees and criteria change every year. Please verify all details from official websites before making decisions.
       </div>
     </div>
   )
