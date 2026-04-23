@@ -1,5 +1,18 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import {
+  ReactFlow,
+  Background,
+  Controls,
+  Handle,
+  MarkerType,
+  MiniMap,
+  Position,
+  useEdgesState,
+  useNodesState,
+} from '@xyflow/react'
+import dagre from 'dagre'
+import '@xyflow/react/dist/style.css'
 import engineeringExams from '../data/engineeringExams'
 import { medicalExams, lawExams, managementExams } from '../data/otherExams'
 import { designExams, architectureExams, agricultureExams, teachingExams, professionalExams, researchExams, culinaryExams, horticultureExams } from '../data/moreExams'
@@ -168,59 +181,509 @@ const schoolStages = [
   { label: 'Secondary 9-10', sub: 'Age 14-16', num: 5 },
 ]
 
+const GRAD_GROUPS = [
+  { id: 'management', label: 'Management & MBA', indices: [0, 1, 2] },
+  { id: 'engineering-pg', label: 'Engineering & Tech PG', indices: [3, 4, 5, 6, 7, 8] },
+  { id: 'law-pg', label: 'Law PG', indices: [9, 10] },
+  { id: 'medical-pg', label: 'Medical PG', indices: [11, 12, 13, 14, 15, 16, 17] },
+  { id: 'science-arts-pg', label: 'Science & Arts PG', indices: [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29] },
+  { id: 'research', label: 'Research & Teaching', indices: [30, 31, 32, 33] },
+  { id: 'professional', label: 'Professional Courses', indices: [34, 35] },
+]
+
+const STREAM_TO_GROUPS = {
+  mpc: ['engineering-pg', 'science-arts-pg', 'management', 'research', 'professional', 'law-pg'],
+  bipc: ['medical-pg', 'science-arts-pg', 'management', 'research', 'professional'],
+  mbipc: ['engineering-pg', 'medical-pg', 'science-arts-pg', 'management', 'research', 'professional', 'law-pg'],
+  commerce: ['management', 'law-pg', 'science-arts-pg', 'professional', 'research'],
+  arts: ['law-pg', 'science-arts-pg', 'management', 'research', 'professional'],
+  vocational: ['professional', 'management', 'science-arts-pg'],
+}
+
+const DEFAULT_EXPANDED = new Set(['root', 'school-nursery', 'school-lkg', 'school-primary', 'school-middle', 'school-secondary'])
+
+function getSupportLinks(exams = '') {
+  const text = exams.toUpperCase()
+  const links = []
+
+  if (text.includes('JEE') || text.includes('CUET') || text.includes('NEET')) links.push({ label: 'NTA', url: 'https://nta.ac.in' })
+  if (text.includes('GATE')) links.push({ label: 'GATE', url: 'https://gate2026.iitr.ac.in' })
+  if (text.includes('CAT')) links.push({ label: 'CAT', url: 'https://iimcat.ac.in' })
+  if (text.includes('CLAT')) links.push({ label: 'CLAT', url: 'https://consortiumofnlus.ac.in' })
+  if (text.includes('NIFT')) links.push({ label: 'NIFT', url: 'https://www.nift.ac.in' })
+  if (text.includes('NID')) links.push({ label: 'NID', url: 'https://www.nid.edu' })
+  if (text.includes('UPSC')) links.push({ label: 'UPSC', url: 'https://www.upsc.gov.in' })
+  if (text.includes('ICAR')) links.push({ label: 'ICAR', url: 'https://icar.org.in' })
+
+  const unique = new Map()
+  links.forEach((item) => unique.set(item.url, item))
+  return Array.from(unique.values())
+}
+
+function getLearningFocus(courseName = '', streamName = '') {
+  const title = courseName.toLowerCase()
+  const stream = streamName.toLowerCase()
+
+  if (title.includes('b.tech') || title.includes('b.e.')) {
+    return 'Core engineering fundamentals, mathematics, programming, design thinking, and practical problem-solving through labs and projects.'
+  }
+  if (title.includes('mbbs')) {
+    return 'Human anatomy, physiology, pathology, diagnostics, and clinical decision-making through hospital postings and supervised patient care.'
+  }
+  if (title.includes('bds')) {
+    return 'Oral anatomy, dental materials, restorative procedures, and clinical dental practice with patient-focused treatment planning.'
+  }
+  if (title.includes('b.pharm') || title.includes('m.pharm') || title.includes('d.pharm')) {
+    return 'Pharmaceutics, medicinal chemistry, pharmacology, drug formulation, and safe dispensing with regulatory and quality standards.'
+  }
+  if (title.includes('nursing') || title.includes('anm') || title.includes('gnm')) {
+    return 'Patient care, clinical procedures, community health, medical ethics, and hands-on hospital/ward practice.'
+  }
+  if (title.includes('law') || title.includes('llb') || title.includes('llm')) {
+    return 'Constitutional law, legal reasoning, drafting, case analysis, and advocacy skills through moot courts and internships.'
+  }
+  if (title.includes('mba') || title.includes('pgdm') || title.includes('mha')) {
+    return 'Business strategy, finance, marketing, operations, analytics, leadership, and real-world decision-making through case studies.'
+  }
+  if (title.includes('m.tech') || title.includes('me (2 yrs)') || title.includes('mca')) {
+    return 'Advanced technical concepts, system design, research methods, and implementation skills in specialized engineering/computing domains.'
+  }
+  if (title.includes('m.sc') || title.includes('b.sc')) {
+    return 'Scientific concepts, experimental methods, data interpretation, and discipline-specific analytical and research skills.'
+  }
+  if (title.includes('bca')) {
+    return 'Programming, databases, web technologies, software development workflows, and practical application development.'
+  }
+  if (title.includes('b.arch') || title.includes('m.arch') || title.includes('b.planning') || title.includes('m.plan')) {
+    return 'Design principles, spatial planning, studio practice, sustainability, and technical drawing with portfolio-driven work.'
+  }
+  if (title.includes('b.des') || title.includes('m.des') || title.includes('fashion')) {
+    return 'User-centered design, visual communication, prototyping, material exploration, and portfolio development.'
+  }
+  if (title.includes('ca') || title.includes('cs') || title.includes('cma') || title.includes('cfa') || title.includes('frm')) {
+    return 'Accounting standards, compliance, taxation, corporate governance, risk management, and financial analysis.'
+  }
+  if (title.includes('phd') || title.includes('fpm') || title.includes('post-doctoral')) {
+    return 'Independent research, literature review, methodology design, publication writing, and advanced domain specialization.'
+  }
+
+  if (stream.includes('mpc')) {
+    return 'Mathematical reasoning, physical science foundations, and technical problem-solving for engineering and science pathways.'
+  }
+  if (stream.includes('bipc')) {
+    return 'Life sciences, healthcare fundamentals, laboratory methods, and patient/community-oriented scientific understanding.'
+  }
+  if (stream.includes('commerce')) {
+    return 'Business economics, accounting, finance fundamentals, and managerial decision-making skills.'
+  }
+  if (stream.includes('arts')) {
+    return 'Critical thinking, communication, social analysis, and interdisciplinary understanding across humanities and creative fields.'
+  }
+
+  return 'Foundational theory with practical application, communication skills, and career-oriented domain knowledge.'
+}
+
+function buildGraph() {
+  const nodes = []
+  const edges = []
+  const nodeMeta = {}
+  const childrenMap = {}
+
+  const addNode = (node) => {
+    nodes.push(node)
+    nodeMeta[node.id] = node.meta || {}
+  }
+
+  const addEdge = (edge) => {
+    edges.push(edge)
+    if (!childrenMap[edge.source]) childrenMap[edge.source] = []
+    childrenMap[edge.source].push(edge.target)
+  }
+
+  addNode({
+    id: 'root',
+    type: 'rootNode',
+    data: { title: 'Start Your Journey', subtitle: 'Nursery to PhD', kind: 'root', color: '#f9a825' },
+    meta: {
+      title: 'Start Your Journey',
+      howToReach: 'Begin with foundational schooling and progressively choose streams and courses based on your interests and strengths.',
+      links: [{ label: 'NCERT', url: 'https://ncert.nic.in' }],
+    },
+  })
+
+  const schoolNodeIds = ['school-nursery', 'school-lkg', 'school-primary', 'school-middle', 'school-secondary']
+  schoolStages.forEach((stage, idx) => {
+    addNode({
+      id: schoolNodeIds[idx],
+      type: 'stageNode',
+      data: { title: stage.label, subtitle: stage.sub, kind: 'stage', color: '#1a237e' },
+      meta: {
+        title: stage.label,
+        howToReach: `Progress through school level ${stage.label}.`,
+        eligibility: stage.sub,
+        links: idx === 4
+          ? [
+              { label: 'KVS Admissions', url: 'https://kvsangathan.nic.in' },
+              { label: 'Navodaya', url: 'https://navodaya.gov.in' },
+              { label: 'Sainik Schools', url: 'https://aissee.nta.nic.in' },
+            ]
+          : [{ label: 'NCERT', url: 'https://ncert.nic.in' }],
+      },
+    })
+
+    if (idx === 0) {
+      addEdge({ id: 'edge-root-nursery', source: 'root', target: schoolNodeIds[idx], label: 'Age 2.5-4' })
+    } else {
+      addEdge({
+        id: `edge-school-${idx - 1}-${idx}`,
+        source: schoolNodeIds[idx - 1],
+        target: schoolNodeIds[idx],
+        label: stage.sub,
+      })
+    }
+  })
+
+  const secondaryNode = 'school-secondary'
+  nodeMeta[secondaryNode] = {
+    ...nodeMeta[secondaryNode],
+    exams: 'KVS, JNVST, Sainik AISSEE, NMMS, RIMC, NTSE, Olympiads',
+  }
+
+  const schoolPathOptions = [
+    {
+      id: 'school-path-preschool',
+      parent: 'school-nursery',
+      edgeLabel: 'Pre-school admission',
+      title: 'Playgroup / Nursery Schools',
+      subtitle: 'Foundational early learning',
+      howToReach: 'Apply to nearby pre-schools with age proof, immunization records, and basic parent interaction where applicable.',
+      eligibility: 'Typical entry age 2.5-4 years (school-specific cutoffs apply).',
+      learning: 'Language readiness, social behavior, motor skills, routines, and classroom comfort before formal schooling.',
+      links: [{ label: 'NCERT ECCE', url: 'https://ncert.nic.in' }],
+    },
+    {
+      id: 'school-path-kvs',
+      parent: 'school-lkg',
+      edgeLabel: 'Lottery system for KVS',
+      title: 'KVS Class 1 Route',
+      subtitle: 'Central school admission path',
+      howToReach: 'Track Kendriya Vidyalaya notifications, complete online registration, and participate in category-wise lottery/allotment.',
+      eligibility: 'Class 1 age and category norms as per KVS admission guidelines.',
+      learning: 'CBSE-aligned foundational academics, language skills, activity-based learning, and smooth continuity till higher classes.',
+      links: [{ label: 'KVS Admissions', url: 'https://kvsangathan.nic.in' }],
+    },
+    {
+      id: 'school-path-regular',
+      parent: 'school-lkg',
+      edgeLabel: 'Regular school route',
+      title: 'Neighborhood / Private School Route',
+      subtitle: 'State/CBSE/ICSE school entry',
+      howToReach: 'Apply to local schools based on board preference, location, fee structure, and language medium.',
+      eligibility: 'Age criteria and seat availability vary by school and board.',
+      learning: 'Core literacy and numeracy, classroom discipline, communication, and grade-wise progression.',
+      links: [{ label: 'NCERT', url: 'https://ncert.nic.in' }],
+    },
+    {
+      id: 'school-path-jnv',
+      parent: 'school-primary',
+      edgeLabel: 'Prepare for JNVST',
+      title: 'Navodaya Route (Class 6 Entry)',
+      subtitle: 'JNV selection pathway',
+      howToReach: 'Prepare for JNVST aptitude-based exam in Class 5 and apply during official admission cycle.',
+      eligibility: 'Studying in eligible local school and meeting district-specific JNVST criteria.',
+      learning: 'Strong academic foundation, competitive exam readiness, and holistic residential school development.',
+      links: [{ label: 'Navodaya', url: 'https://navodaya.gov.in' }],
+    },
+    {
+      id: 'school-path-sainik',
+      parent: 'school-middle',
+      edgeLabel: 'AISSEE pathway',
+      title: 'Sainik School Route',
+      subtitle: 'Defence-oriented schooling track',
+      howToReach: 'Prepare for AISSEE exam, meet age/class criteria, and complete counselling/admission formalities.',
+      eligibility: 'Age and class requirements as defined by AISSEE for Class 6/9 admissions.',
+      learning: 'Academic rigor, discipline, leadership, physical fitness, and structured preparation for future defence academies.',
+      links: [{ label: 'AISSEE (NTA)', url: 'https://aissee.nta.nic.in' }],
+    },
+    {
+      id: 'school-path-olympiad',
+      parent: 'school-middle',
+      edgeLabel: 'Competitive prep track',
+      title: 'Olympiad / Scholarship Track',
+      subtitle: 'NMMS, Olympiads, talent exams',
+      howToReach: 'Participate in school-led and national-level exams with concept-focused preparation and regular mock practice.',
+      eligibility: 'Class-wise eligibility depends on each exam (NMMS/Olympiads/etc.).',
+      learning: 'Advanced problem solving, conceptual depth in maths/science, and exam temperament.',
+      links: [{ label: 'NCERT', url: 'https://ncert.nic.in' }],
+    },
+  ]
+
+  schoolPathOptions.forEach((path) => {
+    addNode({
+      id: path.id,
+      type: 'courseNode',
+      data: { title: path.title, subtitle: path.subtitle, kind: 'course', color: '#1a237e' },
+      meta: {
+        title: path.title,
+        howToReach: path.howToReach,
+        eligibility: path.eligibility,
+        learning: path.learning,
+        links: path.links,
+      },
+    })
+
+    addEdge({
+      id: `edge-${path.parent}-${path.id}`,
+      source: path.parent,
+      target: path.id,
+      label: path.edgeLabel,
+    })
+  })
+
+  afterTenthStreams.forEach((stream) => {
+    const streamId = `stream-${stream.id}`
+
+    addNode({
+      id: streamId,
+      type: 'streamNode',
+      data: { title: stream.name, subtitle: stream.full, kind: 'stream', color: stream.color, count: stream.courses.length },
+      meta: {
+        title: stream.name,
+        howToReach: 'Complete Class 10 and choose this stream in Class 11-12.',
+        eligibility: stream.full,
+        learning: getLearningFocus(stream.name, stream.name),
+        note: `${stream.courses.length} course paths available from this stream.`,
+      },
+    })
+
+    addEdge({
+      id: `edge-secondary-${stream.id}`,
+      source: secondaryNode,
+      target: streamId,
+      label: 'Choose stream',
+    })
+
+    stream.courses.forEach((course, index) => {
+      const courseId = `course-${stream.id}-${index}`
+
+      addNode({
+        id: courseId,
+        type: 'courseNode',
+        data: { title: course.name, subtitle: course.exams, kind: 'course', color: stream.color },
+        meta: {
+          title: course.name,
+          howToReach: `Select ${stream.name} in Class 11-12 and satisfy eligibility criteria for this course.`,
+          eligibility: course.eligibility,
+          learning: getLearningFocus(course.name, stream.name),
+          exams: course.exams,
+          colleges: course.colleges,
+          note: course.note,
+          links: getSupportLinks(course.exams),
+        },
+      })
+
+      addEdge({
+        id: `edge-${stream.id}-course-${index}`,
+        source: streamId,
+        target: courseId,
+        label: 'Course option',
+      })
+
+      ;(STREAM_TO_GROUPS[stream.id] || []).forEach((groupId) => {
+        addEdge({
+          id: `edge-${courseId}-group-${groupId}`,
+          source: courseId,
+          target: `group-${groupId}`,
+          label: 'After graduation',
+        })
+      })
+    })
+  })
+
+  GRAD_GROUPS.forEach((group) => {
+    addNode({
+      id: `group-${group.id}`,
+      type: 'groupNode',
+      data: { title: group.label, subtitle: `${group.indices.length} higher-study options`, kind: 'group', color: '#1a237e' },
+      meta: {
+        title: group.label,
+        howToReach: 'Complete your undergraduate degree, then prepare for relevant PG entrance exams.',
+        learning: 'Advanced specialization, deeper subject mastery, and role-focused skills for higher studies or professional growth.',
+        note: `${group.indices.length} pathways available in this group.`,
+      },
+    })
+
+    group.indices.forEach((idx) => {
+      const pg = afterGradPaths[idx]
+      const pgId = `pg-${idx}`
+      addNode({
+        id: pgId,
+        type: 'courseNode',
+        data: { title: pg.name, subtitle: pg.exams, kind: 'course', color: '#3949ab' },
+        meta: {
+          title: pg.name,
+          howToReach: 'Finish the required UG degree, qualify in listed entrance exams, then apply through counselling/admission process.',
+          eligibility: pg.eligibility,
+          learning: getLearningFocus(pg.name, 'postgraduate'),
+          exams: pg.exams,
+          colleges: pg.colleges,
+          note: pg.note,
+          links: getSupportLinks(pg.exams),
+        },
+      })
+
+      addEdge({
+        id: `edge-group-${group.id}-${idx}`,
+        source: `group-${group.id}`,
+        target: pgId,
+        label: 'PG path',
+      })
+    })
+  })
+
+  return { nodes, edges, childrenMap, nodeMeta }
+}
+
+function getLayoutedElements(rawNodes, rawEdges) {
+  const g = new dagre.graphlib.Graph()
+  g.setDefaultEdgeLabel(() => ({}))
+  g.setGraph({ rankdir: 'TB', ranksep: 100, nodesep: 50, marginx: 24, marginy: 24 })
+
+  rawNodes.forEach((node) => {
+    const dims = node.type === 'courseNode' ? { width: 260, height: 84 } : { width: 210, height: 72 }
+    if (node.type === 'rootNode') {
+      g.setNode(node.id, { width: 240, height: 76 })
+    } else {
+      g.setNode(node.id, dims)
+    }
+  })
+
+  rawEdges.forEach((edge) => g.setEdge(edge.source, edge.target))
+  dagre.layout(g)
+
+  const nodes = rawNodes.map((node) => {
+    const pos = g.node(node.id)
+    const width = node.type === 'courseNode' ? 260 : node.type === 'rootNode' ? 240 : 210
+    const height = node.type === 'courseNode' ? 84 : node.type === 'rootNode' ? 76 : 72
+    return {
+      ...node,
+      targetPosition: Position.Top,
+      sourcePosition: Position.Bottom,
+      position: { x: pos.x - width / 2, y: pos.y - height / 2 },
+    }
+  })
+
+  const edges = rawEdges.map((edge) => ({
+    ...edge,
+    type: 'smoothstep',
+    markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16, color: '#606985' },
+    style: { stroke: '#606985', strokeWidth: 1.4 },
+    labelStyle: { fill: '#424b63', fontSize: 11, fontWeight: 600 },
+    labelBgStyle: { fill: '#ffffff', fillOpacity: 0.9 },
+  }))
+
+  return { nodes, edges }
+}
+
+function OrgChartNode({ data, selected }) {
+  return (
+    <div className={`oc-node oc-node--${data.kind}${selected ? ' is-selected' : ''}`} style={{ '--node-accent': data.color || '#1a237e' }}>
+      <Handle type="target" position={Position.Top} className="oc-node-handle" />
+      <div className="oc-node-title">{data.title}</div>
+      {data.subtitle ? <div className="oc-node-subtitle">{data.subtitle}</div> : null}
+      {typeof data.count === 'number' ? <div className="oc-node-count">{data.count} options</div> : null}
+      <Handle type="source" position={Position.Bottom} className="oc-node-handle" />
+    </div>
+  )
+}
+
+const nodeTypes = {
+  rootNode: OrgChartNode,
+  stageNode: OrgChartNode,
+  streamNode: OrgChartNode,
+  groupNode: OrgChartNode,
+  courseNode: OrgChartNode,
+}
+
 export default function Home() {
-  const [activeStream, setActiveStream] = useState('mpc')
-  const [openCourses, setOpenCourses] = useState({})
-  const [activeGradTab, setActiveGradTab] = useState(null)
-  const [openGradCourse, setOpenGradCourse] = useState({})
-
-  const toggleCourse = (key) => setOpenCourses(p => ({...p, [key]: !p[key]}))
-  const toggleGradCourse = (i) => setOpenGradCourse(p => ({...p, [i]: !p[i]}))
-
-  const selectedStream = afterTenthStreams.find(s => s.id === activeStream)
-
   const quickLinks = [
-    { icon: '~', title: 'School Exams', count: schoolEntranceExams.length, link: '/school-exams' },
-    { icon: '~', title: 'Entrance Exams', count: allExams.length, link: '/entrance-exams' },
-    { icon: '~', title: 'Colleges', count: colleges.length, link: '/colleges' },
-    { icon: '~', title: 'States & UTs', count: statesData.length, link: '/states' },
-    { icon: '~', title: 'Career Paths', count: careerPaths.length, link: '/career-paths' },
+    { title: 'School Exams', count: schoolEntranceExams.length, link: '/school-exams' },
+    { title: 'Entrance Exams', count: allExams.length, link: '/entrance-exams' },
+    { title: 'Colleges', count: colleges.length, link: '/colleges' },
+    { title: 'States & UTs', count: statesData.length, link: '/states' },
+    { title: 'Career Paths', count: careerPaths.length, link: '/career-paths' },
   ]
 
-  const moreLinks = [
-    { title: 'Prep Timeline', desc: 'Grade-wise roadmap', link: '/timeline' },
-    { title: 'Scholarships', desc: '40+ scholarships', link: '/scholarships' },
-    { title: 'Govt Jobs', desc: 'Central, State & PSU', link: '/govt-jobs' },
-    { title: 'Internships', desc: '50+ opportunities', link: '/internships' },
-    { title: 'Search All', desc: 'Exams, colleges & more', link: '/search' },
-  ]
+  const graph = useMemo(() => buildGraph(), [])
+  const [expanded, setExpanded] = useState(() => new Set(DEFAULT_EXPANDED))
+  const [selectedNodeId, setSelectedNodeId] = useState('root')
 
-  // Group grad paths for tabbed view
-  // Management: 0-2, Engineering: 3-8, Law: 9-10, Medical: 11-17, Science&Arts: 18-29, Research: 30-33, Professional: 34-35
-  const gradGroups = [
-    { id: 'management', label: 'Management & MBA', indices: [0, 1, 2] },
-    { id: 'engineering-pg', label: 'Engineering & Tech PG', indices: [3, 4, 5, 6, 7, 8] },
-    { id: 'law-pg', label: 'Law PG', indices: [9, 10] },
-    { id: 'medical-pg', label: 'Medical PG', indices: [11, 12, 13, 14, 15, 16, 17] },
-    { id: 'science-arts-pg', label: 'Science & Arts PG', indices: [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29] },
-    { id: 'research', label: 'Research & Teaching', indices: [30, 31, 32, 33] },
-    { id: 'professional', label: 'Professional Courses', indices: [34, 35] },
-  ]
+  const visible = useMemo(() => {
+    const visibleIds = new Set(['root'])
+    const stack = ['root']
+
+    while (stack.length) {
+      const current = stack.pop()
+      if (!expanded.has(current)) continue
+      const kids = graph.childrenMap[current] || []
+      kids.forEach((child) => {
+        if (!visibleIds.has(child)) {
+          visibleIds.add(child)
+          stack.push(child)
+        }
+      })
+    }
+
+    return {
+      nodes: graph.nodes.filter((n) => visibleIds.has(n.id)),
+      edges: graph.edges.filter((e) => visibleIds.has(e.source) && visibleIds.has(e.target)),
+    }
+  }, [expanded, graph])
+
+  const layouted = useMemo(() => getLayoutedElements(visible.nodes, visible.edges), [visible])
+  const [nodes, setNodes, onNodesChange] = useNodesState(layouted.nodes)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(layouted.edges)
+  const [rfInstance, setRfInstance] = useState(null)
+
+  useEffect(() => setNodes(layouted.nodes), [layouted.nodes, setNodes])
+  useEffect(() => setEdges(layouted.edges), [layouted.edges, setEdges])
+
+  useEffect(() => {
+    if (!rfInstance) return
+    const timer = setTimeout(() => {
+      rfInstance.fitView({ padding: 0.2, duration: 450 })
+    }, 30)
+    return () => clearTimeout(timer)
+  }, [rfInstance, nodes, edges])
+
+  const onNodeClick = useCallback((_, node) => {
+    setSelectedNodeId(node.id)
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(node.id)) next.delete(node.id)
+      else next.add(node.id)
+      return next
+    })
+  }, [])
+
+  const selectedMeta = graph.nodeMeta[selectedNodeId] || {}
+  const nextStages = (graph.childrenMap[selectedNodeId] || [])
+    .map((id) => graph.nodeMeta[id]?.title)
+    .filter(Boolean)
 
   return (
     <div>
-      {/* Hero */}
       <section className="home-hero">
         <div className="home-hero-text">
           <h1>Your Complete Education Guide</h1>
-          <p>From nursery to PhD — explore every pathway, entrance exam, college, and career option across India.</p>
+          <p>From nursery to PhD - explore every pathway, entrance exam, college, and career option across India.</p>
           <div className="home-hero-actions">
             <Link to="/build-profile" className="btn btn-primary btn-lg">Build Your Profile</Link>
             <Link to="/my-path" className="btn btn-outline btn-lg">View My Path</Link>
           </div>
         </div>
         <div className="home-hero-stats">
-          {quickLinks.map(q => (
+          {quickLinks.map((q) => (
             <Link key={q.link} to={q.link} className="home-stat-link">
               <span className="home-stat-num">{q.count}+</span>
               <span className="home-stat-label">{q.title}</span>
@@ -229,225 +692,98 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Quick navigation */}
-      <section className="home-nav-grid">
-        {moreLinks.map(l => (
-          <Link key={l.link} to={l.link} className="home-nav-item">
-            <div>
-              <strong>{l.title}</strong>
-              <span>{l.desc}</span>
-            </div>
-          </Link>
-        ))}
-      </section>
-
-      {/* Disclaimer */}
-      <div className="disclaimer-bar">
-        <strong>Disclaimer:</strong> We have tried our best to gather all the information, but there might be some deviations. Kindly verify everything directly with the respective institutions. Data is as of 2025.
-      </div>
-
-      {/* ===== EDUCATION JOURNEY ===== */}
-      <section className="home-section">
+      <section className="home-section oc-section">
         <div className="home-section-header">
           <h2>Complete Education Pathway</h2>
-          <p>Explore the full journey from school to career — click on any stage to learn more.</p>
+          <p>Click any node to expand/collapse and view full details below the chart.</p>
         </div>
 
-        {/* Phase 1: School Stages */}
-        <div className="ej-phase">
-          <div className="ej-phase-label">Phase 1</div>
-          <h3 className="ej-phase-title">School Education</h3>
-          <div className="ej-stepper">
-            {schoolStages.map((s, i) => (
-              <div key={i} className="ej-step">
-                <div className="ej-step-circle">{s.num}</div>
-                <div className="ej-step-text">
-                  <strong>{s.label}</strong>
-                  <span>{s.sub}</span>
-                </div>
-                {i < schoolStages.length - 1 && <div className="ej-step-line"></div>}
-              </div>
-            ))}
-          </div>
-          <div className="ej-school-exams">
-            <span>Key school-level exams: KVS, JNVST, Sainik AISSEE, NMMS, RIMC, NTSE, Olympiads</span>
-            <Link to="/school-exams">View all school exams</Link>
-          </div>
+        <div className="oc-flow-wrap">
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onNodeClick={onNodeClick}
+            onInit={setRfInstance}
+            nodeTypes={nodeTypes}
+            fitView
+            minZoom={0.2}
+            maxZoom={1.2}
+            proOptions={{ hideAttribution: true }}
+          >
+            <Background gap={24} size={1} color="#e2e8f0" />
+            <MiniMap zoomable pannable nodeColor={(n) => n?.data?.color || '#1a237e'} />
+            <Controls />
+          </ReactFlow>
         </div>
 
-        {/* Phase 2: After Class 10 */}
-        <div className="ej-phase">
-          <div className="ej-phase-label">Phase 2</div>
-          <h3 className="ej-phase-title">After Class 10 — Choose Your Stream</h3>
-          <p className="ej-phase-desc">Select a stream below to see all available courses, entrance exams, and top colleges.</p>
-
-          <div className="ej-tabs">
-            {afterTenthStreams.map(s => (
-              <button
-                key={s.id}
-                className={'ej-tab' + (activeStream === s.id ? ' ej-tab-active' : '')}
-                style={activeStream === s.id ? {'--tab-color': s.color} : {}}
-                onClick={() => { setActiveStream(s.id); setOpenCourses({}) }}
-              >
-                <strong>{s.name}</strong>
-                <span>{s.courses.length} courses</span>
-              </button>
-            ))}
+        <div className="oc-detail-card">
+          <div className="oc-detail-header">
+            <h3>{selectedMeta.title || 'Select a stage'}</h3>
+            <span>{expanded.has(selectedNodeId) ? 'Expanded' : 'Collapsed'} node</span>
           </div>
 
-          {selectedStream && (
-            <div className="ej-stream-panel">
-              <div className="ej-stream-header" style={{'--sc': selectedStream.color}}>
-                <div>
-                  <h4>{selectedStream.name}</h4>
-                  <p>{selectedStream.full}</p>
-                </div>
-                <span className="ej-stream-count">{selectedStream.courses.length} courses available</span>
-              </div>
-              <div className="ej-course-list">
-                {selectedStream.courses.map((c, i) => {
-                  const key = selectedStream.id + '_' + i
-                  const isOpen = openCourses[key]
-                  return (
-                    <div key={key} className={'ej-course' + (isOpen ? ' ej-course-open' : '')}>
-                      <div className="ej-course-header" onClick={() => toggleCourse(key)}>
-                        <span className="ej-course-name">{c.name}</span>
-                        <span className="ej-course-toggle">{isOpen ? '−' : '+'}</span>
-                      </div>
-                      {isOpen && (
-                        <div className="ej-course-detail">
-                          <div className="ej-detail-row">
-                            <span className="ej-detail-label">Eligibility</span>
-                            <span className="ej-detail-value">{c.eligibility}</span>
-                          </div>
-                          <div className="ej-detail-row">
-                            <span className="ej-detail-label">Entrance Exams</span>
-                            <span className="ej-detail-value">{c.exams}</span>
-                          </div>
-                          <div className="ej-detail-row">
-                            <span className="ej-detail-label">Top Colleges</span>
-                            <span className="ej-detail-value">{c.colleges}</span>
-                          </div>
-                          {c.note && <div className="ej-detail-note">{c.note}</div>}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
+          {selectedMeta.howToReach ? (
+            <div className="oc-detail-row">
+              <strong>How to reach:</strong>
+              <p>{selectedMeta.howToReach}</p>
+            </div>
+          ) : null}
+
+          {selectedMeta.eligibility ? (
+            <div className="oc-detail-row">
+              <strong>Eligibility:</strong>
+              <p>{selectedMeta.eligibility}</p>
+            </div>
+          ) : null}
+
+          {selectedMeta.learning ? (
+            <div className="oc-detail-row">
+              <strong>What you learn:</strong>
+              <p>{selectedMeta.learning}</p>
+            </div>
+          ) : null}
+
+          {selectedMeta.exams ? (
+            <div className="oc-detail-row">
+              <strong>Entrance exams:</strong>
+              <p>{selectedMeta.exams}</p>
+            </div>
+          ) : null}
+
+          {selectedMeta.colleges ? (
+            <div className="oc-detail-row">
+              <strong>Top colleges:</strong>
+              <p>{selectedMeta.colleges}</p>
+            </div>
+          ) : null}
+
+          {nextStages.length ? (
+            <div className="oc-detail-row">
+              <strong>What next:</strong>
+              <div className="oc-next-list">
+                {nextStages.map((item) => <span key={item}>{item}</span>)}
               </div>
             </div>
-          )}
-        </div>
+          ) : null}
 
-        {/* Phase 3: After Graduation */}
-        <div className="ej-phase">
-          <div className="ej-phase-label">Phase 3</div>
-          <h3 className="ej-phase-title">After Graduation — Higher Studies & Cross Paths</h3>
-          <p className="ej-phase-desc">Any graduate can pursue these paths regardless of their undergraduate stream.</p>
-
-          <div className="ej-tabs">
-            {gradGroups.map(g => (
-              <button
-                key={g.id}
-                className={'ej-tab' + (activeGradTab === g.id ? ' ej-tab-active' : '')}
-                onClick={() => { setActiveGradTab(activeGradTab === g.id ? null : g.id); setOpenGradCourse({}) }}
-              >
-                <strong>{g.label}</strong>
-                <span>{g.indices.length} {g.indices.length === 1 ? 'path' : 'paths'}</span>
-              </button>
-            ))}
-          </div>
-
-          {activeGradTab && (
-            <div className="ej-stream-panel">
-              <div className="ej-course-list">
-                {gradGroups.find(g => g.id === activeGradTab)?.indices.map(idx => {
-                  const c = afterGradPaths[idx]
-                  const isOpen = openGradCourse[idx]
-                  return (
-                    <div key={idx} className={'ej-course' + (isOpen ? ' ej-course-open' : '')}>
-                      <div className="ej-course-header" onClick={() => toggleGradCourse(idx)}>
-                        <span className="ej-course-name">{c.name}</span>
-                        <span className="ej-course-toggle">{isOpen ? '−' : '+'}</span>
-                      </div>
-                      {isOpen && (
-                        <div className="ej-course-detail">
-                          <div className="ej-detail-row">
-                            <span className="ej-detail-label">Eligibility</span>
-                            <span className="ej-detail-value">{c.eligibility}</span>
-                          </div>
-                          <div className="ej-detail-row">
-                            <span className="ej-detail-label">Entrance Exams</span>
-                            <span className="ej-detail-value">{c.exams}</span>
-                          </div>
-                          <div className="ej-detail-row">
-                            <span className="ej-detail-label">Top Colleges</span>
-                            <span className="ej-detail-value">{c.colleges}</span>
-                          </div>
-                          {c.note && <div className="ej-detail-note">{c.note}</div>}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
+          {selectedMeta.links?.length ? (
+            <div className="oc-detail-row">
+              <strong>Useful URLs:</strong>
+              <div className="oc-link-list">
+                {selectedMeta.links.map((item) => (
+                  <a key={item.url} href={item.url} target="_blank" rel="noreferrer">{item.label}</a>
+                ))}
               </div>
             </div>
-          )}
+          ) : null}
+
+          {selectedMeta.note ? <p className="oc-note">{selectedMeta.note}</p> : null}
         </div>
       </section>
 
-      {/* Popular Categories */}
-      <section className="home-section">
-        <div className="home-section-header">
-          <h2>Popular Categories</h2>
-          <p>Jump to the most searched education pathways</p>
-        </div>
-        <div className="home-cat-grid">
-          {[
-            { title: 'Engineering', sub: 'JEE Main, JEE Advanced, BITSAT, CUET', bottom: '23 IITs | 31 NITs | 26 IIITs', link: '/entrance-exams?category=Engineering', color: '#2563eb' },
-            { title: 'Medical', sub: 'NEET UG — the only exam for all medical admissions', bottom: 'AIIMS | JIPMER | CMC Vellore | AFMC', link: '/entrance-exams?category=Medical', color: '#dc2626' },
-            { title: 'MBA / Management', sub: 'CAT, XAT, MAT, CMAT, SNAP, NMAT, IIFT', bottom: '21 IIMs | XLRI | FMS | ISB', link: '/entrance-exams?category=Management', color: '#d97706' },
-            { title: 'Law', sub: 'CLAT, AILET, LSAT India, MH CET Law', bottom: 'NLSIU | NALSAR | NLU Delhi | NUJS', link: '/entrance-exams?category=Law', color: '#7c3aed' },
-            { title: 'Design & Architecture', sub: 'NID DAT, NIFT, UCEED, NATA, JEE Paper 2', bottom: 'NID | NIFT | SPA Delhi | IIT B.Des', link: '/entrance-exams?category=Design', color: '#0d9488' },
-            { title: 'Scholarships', sub: 'Central, State, Private, NGO & International', bottom: 'NSP | Post Matric | Merit-cum-Means', link: '/scholarships', color: '#059669' },
-          ].map(c => (
-            <Link key={c.link} to={c.link} className="home-cat-card">
-              <div className="home-cat-accent" style={{background: c.color}}></div>
-              <div className="home-cat-body">
-                <h3>{c.title}</h3>
-                <p className="home-cat-sub">{c.sub}</p>
-                <p className="home-cat-bottom">{c.bottom}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Notes */}
-      <section className="home-section">
-        <div className="home-section-header">
-          <h2>Important Notes for Students (2025)</h2>
-        </div>
-        <div className="home-notes">
-          {[
-            { text: 'NEET UG is the single entrance exam for ALL MBBS, BDS, AYUSH, Veterinary admissions.', tag: 'Medical' },
-            { text: 'CUET UG is mandatory for ALL Central University admissions (DU, JNU, BHU, JMI, AMU) from 2022.', tag: 'Central' },
-            { text: 'JEE Main is conducted twice a year (Jan & Apr). Best score counts. Top 2.5 lakh qualify for JEE Advanced.', tag: 'Engineering' },
-            { text: 'Engineering graduates CAN do Law — 3-year LLB after any graduation.', tag: 'Cross-path' },
-            { text: 'GATE score is valid for 3 years and is used for M.Tech admissions + PSU recruitment.', tag: 'PG' },
-            { text: 'IIM Indore & IIM Rohtak offer 5-year IPM directly after Class 12.', tag: 'MBA' },
-            { text: 'CA Foundation can be registered after Class 12. Many do B.Com + CA simultaneously.', tag: 'Commerce' },
-            { text: 'NDA exam is now open to women as well (Supreme Court order).', tag: 'Defence' },
-          ].map((n, i) => (
-            <div key={i} className="home-note">
-              <span className="home-note-tag">{n.tag}</span>
-              <span>{n.text}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="disclaimer-bar" style={{marginTop: 20}}>
+      <div className="disclaimer-bar" style={{ marginTop: 20 }}>
         <strong>Important:</strong> All information is indicative and based on data as of 2025. Fees and criteria change every year. Please verify all details from official websites before making decisions.
       </div>
     </div>

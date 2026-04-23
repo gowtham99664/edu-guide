@@ -2939,3 +2939,165 @@ tr:hover { background: #f8fafc; }
   .pg-pills { gap: 4px; }
   .pg-pill { padding: 5px 12px; font-size: 0.78rem; }
 }
+
+/* Org-chart (React Flow) */
+.oc-section { margin-top: 18px; }
+.oc-flow-wrap {
+  height: 640px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f8fbff 0%, #f2f6fd 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.oc-node {
+  min-width: 180px;
+  max-width: 260px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: 10px 12px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.oc-node:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.1);
+}
+
+.oc-node.is-selected {
+  border-color: #f9a825;
+  box-shadow: 0 10px 20px rgba(249, 168, 37, 0.22), 0 2px 6px rgba(15, 23, 42, 0.12);
+}
+
+.oc-node--root {
+  background: linear-gradient(135deg, #f9a825, #ffd67b);
+  color: #1a1a1a;
+}
+
+.oc-node--stage,
+.oc-node--group {
+  background: #1a237e;
+  color: #ffffff;
+}
+
+.oc-node--stream {
+  background: var(--node-accent, #1a237e);
+  color: #ffffff;
+}
+
+.oc-node--course {
+  background: #ffffff;
+  color: #1a1a1a;
+  border-left: 5px solid var(--node-accent, #1a237e);
+}
+
+.oc-node-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  line-height: 1.25;
+}
+
+.oc-node-subtitle {
+  margin-top: 5px;
+  font-size: 0.72rem;
+  opacity: 0.9;
+  line-height: 1.3;
+  max-height: 2.7em;
+  overflow: hidden;
+}
+
+.oc-node-count {
+  margin-top: 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.oc-node-handle {
+  width: 8px !important;
+  height: 8px !important;
+  border: 1px solid #ffffff !important;
+  background: #1a237e !important;
+}
+
+.oc-detail-card {
+  margin-top: 14px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: 16px 18px;
+}
+
+.oc-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.oc-detail-header h3 {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  color: #1a237e;
+  font-size: 1.25rem;
+}
+
+.oc-detail-header span {
+  font-size: 0.78rem;
+  background: #eef2ff;
+  color: #374151;
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.oc-detail-row { margin-bottom: 9px; }
+.oc-detail-row strong { display: block; color: #1a237e; font-size: 0.86rem; margin-bottom: 2px; }
+.oc-detail-row p { margin: 0; color: #1a1a1a; line-height: 1.55; font-size: 0.9rem; }
+
+.oc-next-list,
+.oc-link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.oc-next-list span {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  color: #334155;
+}
+
+.oc-link-list a {
+  text-decoration: none;
+  background: #1a237e;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.oc-link-list a:hover { background: #0f1658; }
+
+.oc-note {
+  margin: 10px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: #4b5563;
+  background: #fffbeb;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+@media (max-width: 768px) {
+  .oc-flow-wrap { height: 560px; }
+  .oc-detail-header { flex-direction: column; align-items: flex-start; }
+  .oc-node { max-width: 230px; }
+}
