@@ -275,7 +275,7 @@ a:hover { color: var(--primary-light); }
 }
 .pw-field input {
   width: 100%;
-  padding-right: 56px;
+  padding-right: 62px;
 }
 .pw-eye {
   position: absolute;
@@ -2126,4 +2126,816 @@ tr:hover { background: #f8fafc; }
   .tab-btn { padding: 6px 12px; font-size: 0.82rem; }
   .timeline { padding-left: 30px; }
   .timeline-item::before { left: -23px; width: 12px; height: 12px; }
+}
+
+/* ============================================
+   EXAM DETAIL — Production Grade (pg-*)
+   ============================================ */
+
+/* Breadcrumb */
+.pg-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+.pg-breadcrumb-link {
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+.pg-breadcrumb-link:hover { color: var(--primary-light); text-decoration: underline; }
+.pg-breadcrumb-sep { color: var(--text-light); font-size: 0.9rem; }
+.pg-breadcrumb-current { color: var(--text-secondary); font-weight: 600; }
+
+/* Quick Info Bar */
+.pg-quick-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+.pg-quick-info-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: #f8f9ff;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  flex: 1;
+  min-width: 180px;
+}
+.pg-quick-info-icon { font-size: 1.3rem; flex-shrink: 0; }
+.pg-quick-info-content { display: flex; flex-direction: column; }
+.pg-quick-info-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-light);
+}
+.pg-quick-info-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Section body spacing */
+.pg-section-body { padding-top: 4px; }
+
+/* Paper cards (Exam Pattern) */
+.pg-paper-card {
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  margin-bottom: 12px;
+}
+.pg-paper-card:last-of-type { margin-bottom: 0; }
+.pg-paper-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 10px;
+}
+.pg-paper-details { display: flex; flex-wrap: wrap; gap: 16px; }
+.pg-paper-detail { display: flex; flex-direction: column; }
+.pg-paper-detail-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-light);
+  margin-bottom: 2px;
+}
+.pg-paper-detail-value { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+.pg-pattern-meta {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-top: 10px;
+  line-height: 1.7;
+}
+.pg-pattern-meta strong { color: var(--text-secondary); }
+
+/* Syllabus */
+.pg-syllabus-block { margin-bottom: 16px; }
+.pg-syllabus-block:last-child { margin-bottom: 0; }
+.pg-syllabus-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: capitalize;
+  margin: 0 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-light);
+}
+.pg-syllabus-list {
+  padding-left: 22px;
+  margin: 0;
+}
+.pg-syllabus-list li {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.pg-syllabus-sub {
+  margin-left: 16px;
+  margin-bottom: 10px;
+}
+.pg-syllabus-sub-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: capitalize;
+  font-size: 0.9rem;
+}
+.pg-syllabus-sub-value { font-size: 0.9rem; color: var(--text-primary); }
+.pg-syllabus-text { font-size: 0.9rem; line-height: 1.7; color: var(--text-primary); margin: 0; }
+
+/* Accepted By */
+.pg-accepted-text { font-size: 0.9rem; line-height: 1.8; color: var(--text-primary); margin: 0; }
+
+/* Important Notes callout */
+.pg-notes-callout {
+  background: #fffbeb;
+  border: 1px solid #fbbf24;
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-top: 24px;
+}
+.pg-notes-callout-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.pg-notes-callout-icon { font-size: 1.3rem; }
+.pg-notes-callout-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0;
+}
+.pg-notes-callout-text {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #78350f;
+  margin: 0;
+}
+
+/* Not Found */
+.pg-not-found {
+  text-align: center;
+  padding: 64px 24px;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.pg-not-found-icon { font-size: 3.5rem; margin-bottom: 16px; }
+.pg-not-found-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin: 0 0 8px;
+}
+.pg-not-found-text {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+
+/* Exam Detail wrapper */
+.pg-exam-detail .detail-section { margin-bottom: 20px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pg-quick-info { flex-direction: column; padding: 14px 16px; }
+  .pg-quick-info-chip { min-width: unset; }
+  .pg-paper-details { flex-direction: column; gap: 8px; }
+}
+@media (max-width: 600px) {
+  .pg-notes-callout { padding: 16px 18px; }
+  .pg-not-found { padding: 40px 18px; }
+}
+
+/* ============================================
+   PG- PRODUCTION GRADE COLLEGE COMPONENTS
+   ============================================ */
+
+/* Stats row in header */
+.pg-stats-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.pg-stat-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  min-width: 120px;
+  box-shadow: var(--shadow);
+}
+.pg-stat-num {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+.pg-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Filters card */
+.pg-filters-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+}
+.pg-search-row {
+  margin-bottom: 14px;
+}
+.pg-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+.pg-filter-active {
+  color: var(--primary-light);
+  font-weight: 500;
+}
+
+/* Empty card */
+.pg-empty-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* College card list */
+.pg-college-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pg-college-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+.pg-college-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+/* Rank column */
+.pg-college-rank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.pg-rank-num {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.1;
+}
+.pg-rank-top {
+  color: var(--success);
+}
+.pg-rank-cat {
+  font-size: 0.68rem;
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* College body */
+.pg-college-body {
+  flex: 1;
+  min-width: 0;
+}
+.pg-college-title {
+  margin-bottom: 8px;
+}
+.pg-college-name {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+  line-height: 1.4;
+}
+.pg-college-name:hover {
+  color: var(--primary-light);
+}
+.pg-college-location {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  display: block;
+  margin-top: 2px;
+}
+.pg-college-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.pg-college-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.pg-chip {
+  background: #f1f5f9;
+  color: var(--text-secondary);
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+/* Right meta column */
+.pg-college-meta-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.pg-meta-item {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.pg-meta-link {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+.pg-meta-link:hover {
+  color: var(--primary-light);
+}
+
+/* Pagination ellipsis */
+.pg-ellipsis {
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  color: var(--text-light);
+  font-size: 1rem;
+}
+
+/* ---- College Detail pg- classes ---- */
+
+/* Breadcrumb */
+.pg-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+.pg-breadcrumb a {
+  color: var(--primary);
+  font-weight: 500;
+}
+.pg-breadcrumb a:hover {
+  color: var(--primary-light);
+}
+.pg-breadcrumb-sep {
+  color: var(--text-light);
+}
+.pg-breadcrumb-current {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Header short name */
+.pg-header-short {
+  opacity: 0.8;
+  margin-top: 4px;
+  font-size: 1rem;
+}
+
+/* Color-coded header badges */
+.pg-badge-cat {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+.pg-badge-govt {
+  background: rgba(46,125,50,0.25);
+  color: #a5d6a7;
+}
+.pg-badge-private {
+  background: rgba(249,168,37,0.25);
+  color: #ffe082;
+}
+.pg-badge-deemed {
+  background: rgba(0,137,123,0.25);
+  color: #80cbc4;
+}
+.pg-badge-naac {
+  background: rgba(156,39,176,0.2);
+  color: #ce93d8;
+}
+.pg-badge-nirf {
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.9);
+}
+
+/* Detail field layout */
+.pg-detail-field {
+  margin-bottom: 16px;
+}
+.pg-detail-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
+}
+.pg-detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Exam badges as links */
+.pg-exam-badge {
+  display: inline-block;
+  background: #e8eaf6;
+  color: var(--primary);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.pg-exam-badge:hover {
+  background: var(--primary);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Course chips */
+.pg-course-chip {
+  display: inline-block;
+  background: #f1f5f9;
+  color: var(--text-primary);
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* Highlights card */
+.pg-highlights-card {
+  background: #f0fdf4;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-top: 20px;
+  box-shadow: var(--shadow);
+  border-left: 4px solid #86efac;
+}
+.pg-highlights-card h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--success);
+  margin-bottom: 10px;
+}
+.pg-highlights-text {
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+/* Not-found card */
+.pg-notfound-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
+  margin-top: 20px;
+}
+
+/* Responsive overrides */
+@media (max-width: 768px) {
+  .pg-college-card {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+  .pg-college-rank {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .pg-college-meta-right {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .pg-stats-row {
+    gap: 10px;
+  }
+  .pg-stat-pill {
+    min-width: 90px;
+    padding: 10px 14px;
+  }
+  .pg-filter-row {
+    flex-direction: column;
+  }
+}
+
+/* ============================================
+   PG- Toolbar, Search, Pills, Accordion List
+   (CareerPaths & SchoolExams shared)
+   ============================================ */
+.pg-toolbar {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pg-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.pg-search-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 0.9rem;
+  pointer-events: none;
+  color: var(--text-light);
+}
+.pg-search-input {
+  width: 100%;
+  padding: 11px 40px 11px 40px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-white);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.pg-search-input:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(83,75,174,0.1);
+}
+.pg-search-input::placeholder { color: var(--text-light); }
+.pg-search-clear {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 50%;
+  transition: color 0.15s;
+}
+.pg-search-clear:hover { color: var(--error); }
+
+.pg-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.pg-pill-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-right: 4px;
+}
+.pg-pill {
+  padding: 6px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-white);
+  font-size: 0.82rem;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.pg-pill:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+.pg-pill-active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.pg-pill-active:hover {
+  background: var(--primary-light);
+  border-color: var(--primary-light);
+  color: #fff;
+}
+
+/* Accordion list (single-column) */
+.pg-acc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pg-acc-card {
+  padding: 0;
+  border: none;
+  margin-bottom: 0;
+}
+.pg-acc-card .acc-header {
+  padding: 16px 20px;
+}
+.pg-acc-card .acc-body {
+  padding: 16px 20px 20px;
+}
+.pg-acc-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+/* Sections inside accordion body */
+.pg-acc-section {
+  margin-bottom: 14px;
+}
+.pg-acc-section:last-child { margin-bottom: 0; }
+.pg-acc-section-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin: 0 0 6px;
+}
+.pg-acc-section-text {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin: 0;
+}
+.pg-chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pg-acc-list-items {
+  padding-left: 20px;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+/* Scholarship highlight (green) */
+.pg-scholarship-highlight {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  background: #e8f5e9;
+  border-radius: var(--radius);
+  line-height: 1.6;
+}
+.pg-scholarship-highlight .acc-detail-label { color: var(--success); }
+.pg-scholarship-highlight .acc-detail-value { color: var(--success); font-weight: 500; }
+
+/* Syllabus collapsible sub-sections */
+.pg-syllabus-item {
+  margin-bottom: 4px;
+  border-radius: var(--radius);
+  background: #f8fafc;
+  overflow: hidden;
+}
+.pg-syllabus-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.15s;
+}
+.pg-syllabus-toggle:hover { background: #eef0f5; }
+.pg-syllabus-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+.pg-syllabus-chevron {
+  font-size: 0.9rem;
+}
+.pg-syllabus-topics {
+  padding: 4px 12px 10px 32px;
+  font-size: 0.84rem;
+}
+
+/* Pagination ellipsis */
+.pg-pagination-ellipsis {
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  color: var(--text-light);
+  font-size: 1.1rem;
+  user-select: none;
+}
+
+/* Inline metadata rows */
+.pg-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 10px;
+  align-items: baseline;
+}
+.pg-meta-row--wrap { flex-wrap: wrap; }
+.pg-meta-tag {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+.pg-meta-tag strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+/* Accordion action row */
+.pg-acc-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* Search icon as text (emoji fallback) */
+.pg-search-icon-text {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pg-toolbar { padding: 16px; }
+  .pg-acc-card .acc-header { padding: 14px 16px; }
+  .pg-acc-card .acc-body { padding: 14px 16px 16px; }
+  .pg-acc-icon { font-size: 1.4rem; }
+}
+@media (max-width: 600px) {
+  .pg-pills { gap: 4px; }
+  .pg-pill { padding: 5px 12px; font-size: 0.78rem; }
 }

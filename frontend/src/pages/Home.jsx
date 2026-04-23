@@ -109,70 +109,55 @@ const afterTenthStreams = [
 ]
 
 const afterGradPaths = [
-  // 0 - Management
+  // === Management (0-2) ===
   { name: 'MBA / PGDM (2 yrs)', eligibility: 'Any Bachelor\'s degree (any stream). Min 50%.', exams: 'CAT, XAT, MAT, CMAT, SNAP, NMAT, IIFT, GMAT', colleges: '21 IIMs, XLRI, FMS Delhi, ISB, MDI, SPJIMR, JBIMS, NMIMS, SIBM' },
-  // 1 - Engineering PG
-  { name: 'M.Tech / ME (2 yrs)', eligibility: 'B.Tech/B.E. in relevant branch. Min 60%.', exams: 'GATE (primary), PGCET (Karnataka, AP, TS), CCMT (NIT/IIIT counselling via GATE), IIT-specific written tests (IISc, some IITs for direct admission), BITS HD, University entrance exams', colleges: 'IITs, IISc, NITs, IIITs, BITS (M.E.). Also: PSU recruitment (IOCL, NTPC, BHEL, ONGC, GAIL, BARC) via GATE score', note: 'GATE is the main route but NOT the only one. Some IITs conduct their own written tests + interview. State universities have PGCET. BITS has its own HD entrance.' },
-  // 2 - Law PG (3yr LLB)
-  { name: 'LLB (3 yrs) — after ANY graduation', eligibility: 'Any Bachelor\'s degree. Min 45%. No age limit.', exams: 'MH CET Law (3yr), DU LLB entrance, BHU LLB, University entrances', colleges: 'DU Law Faculty, BHU, Symbiosis, GLC Mumbai, ILS Pune, State Law Colleges', note: 'Engineers, Doctors, Commerce, Arts — ALL can do LLB after graduation!' },
-  // 3 - Medical PG
-  { name: 'MD / MS (Medical PG, 3 yrs)', eligibility: 'MBBS degree + Internship completion.', exams: 'NEET PG (only exam for all MD/MS admissions)', colleges: 'AIIMS (23), PGI Chandigarh, CMC Vellore, JIPMER, NIMHANS, Govt Medical Colleges' },
-  // 4 - LLM
-  { name: 'LLM (1-2 yrs)', eligibility: 'LLB/BA LLB degree.', exams: 'CLAT PG, AILET PG, University entrances', colleges: 'NLUs, DU, NLU Delhi, NALSAR, NLSIU' },
-  // 5 - M.Sc
-  { name: 'M.Sc (2 yrs)', eligibility: 'B.Sc in relevant subject. Min 50%.', exams: 'IIT JAM, CUET PG, BHU PET, University entrances', colleges: 'IITs, IISc, IISERs, JNU, BHU, DU, Central & State Universities' },
-  // 6 - MA
-  { name: 'MA (2 yrs)', eligibility: 'BA in relevant subject (some accept any grad).', exams: 'CUET PG, JNU entrance, BHU PET, University entrances', colleges: 'JNU, DU, BHU, HCU, Jadavpur, AMU, TISS' },
-  // 7 - MCA
-  { name: 'MCA (2 yrs)', eligibility: 'Any graduation with Maths at 12th/grad level. Min 50%.', exams: 'NIMCET, State MCA CET, CUET PG', colleges: 'NIT Trichy/Warangal/Allahabad, JNU, BHU, Anna University' },
-  // 8 - M.Pharm
-  { name: 'M.Pharm (2 yrs)', eligibility: 'B.Pharm degree. Min 55%.', exams: 'GPAT (primary), NIPER JEE, State PG Pharmacy CET', colleges: 'NIPER (7 campuses), BITS, Jamia Hamdard, Manipal, ICT Mumbai' },
-  // 9 - UGC/CSIR NET
-  { name: 'UGC NET / CSIR NET (Teaching & Research eligibility)', eligibility: 'Master\'s degree with 55% (50% SC/ST/OBC/PwD).', exams: 'UGC NET (Humanities/Social Sci/Commerce), CSIR NET (Science subjects)', colleges: 'Qualifies for Assistant Professor in any University/College. JRF for PhD research funding.', note: 'NET is an eligibility test, not an admission exam. JRF provides Rs. 37,000/month fellowship for PhD.' },
-  // 10 - PhD
-  { name: 'PhD / FPM (3-5 yrs)', eligibility: 'Master\'s degree (PhD). B.Tech+GATE or NET/JRF for some. FPM: any PG or B.Tech with good scores.', exams: 'GATE, UGC NET, CSIR NET, JEST, TIFR GS, NBHM, IIT/IISc written tests, University entrance', colleges: 'IITs, IISc, IISERs, TIFR, HRI, CMI, IIMs (FPM), JNU, Central Universities' },
-  // 11 - Super specialty
-  { name: 'DM / MCh (Super Specialty, 3 yrs)', eligibility: 'MD/MS degree in relevant specialty.', exams: 'NEET SS (only exam)', colleges: 'AIIMS, PGI, NIMHANS, CMC, SGPGI Lucknow, Sanjay Gandhi PGI' },
-  // 12 - DNB
-  { name: 'DNB (Diplomate of National Board, 3 yrs)', eligibility: 'MBBS degree + Internship.', exams: 'NEET PG (counselling via NBE)', colleges: 'NBE-accredited hospitals (Apollo, Fortis, Max, Medanta, Narayana Health, private & corporate hospitals)', note: 'DNB is equivalent to MD/MS. Training happens in accredited hospitals, not just medical colleges.' },
-  // 13 - MFA/Performing Arts
-  { name: 'MFA / M.Mus / MA Performing Arts (2 yrs)', eligibility: 'BFA/BPA/BA in relevant art form. Audition/portfolio.', exams: 'University entrance + audition/portfolio', colleges: 'MSU Baroda, BHU, Hyderabad Univ, JJ School of Art, Rabindra Bharati, Kalakshetra' },
-  // 14 - Sports PG
-  { name: 'M.P.Ed / M.Sc Sports Science (2 yrs)', eligibility: 'B.P.Ed / B.Sc Sports Science / any graduation with sports background.', exams: 'University entrance + physical fitness', colleges: 'LNIPE Gwalior, NIS Patiala, IGIPESS Delhi, Pune University, State Universities' },
-  // 15 - Film/Mass Comm PG
-  { name: 'PG Diploma in Film / Mass Communication (1-2 yrs)', eligibility: 'Any graduation. Age varies.', exams: 'FTII entrance, IIMC entrance, Institute tests', colleges: 'FTII Pune, SRFTI Kolkata, IIMC Delhi, ACJ Chennai, Symbiosis, XIC Mumbai' },
-  // 16 - UPSC Civil Services
-  { name: 'UPSC Civil Services (IAS/IPS/IFS/IRS)', eligibility: 'Any Bachelor\'s degree from a recognized university. Age: 21-32 (Gen), relaxation for SC/ST/OBC. Max 6 attempts (Gen).', exams: 'UPSC CSE: Prelims (June) → Mains (Sep) → Interview (Feb-Apr)', colleges: 'LBSNAA Mussoorie (IAS), SVPNPA Hyderabad (IPS), FSI (IFS). Training after selection.', note: 'India\'s most prestigious exam. ~10 lakh applicants, ~1000 selected. Optional subjects include Maths, Pub Admin, Sociology, History, Geography, etc.' },
-  // 17 - State PSC
-  { name: 'State PSC (State Civil Services)', eligibility: 'Any Bachelor\'s degree. Age varies by state (21-37 typically). Domicile required for most states.', exams: 'State PSC exams: UPPSC, MPPSC, BPSC, TSPSC, APPSC, RPSC, WBPSC, KPSC, TNPSC, GPSC, HPSC, JPSC etc.', colleges: 'State Administrative Training Institutes. Posts: SDM, DSP, BDO, Tehsildar, RTO, etc.' },
-  // 18 - Banking
-  { name: 'Banking (PO/Clerk/SO)', eligibility: 'Any Bachelor\'s degree. Age: 20-30 (PO), varies for Clerk/SO.', exams: 'IBPS PO, IBPS Clerk, IBPS SO, SBI PO, SBI Clerk, RBI Grade B, RBI Assistant, NABARD, SIDBI', colleges: 'Bank training centres after selection. RBI, SBI, PNB, BOB, Canara Bank, etc.', note: 'RBI Grade B is the most prestigious banking exam. SBI PO is the most popular.' },
-  // 19 - SSC
-  { name: 'SSC CGL / SSC CHSL / SSC MTS', eligibility: 'CGL: Any graduation. CHSL: Class 12. MTS: Class 10. Age: 18-32 (varies).', exams: 'SSC CGL (Tier 1+2), SSC CHSL (Tier 1+2), SSC MTS', colleges: 'Central Govt ministries/departments after selection. Posts: Inspector (IT/Customs/CBI), Auditor, Accountant, Tax Asst, LDC, UDC, etc.', note: 'SSC CGL leads to Group B & C posts in Central Govt. One of the largest recruitment exams in India.' },
-  // 20 - Defence (after graduation)
-  { name: 'CDS / SSB (Defence after Graduation)', eligibility: 'Any graduation for IMA/OTA. Engineering degree for TES (some entries). Unmarried. Age: 19-25 (varies by entry).', exams: 'CDS Exam (UPSC) + SSB Interview, AFCAT (Air Force), Indian Navy entrance (various entries)', colleges: 'IMA Dehradun (Army), INA Ezhimala (Navy), AFA Dundigal (Air Force), OTA Chennai (Short Service)', note: 'CDS is for permanent commission. SSC (Short Service Commission) also available. Women eligible for all branches.' },
-  // 21 - M.Des
-  { name: 'M.Des (2 yrs)', eligibility: 'B.Des / B.Arch / B.Tech / any graduation (varies by institute). Portfolio required.', exams: 'CEED (IITs/IISc), NID M.Des entrance, NIFT M.Des entrance, UCEED (for some)', colleges: 'IIT Bombay IDC, IIT Delhi, IIT Guwahati, IIT Hyderabad, IISc, NID (4 campuses), NIFT, DSK ISD Pune' },
-  // 22 - MSW
-  { name: 'MSW (Master of Social Work, 2 yrs)', eligibility: 'Any Bachelor\'s degree. Min 50%.', exams: 'TISS entrance (TISSNET + GD/PI), CUET PG, University entrances', colleges: 'TISS Mumbai/Tuljapur/Guwahati/Hyderabad, DU, JMI, Loyola Chennai, Madras School of Social Work' },
-  // 23 - M.Ed
-  { name: 'M.Ed (Master of Education, 2 yrs)', eligibility: 'B.Ed degree with 50%.', exams: 'State M.Ed CET, CUET PG, University entrances', colleges: 'CIE DU, BHU, Jamia Millia Islamia, State Universities, IGNOU' },
-  // 24 - CA/CS/CMA (can start after grad too)
-  { name: 'CA / CS / CMA (Professional Courses)', eligibility: 'CA: Can register after graduation (skip Foundation, direct Intermediate). CS/CMA: Similar.', exams: 'CA Intermediate + Final (ICAI), CS Executive + Professional (ICSI), CMA Intermediate + Final (ICMAI)', colleges: 'Self-study + coaching. Articleship (CA) under practicing CA for 3 years.', note: 'If you already have a Commerce/relevant graduation, you can skip Foundation and enter at Intermediate level directly.' },
-  // 25 - M.Plan
-  { name: 'M.Plan (Master of Planning, 2 yrs)', eligibility: 'B.Plan / B.Arch / B.Tech (Civil/relevant). Min 55%.', exams: 'GATE (Planning), IIT entrance, CEPT entrance, SPA entrance', colleges: 'SPA Delhi/Bhopal/Vijayawada, IIT Kharagpur/Roorkee, CEPT Ahmedabad' },
-  // 26 - Judiciary
-  { name: 'Judiciary / Judicial Services', eligibility: 'LLB/BA LLB degree. Age: 23-35 (varies by state).', exams: 'State Judicial Service Exam (Prelims + Mains + Interview). Each state conducts separately.', colleges: 'State Judicial Academies. Posts: Civil Judge (Junior Division), Magistrate.', note: 'Path to becoming a Judge. After years of experience, promotion to District Judge, High Court, and potentially Supreme Court.' },
-  // 27 - UPSC other services
-  { name: 'UPSC Other Services (ISS/IES/IFoS/CMS/CAPF)', eligibility: 'Varies: IES (Engineering grad), ISS (Stats PG), IFoS (Science grad), CMS (MBBS), CAPF (Any grad). Age: 21-32.', exams: 'UPSC IES/ISS (Engineering/Statistical Services), UPSC IFoS (Indian Forest Service), UPSC CMS (Combined Medical Services), UPSC CAPF (Central Armed Police Forces)', colleges: 'IGNFA Dehradun (IFoS), respective training academies. Posts: Asst Executive Engineer, Statistical Officer, Forest Officer, Medical Officer, CAPF officer.', note: 'These are separate UPSC exams, NOT through Civil Services. Each has its own eligibility and exam pattern.' },
-  // 28 - Railway
-  { name: 'Railways (RRB NTPC / Group D / JE / ALP)', eligibility: 'NTPC: Any graduation. JE: Engineering diploma/degree. Group D: Class 10. ALP: ITI/Diploma.', exams: 'RRB NTPC, RRB Group D, RRB JE, RRB ALP', colleges: 'Zonal Railway Training Institutes. Posts: Station Master, Goods Guard, Commercial Apprentice, Junior Engineer, Asst Loco Pilot.', note: 'Indian Railways is the largest employer in India. RRB NTPC alone gets 1+ crore applications.' },
-  // 29 - Insurance/PSU
-  { name: 'Insurance & PSU Exams', eligibility: 'Any graduation for most. Engineering degree for Technical PSU posts.', exams: 'LIC AAO/ADO, NIACL AO, UIIC AO, EPFO SSA/EO. PSU: GATE-based (IOCL, NTPC, BHEL, ONGC, GAIL, PGCIL, SAIL)', colleges: 'LIC, GIC, New India Assurance, Oriental Insurance. PSU training centres.', note: 'Engineering PSU recruitment is primarily through GATE score. Non-technical PSUs have their own exams.' },
-  // 30 - PG Diploma Management
-  { name: 'PGDM in Specialized Areas (1-2 yrs)', eligibility: 'Any Bachelor\'s degree. Work experience preferred for some.', exams: 'CAT/XAT/GMAT (for top institutes). Institute-specific tests for others.', colleges: 'ISB Hyderabad (PGP), XLRI (HRM), IRMA (Rural Mgmt), IIMC (Forest Mgmt), MANAGE (Agri), IIFM Bhopal, TISS (HRM/Social Enterprise)' },
-  // 31 - M.Arch
+  { name: 'PGDM in Specialized Areas (1-2 yrs)', eligibility: 'Any Bachelor\'s degree. Work experience preferred for some.', exams: 'CAT/XAT/GMAT (for top institutes). Institute-specific tests for others.', colleges: 'ISB Hyderabad (PGP), XLRI (HRM), IRMA (Rural Mgmt), MANAGE (Agri Mgmt), IIFM Bhopal, TISS (HRM/Social Enterprise)' },
+  { name: 'MHA / MBA Healthcare (2 yrs)', eligibility: 'Any graduation (MBBS/BDS/BPT/B.Sc Nursing preferred). Min 50%.', exams: 'TISS entrance, CAT/XAT (for IIMs), CUET PG, Institute entrance', colleges: 'TISS Mumbai, IIM Lucknow (HM), IIHMR Jaipur, Symbiosis (SCHM), AIIMS (MHA), NIHFW Delhi' },
+
+  // === Engineering & Tech PG (3-8) ===
+  { name: 'M.Tech / ME (2 yrs)', eligibility: 'B.Tech/B.E. in relevant branch. Min 60%.', exams: 'GATE (primary), PGCET (Karnataka, AP, TS), CCMT (NIT/IIIT counselling via GATE), IIT-specific written tests, BITS HD, University entrance exams', colleges: 'IITs, IISc, NITs, IIITs, BITS (M.E.), IIIT Hyderabad, COEP, State Tech Universities', note: 'GATE is the main route but NOT the only one. Some IITs conduct their own written tests + interview. State universities have PGCET. BITS has its own HD entrance.' },
+  { name: 'MCA (2 yrs)', eligibility: 'Any graduation with Maths at 12th/grad level. Min 50%.', exams: 'NIMCET (NIT MCA Common Entrance), State MCA CET, CUET PG, IPU CET, TANCET', colleges: 'NIT Trichy/Warangal/Allahabad/Surathkal, JNU, BHU, Anna University, DU, Pune University' },
+  { name: 'M.Des (2 yrs)', eligibility: 'B.Des / B.Arch / B.Tech / any graduation (varies by institute). Portfolio required.', exams: 'CEED (IITs/IISc), NID M.Des entrance, NIFT M.Des entrance', colleges: 'IIT Bombay IDC, IIT Delhi, IIT Guwahati, IIT Hyderabad, IISc, NID (4 campuses), NIFT, DSK ISD Pune' },
   { name: 'M.Arch (2 yrs)', eligibility: 'B.Arch degree. Min 55%. Valid GATE score (Architecture).', exams: 'GATE (Architecture & Planning), CEED (some IITs), SPA entrance, Institute tests', colleges: 'SPA Delhi, IIT Roorkee/Kharagpur, CEPT, JJ College of Architecture, NIT Trichy' },
+  { name: 'M.Plan (Master of Planning, 2 yrs)', eligibility: 'B.Plan / B.Arch / B.Tech (Civil/relevant). Min 55%.', exams: 'GATE (Planning), IIT entrance, CEPT entrance, SPA entrance', colleges: 'SPA Delhi/Bhopal/Vijayawada, IIT Kharagpur/Roorkee, CEPT Ahmedabad' },
+  { name: 'M.Sc Data Science / AI / ML (2 yrs)', eligibility: 'B.Tech / B.Sc / BCA with Maths background. Min 55%.', exams: 'GATE, IIT JAM, Institute entrance, CUET PG', colleges: 'IIT Madras, IIT Hyderabad, IISc, CMI, ISI Kolkata, IIIT Hyderabad, Chennai Mathematical Institute' },
+
+  // === Law PG (9-10) ===
+  { name: 'LLB (3 yrs) — after ANY graduation', eligibility: 'Any Bachelor\'s degree. Min 45%. No age limit.', exams: 'MH CET Law (3yr), DU LLB entrance, BHU LLB, University entrances', colleges: 'DU Law Faculty, BHU, Symbiosis, GLC Mumbai, ILS Pune, State Law Colleges', note: 'Engineers, Doctors, Commerce, Arts — ALL can do LLB after graduation!' },
+  { name: 'LLM (1-2 yrs)', eligibility: 'LLB/BA LLB degree.', exams: 'CLAT PG, AILET PG, University entrances', colleges: 'NLUs, DU, NLU Delhi, NALSAR, NLSIU, NUJS Kolkata' },
+
+  // === Medical PG (11-17) ===
+  { name: 'MD / MS (Medical PG, 3 yrs)', eligibility: 'MBBS degree + Internship completion.', exams: 'NEET PG (only exam for all MD/MS admissions)', colleges: 'AIIMS (23), PGI Chandigarh, CMC Vellore, JIPMER, NIMHANS, Govt Medical Colleges' },
+  { name: 'DM / MCh (Super Specialty, 3 yrs)', eligibility: 'MD/MS degree in relevant specialty.', exams: 'NEET SS (only exam)', colleges: 'AIIMS, PGI, NIMHANS, CMC, SGPGI Lucknow' },
+  { name: 'DNB (Diplomate of National Board, 3 yrs)', eligibility: 'MBBS degree + Internship.', exams: 'NEET PG (counselling via NBE)', colleges: 'NBE-accredited hospitals (Apollo, Fortis, Max, Medanta, Narayana Health)', note: 'DNB is equivalent to MD/MS. Training happens in accredited hospitals, not just medical colleges.' },
+  { name: 'PG Diploma in Clinical Specialties (2 yrs)', eligibility: 'MBBS degree.', exams: 'NEET PG, DNB CET, State PG CET', colleges: 'District hospitals, Medical colleges. Specialties: Anaesthesia, Obstetrics, Paediatrics, Ortho, etc.', note: 'Shorter than MD/MS. Good for those wanting to practice quickly in rural/district areas.' },
+  { name: 'M.Sc Nursing (2 yrs)', eligibility: 'B.Sc Nursing with 55%. 1 year clinical experience required.', exams: 'State PG Nursing CET, AIIMS M.Sc Nursing entrance', colleges: 'AIIMS, CMC Vellore, NIMHANS, RAK CON Delhi, State Nursing Colleges' },
+  { name: 'MPH (Master of Public Health, 2 yrs)', eligibility: 'MBBS / BDS / BAMS / B.Sc Nursing / any health-related graduation.', exams: 'Institute entrance, CUET PG', colleges: 'IIPH (Gandhinagar, Hyderabad, Delhi), AIIMS, JNU, TISS, Manipal, CMC Vellore' },
+  { name: 'M.Pharm (2 yrs)', eligibility: 'B.Pharm degree. Min 55%.', exams: 'GPAT (primary), NIPER JEE, State PG Pharmacy CET', colleges: 'NIPER (7 campuses), BITS, Jamia Hamdard, Manipal, ICT Mumbai' },
+
+  // === Science & Arts PG (18-30) ===
+  { name: 'M.Sc (2 yrs)', eligibility: 'B.Sc in relevant subject. Min 50%.', exams: 'IIT JAM, CUET PG, BHU PET, University entrances', colleges: 'IITs, IISc, IISERs, JNU, BHU, DU, Central & State Universities' },
+  { name: 'MA (2 yrs)', eligibility: 'BA in relevant subject (some accept any grad).', exams: 'CUET PG, JNU entrance, BHU PET, University entrances', colleges: 'JNU, DU, BHU, HCU, Jadavpur, AMU, TISS' },
+  { name: 'M.Com (2 yrs)', eligibility: 'B.Com / BBA / related degree. Min 50%.', exams: 'CUET PG, DU entrance, BHU PET, University entrances', colleges: 'DU (SRCC, Hindu, Hansraj), DSE, BHU, Christ University, Loyola, JMI, Symbiosis' },
+  { name: 'M.Sc Agriculture / M.Sc Horticulture (2 yrs)', eligibility: 'B.Sc Agriculture / B.Sc Horticulture. Min 55%.', exams: 'ICAR AIEEA PG, State Agri University entrance, CUET PG', colleges: 'IARI Delhi, TNAU, PAU, ANGRAU, GBPUAT, UHS Bagalkot, State Agri Universities' },
+  { name: 'MVSc (Master of Veterinary Science, 2 yrs)', eligibility: 'BVSc & AH degree.', exams: 'ICAR AIEEA PG, State Vet CET', colleges: 'IVRI Izatnagar, GADVASU, TANUVAS, MAFSU, State Veterinary Universities' },
+  { name: 'MSW (Master of Social Work, 2 yrs)', eligibility: 'Any Bachelor\'s degree. Min 50%.', exams: 'TISS entrance (TISSNET + GD/PI), CUET PG, University entrances', colleges: 'TISS Mumbai/Tuljapur/Guwahati/Hyderabad, DU, JMI, Loyola Chennai' },
+  { name: 'M.Ed (Master of Education, 2 yrs)', eligibility: 'B.Ed degree with 50%.', exams: 'State M.Ed CET, CUET PG, University entrances', colleges: 'CIE DU, BHU, Jamia Millia Islamia, State Universities, IGNOU' },
+  { name: 'MFA / M.Mus / MA Performing Arts (2 yrs)', eligibility: 'BFA/BPA/BA in relevant art form. Audition/portfolio.', exams: 'University entrance + audition/portfolio', colleges: 'MSU Baroda, BHU, Hyderabad Univ, JJ School of Art, Rabindra Bharati, Kalakshetra' },
+  { name: 'M.P.Ed / M.Sc Sports Science (2 yrs)', eligibility: 'B.P.Ed / B.Sc Sports Science / any graduation with sports background.', exams: 'University entrance + physical fitness', colleges: 'LNIPE Gwalior, NIS Patiala, IGIPESS Delhi, Pune University, State Universities' },
+  { name: 'PG Diploma in Film / Mass Communication (1-2 yrs)', eligibility: 'Any graduation. Age varies.', exams: 'FTII entrance, IIMC entrance, Institute tests', colleges: 'FTII Pune, SRFTI Kolkata, IIMC Delhi, ACJ Chennai, Symbiosis, XIC Mumbai' },
+  { name: 'MA / M.Sc Yoga & Naturopathy (2 yrs)', eligibility: 'BNYS / B.Sc Yoga / BA Yoga / Related graduation.', exams: 'University entrance', colleges: 'S-VYASA Bangalore, Morarji Desai National Inst Delhi, Patanjali University, Dev Sanskriti Vishwavidyalaya' },
+  { name: 'M.Lib.I.Sc (Library & Info Science, 1 yr)', eligibility: 'B.Lib.I.Sc or equivalent. Min 50%.', exams: 'University entrance, CUET PG', colleges: 'DU, BHU, AMU, JMI, IGNOU, State Universities' },
+
+  // === Research & Teaching (31-34) ===
+  { name: 'UGC NET / CSIR NET (Teaching & Research eligibility)', eligibility: 'Master\'s degree with 55% (50% SC/ST/OBC/PwD).', exams: 'UGC NET (Humanities/Social Sci/Commerce), CSIR NET (Science subjects)', colleges: 'Qualifies for Assistant Professor in any University/College. JRF provides fellowship for PhD.', note: 'NET is an eligibility test, not an admission exam. JRF provides Rs. 37,000/month fellowship for PhD.' },
+  { name: 'PhD / FPM (3-5 yrs)', eligibility: 'Master\'s degree (PhD). B.Tech+GATE or NET/JRF for some. FPM: any PG or B.Tech with good scores.', exams: 'GATE, UGC NET, CSIR NET, JEST, TIFR GS, NBHM, IIT/IISc written tests, University entrance', colleges: 'IITs, IISc, IISERs, TIFR, HRI, CMI, IIMs (FPM), JNU, Central Universities' },
+  { name: 'Integrated PhD / BS-MS-PhD (5-6 yrs)', eligibility: 'B.Sc / B.Tech / M.Sc (varies). Strong academic record.', exams: 'IISc entrance, IISER entrance, JEST, TIFR GS, NBHM, Institute tests', colleges: 'IISc Bangalore, IISERs, TIFR, HRI, IMSc, CMI, NISER' },
+  { name: 'Post-Doctoral Research (1-3 yrs)', eligibility: 'PhD in relevant field. Published research papers.', exams: 'No exam. Application + research proposal + interview.', colleges: 'IITs, IISc, IISERs, TIFR, NCBS, JNU, International universities. Funded by DST, CSIR, DBT, SERB fellowships.' },
+
+  // === Professional Courses (35-36) ===
+  { name: 'CA / CS / CMA (Professional Courses)', eligibility: 'CA: Can register after graduation (skip Foundation, direct Intermediate). CS/CMA: Similar.', exams: 'CA Intermediate + Final (ICAI), CS Executive + Professional (ICSI), CMA Intermediate + Final (ICMAI)', colleges: 'Self-study + coaching. Articleship (CA) under practicing CA for 3 years.', note: 'If you already have a Commerce/relevant graduation, you can skip Foundation and enter at Intermediate level directly.' },
+  { name: 'CFA / FRM (Global Finance Certifications)', eligibility: 'Any Bachelor\'s degree (CFA). CFA requires 4 yrs work exp for charter. FRM: no degree required.', exams: 'CFA Level 1, 2, 3 (CFA Institute, USA). FRM Part 1, 2 (GARP, USA).', colleges: 'Self-study + coaching. Globally recognized. CFA is gold standard for investment/equity research/portfolio mgmt.' },
 ]
 
 const schoolStages = [
@@ -211,14 +196,15 @@ export default function Home() {
   ]
 
   // Group grad paths for tabbed view
+  // Management: 0-2, Engineering: 3-8, Law: 9-10, Medical: 11-17, Science&Arts: 18-29, Research: 30-33, Professional: 34-35
   const gradGroups = [
-    { id: 'management', label: 'Management & MBA', indices: [0, 1, 24] },
-    { id: 'engineering-pg', label: 'Engineering & Tech PG', indices: [2, 3, 4, 5, 6] },
-    { id: 'law-pg', label: 'Law PG', indices: [7, 8] },
-    { id: 'medical-pg', label: 'Medical PG', indices: [9, 10, 11, 29, 30, 31, 25] },
-    { id: 'science-arts-pg', label: 'Science & Arts PG', indices: [12, 13, 23, 14, 27, 28, 15, 16, 17, 18, 19] },
-    { id: 'research', label: 'Research & Teaching', indices: [20, 21, 26] },
-    { id: 'professional', label: 'Professional Courses', indices: [22] },
+    { id: 'management', label: 'Management & MBA', indices: [0, 1, 2] },
+    { id: 'engineering-pg', label: 'Engineering & Tech PG', indices: [3, 4, 5, 6, 7, 8] },
+    { id: 'law-pg', label: 'Law PG', indices: [9, 10] },
+    { id: 'medical-pg', label: 'Medical PG', indices: [11, 12, 13, 14, 15, 16, 17] },
+    { id: 'science-arts-pg', label: 'Science & Arts PG', indices: [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29] },
+    { id: 'research', label: 'Research & Teaching', indices: [30, 31, 32, 33] },
+    { id: 'professional', label: 'Professional Courses', indices: [34, 35] },
   ]
 
   return (

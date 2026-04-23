@@ -143,7 +143,7 @@ export default function Register() {
                       type={showPw ? 'text' : 'password'}
                       value={form.password}
                       onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
-                      placeholder="Min 8 chars, 1 uppercase, 1 number"
+                      placeholder="Min 8 chars, uppercase + number"
                       autoComplete="new-password"
                       className={errors.password ? 'input-error' : ''}
                     />
