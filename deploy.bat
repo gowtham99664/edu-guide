@@ -4,9 +4,9 @@ REM ============================================================
 REM  EduGuide India — Windows Full Stack Deploy Script
 REM  Usage: deploy.bat
 REM  Builds and deploys: PostgreSQL, Ollama, Backend, Frontend
-REM  Frontend: http://10.127.248.85:1206
-REM  Backend:  http://10.127.248.85:1207
-REM  API Docs: http://10.127.248.85:1207/docs
+REM  Frontend: http://<host>:1206
+REM  Backend:  http://<host>:1207
+REM  API Docs: http://<host>:1207/docs
 REM ============================================================
 
 set PROJECT_DIR=%~dp0

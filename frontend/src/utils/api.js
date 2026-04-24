@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://10.127.248.85:1207'
+const BASE_URL = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:1207`
 
 async function request(method, path, body, token) {
   const headers = { 'Content-Type': 'application/json' }

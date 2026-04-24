@@ -3,9 +3,9 @@
 #  EduGuide India — Full Stack Deploy Script
 #  Usage: bash /opt/edu-guide/deploy.sh
 #  Builds and deploys: PostgreSQL, Ollama, Backend, Frontend
-#  Frontend: http://10.127.248.85:1206
-#  Backend:  http://10.127.248.85:1207
-#  API Docs: http://10.127.248.85:1207/docs
+#  Frontend: http://<host>:1206
+#  Backend:  http://<host>:1207
+#  API Docs: http://<host>:1207/docs
 # ============================================================
 
 set -e
@@ -13,7 +13,9 @@ set -e
 PROJECT_DIR="/opt/edu-guide"
 FRONTEND_PORT=1206
 BACKEND_PORT=1207
-VM_IP="10.127.248.85"
+
+# Host shown in summary URLs (override with DEPLOY_HOST if needed)
+APP_HOST="${DEPLOY_HOST:-localhost}"
 
 echo "======================================================"
 echo " EduGuide India - Full Stack Deployment"
@@ -104,13 +106,12 @@ echo ""
 echo "======================================================"
 echo " Deployment Summary"
 echo "======================================================"
-echo " Frontend  http://${VM_IP}:${FRONTEND_PORT}    [$FRONTEND_STATUS]"
-echo " Backend   http://${VM_IP}:${BACKEND_PORT}     [$BACKEND_STATUS]"
-echo " Ollama    http://${VM_IP}:11434        [$OLLAMA_STATUS]"
-echo " API Docs  http://${VM_IP}:${BACKEND_PORT}/docs"
+echo " Frontend  http://${APP_HOST}:${FRONTEND_PORT}    [$FRONTEND_STATUS]"
+echo " Backend   http://${APP_HOST}:${BACKEND_PORT}     [$BACKEND_STATUS]"
+echo " Ollama    http://${APP_HOST}:11434        [$OLLAMA_STATUS]"
+echo " API Docs  http://${APP_HOST}:${BACKEND_PORT}/docs"
 echo ""
 echo " .env file: $PROJECT_DIR/backend/.env"
-echo " Update SMTP_EMAIL and SMTP_PASSWORD for OTP emails"
 echo "======================================================"
 
 docker ps --filter "name=eduguide" --filter "name=edu-guide" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
