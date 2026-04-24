@@ -1,4 +1,5 @@
 @echo off
+setlocal EnableDelayedExpansion
 REM ============================================================
 REM  EduGuide India — Windows Full Stack Deploy Script
 REM  Usage: deploy.bat
@@ -11,7 +12,13 @@ REM ============================================================
 set PROJECT_DIR=%~dp0
 set FRONTEND_PORT=1206
 set BACKEND_PORT=1207
-set VM_IP=10.127.248.85
+
+REM Host shown in summary URLs (override with DEPLOY_HOST if needed)
+if defined DEPLOY_HOST (
+  set APP_HOST=%DEPLOY_HOST%
+) else (
+  set APP_HOST=localhost
+)
 
 echo ======================================================
 echo  EduGuide India - Full Stack Deployment
@@ -54,7 +61,21 @@ docker run -d ^
 echo       Ollama started
 
 echo       Waiting for Ollama to be ready...
-timeout /t 10 /nobreak >nul
+set OLLAMA_READY=0
+for /l %%i in (1,1,30) do (
+    curl -sf http://localhost:11434/api/tags >nul 2>&1
+    if !errorlevel! equ 0 (
+        set OLLAMA_READY=1
+        goto :ollama_ready
+    )
+    timeout /t 2 /nobreak >nul
+)
+:ollama_ready
+if !OLLAMA_READY! equ 1 (
+    echo       Ollama is ready!
+) else (
+    echo       [WARN] Ollama readiness check timed out; continuing...
+)
 
 REM ── 4. Pull Qwen model ────────────────────────────────
 echo [4/7] Pulling Qwen2.5:1.5b model...
@@ -106,17 +127,24 @@ REM ── 7. Verify ───────────────────�
 echo [7/7] Verifying deployment...
 timeout /t 5 /nobreak >nul
 
+for /f "delims=" %%A in ('curl -s -o nul -w "%%{http_code}" http://localhost:%FRONTEND_PORT%/ 2^>nul') do set FRONTEND_STATUS=%%A
+for /f "delims=" %%A in ('curl -s -o nul -w "%%{http_code}" http://localhost:%BACKEND_PORT%/health 2^>nul') do set BACKEND_STATUS=%%A
+for /f "delims=" %%A in ('curl -s -o nul -w "%%{http_code}" http://localhost:11434/api/tags 2^>nul') do set OLLAMA_STATUS=%%A
+
+if not defined FRONTEND_STATUS set FRONTEND_STATUS=000
+if not defined BACKEND_STATUS set BACKEND_STATUS=000
+if not defined OLLAMA_STATUS set OLLAMA_STATUS=000
+
 echo.
 echo ======================================================
 echo  Deployment Summary
 echo ======================================================
-echo  Frontend  http://%VM_IP%:%FRONTEND_PORT%
-echo  Backend   http://%VM_IP%:%BACKEND_PORT%
-echo  API Docs  http://%VM_IP%:%BACKEND_PORT%/docs
-echo  Ollama    http://%VM_IP%:11434
+echo  Frontend  http://%APP_HOST%:%FRONTEND_PORT%    [%FRONTEND_STATUS%]
+echo  Backend   http://%APP_HOST%:%BACKEND_PORT%     [%BACKEND_STATUS%]
+echo  Ollama    http://%APP_HOST%:11434              [%OLLAMA_STATUS%]
+echo  API Docs  http://%APP_HOST%:%BACKEND_PORT%/docs
 echo.
 echo  .env file: %PROJECT_DIR%backend\.env
-echo  Update SMTP_EMAIL and SMTP_PASSWORD for OTP emails
 echo ======================================================
 
 docker ps --filter "name=eduguide" --filter "name=edu-guide" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
