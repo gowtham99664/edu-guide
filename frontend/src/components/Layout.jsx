@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../utils/i18n.jsx'
 import { api } from '../utils/api'
 import engineeringExams from '../data/engineeringExams'
 import { medicalExams, lawExams, managementExams } from '../data/otherExams'
@@ -25,6 +26,7 @@ export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, token, logout } = useAuth()
+  const { lang, setLang, t } = useLanguage()
   const roles = Array.isArray(user?.roles) ? user.roles : []
   const isAdmin = roles.includes('admin')
   const isActive = (path) => location.pathname === path ? 'active' : ''
@@ -125,7 +127,7 @@ export default function Layout({ children }) {
             <span className="header-search-icon">🔍</span>
             <input
               type="text"
-              placeholder="Search exams, colleges, states..."
+              placeholder={t('search.placeholder')}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               onFocus={() => setSearchFocused(true)}
@@ -147,6 +149,30 @@ export default function Layout({ children }) {
                 )}
               </div>
             )}
+          </div>
+
+          {/* Language Switcher */}
+          <div style={{ display: 'flex', alignItems: 'center', marginRight: 8 }}>
+            <select
+              value={lang}
+              onChange={e => setLang(e.target.value)}
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.3)',
+                color: 'white',
+                borderRadius: 4,
+                padding: '4px 6px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              <option value="en" style={{ color: '#333' }}>EN</option>
+              <option value="hi" style={{ color: '#333' }}>HI</option>
+              <option value="te" style={{ color: '#333' }}>TE</option>
+              <option value="ta" style={{ color: '#333' }}>TA</option>
+            </select>
           </div>
 
           {/* User Dropdown */}
@@ -181,26 +207,21 @@ export default function Layout({ children }) {
       {/* Sub-nav */}
       <nav className={`sub-nav ${menuOpen ? 'open' : ''}`}>
         <div className="sub-nav-inner">
-          <Link to="/" className={isActive('/')} onClick={() => setMenuOpen(false)}>Home</Link>
-          <Link to="/school-exams" className={isActive('/school-exams')} onClick={() => setMenuOpen(false)}>School Exams</Link>
-          <Link to="/entrance-exams" className={isActive('/entrance-exams')} onClick={() => setMenuOpen(false)}>Entrance Exams</Link>
-          <Link to="/colleges" className={isActive('/colleges')} onClick={() => setMenuOpen(false)}>Colleges</Link>
-          <Link to="/states" className={isActive('/states')} onClick={() => setMenuOpen(false)}>States</Link>
-          <Link to="/career-paths" className={isActive('/career-paths')} onClick={() => setMenuOpen(false)}>Career Paths</Link>
-          <Link to="/timeline" className={isActive('/timeline')} onClick={() => setMenuOpen(false)}>Prep Timeline</Link>
-          <Link to="/scholarships" className={isActive('/scholarships')} onClick={() => setMenuOpen(false)}>Scholarships</Link>
-          <Link to="/govt-jobs" className={isActive('/govt-jobs')} onClick={() => setMenuOpen(false)}>Govt Jobs</Link>
-          <Link to="/internships" className={isActive('/internships')} onClick={() => setMenuOpen(false)}>Internships</Link>
-          <Link to="/mentors" className={isActive('/mentors')} onClick={() => setMenuOpen(false)}>Find Mentors</Link>
-          <Link to="/my-mentorship" className={isActive('/my-mentorship')} onClick={() => setMenuOpen(false)}>My Mentorship</Link>
-          <Link to="/mentor-hub" className={isActive('/mentor-hub')} onClick={() => setMenuOpen(false)}>Mentor Hub</Link>
-          {isAdmin && <Link to="/admin/mentors" className={isActive('/admin/mentors')} onClick={() => setMenuOpen(false)}>Admin Mentors</Link>}
-          {isAdmin && <Link to="/admin/mentorship" className={isActive('/admin/mentorship')} onClick={() => setMenuOpen(false)}>Admin Mentorship</Link>}
-          <Link to="/build-profile" className={`nav-highlight ${isActive('/build-profile')}`} onClick={() => setMenuOpen(false)}>
-            Build Profile
+          <Link to="/" className={isActive("/")} onClick={() => setMenuOpen(false)}>{t('nav.home')}</Link>
+          <Link to="/entrance-exams" className={isActive("/entrance-exams")} onClick={() => setMenuOpen(false)}>{t('nav.entranceExams')}</Link>
+          <Link to="/colleges" className={isActive("/colleges")} onClick={() => setMenuOpen(false)}>{t('nav.colleges')}</Link>
+          <Link to="/states" className={isActive("/states")} onClick={() => setMenuOpen(false)}>{t('nav.states')}</Link>
+          <Link to="/career-paths" className={isActive("/career-paths")} onClick={() => setMenuOpen(false)}>{t('nav.careerPaths')}</Link>
+          <Link to="/exam-calendar" className={isActive("/exam-calendar")} onClick={() => setMenuOpen(false)}>{t('nav.examCalendar')}</Link>
+          <Link to="/timeline" className={isActive("/timeline")} onClick={() => setMenuOpen(false)}>{t('nav.prepTimeline')}</Link>
+          {isAdmin && <Link to="/admin/mentors" className={isActive("/admin/mentors")} onClick={() => setMenuOpen(false)}>{t('nav.adminMentors')}</Link>}
+          {isAdmin && <Link to="/admin/mentorship" className={isActive("/admin/mentorship")} onClick={() => setMenuOpen(false)}>{t('nav.adminMentorship')}</Link>}
+          {isAdmin && <Link to="/admin/exam-calendar" className={isActive("/admin/exam-calendar")} onClick={() => setMenuOpen(false)}>{t('nav.adminCalendar')}</Link>}
+          <Link to="/build-profile" className={`nav-highlight ${isActive("/build-profile")}`} onClick={() => setMenuOpen(false)}>
+            {t('nav.buildProfile')}
           </Link>
-          <Link to="/my-path" className={`nav-highlight ${isActive('/my-path')}`} onClick={() => setMenuOpen(false)}>
-            My Path
+          <Link to="/my-path" className={`nav-highlight ${isActive("/my-path")}`} onClick={() => setMenuOpen(false)}>
+            {t('nav.myPath')}
           </Link>
         </div>
       </nav>

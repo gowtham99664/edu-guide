@@ -151,7 +151,7 @@ const scholarships = [
   },
   {
     id: "ugc_maulana_azad",
-    name: "Maulana Azad National Fellowship (MANF)",
+    name: "Maulana Azad National Fellowship (MANF) [DISCONTINUED]",
     provider: "UGC / Ministry of Minority Affairs",
     type: "Central Government",
     eligibility: "Minority community students (Muslim/Christian/Sikh/Buddhist/Jain/Parsi) pursuing PhD",
@@ -159,7 +159,7 @@ const scholarships = [
     courses: ["PhD / M.Phil"],
     period: "Annual notification via UGC/Minority Affairs",
     website: "https://minorityaffairs.gov.in/",
-    highlights: "756 fellowships per year. Applied via UGC/Minority Affairs Ministry portal."
+    highlights: "DISCONTINUED in 2022-23. No new selections. Minority students may apply for other UGC fellowships."
   },
   {
     id: "inspire_she",
@@ -175,7 +175,7 @@ const scholarships = [
   },
   {
     id: "ntse",
-    name: "National Talent Search Examination (NTSE) Scholarship",
+    name: "National Talent Search Examination (NTSE) [DISCONTINUED]",
     provider: "NCERT",
     type: "Central Government",
     eligibility: "Class 10 students; 2-stage state + national exam selection",
@@ -183,7 +183,7 @@ const scholarships = [
     courses: ["Class 11 onwards to PhD"],
     period: "November (Stage 1 – State); May (Stage 2 – National)",
     website: "https://ncert.nic.in/ntse.php",
-    highlights: "2,000 scholarships. Lifelong scholarship — one of the most prestigious school-level awards."
+    highlights: "DISCONTINUED after 2021-22 cycle. No new exams conducted. Existing awardees continue to receive stipend."
   },
   {
     id: "ishan_uday",

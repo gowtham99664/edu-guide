@@ -20,6 +20,7 @@ import colleges from '../data/colleges'
 import statesData from '../data/statesData'
 import schoolEntranceExams from '../data/schoolEntranceExams'
 import { careerPaths } from '../data/careerPaths'
+import { useLanguage } from '../utils/i18n.jsx'
 
 const allExams = [...engineeringExams, ...medicalExams, ...lawExams, ...managementExams, ...designExams, ...architectureExams, ...agricultureExams, ...teachingExams, ...professionalExams, ...researchExams, ...culinaryExams, ...horticultureExams]
 
@@ -606,12 +607,13 @@ const nodeTypes = {
 }
 
 export default function Home() {
+  const { t } = useLanguage()
   const quickLinks = [
-    { title: 'School Exams', count: schoolEntranceExams.length, link: '/school-exams' },
-    { title: 'Entrance Exams', count: allExams.length, link: '/entrance-exams' },
-    { title: 'Colleges', count: colleges.length, link: '/colleges' },
-    { title: 'States & UTs', count: statesData.length, link: '/states' },
-    { title: 'Career Paths', count: careerPaths.length, link: '/career-paths' },
+    { title: t('stat.schoolExams'), count: schoolEntranceExams.length, link: '/school-exams' },
+    { title: t('stat.entranceExams'), count: allExams.length, link: '/entrance-exams' },
+    { title: t('stat.colleges'), count: colleges.length, link: '/colleges' },
+    { title: t('stat.statesUTs'), count: statesData.length, link: '/states' },
+    { title: t('stat.careerPaths'), count: careerPaths.length, link: '/career-paths' },
   ]
 
   const graph = useMemo(() => buildGraph(), [])
@@ -675,11 +677,11 @@ export default function Home() {
     <div>
       <section className="home-hero">
         <div className="home-hero-text">
-          <h1>Your Complete Education Guide</h1>
-          <p>From nursery to PhD - explore every pathway, entrance exam, college, and career option across India.</p>
+          <h1>{t('home.hero.title')}</h1>
+          <p>{t('home.hero.subtitle')}</p>
           <div className="home-hero-actions">
-            <Link to="/build-profile" className="btn btn-primary btn-lg">Build Your Profile</Link>
-            <Link to="/my-path" className="btn btn-outline btn-lg">View My Path</Link>
+            <Link to="/build-profile" className="btn btn-primary btn-lg">{t('home.hero.buildProfile')}</Link>
+            <Link to="/my-path" className="btn btn-outline btn-lg">{t('home.hero.viewPath')}</Link>
           </div>
         </div>
         <div className="home-hero-stats">
@@ -692,10 +694,22 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="quick-nav-row">
+        <Link to="/scholarships" className="quick-nav-item">{t('quicknav.scholarships')}</Link>
+        <Link to="/govt-jobs" className="quick-nav-item">{t('quicknav.govtJobs')}</Link>
+        <Link to="/internships" className="quick-nav-item">{t('quicknav.internships')}</Link>
+        <Link to="/mentors" className="quick-nav-item">{t('quicknav.findMentors')}</Link>
+        <Link to="/my-mentorship" className="quick-nav-item">{t('quicknav.myMentorship')}</Link>
+        <Link to="/mentor-hub" className="quick-nav-item">{t('quicknav.mentorHub')}</Link>
+        <Link to="/exam-calendar" className="quick-nav-item">{t('quicknav.examCalendar')}</Link>
+        <Link to="/college-predictor" className="quick-nav-item">{t('quicknav.collegePredictor')}</Link>
+        <Link to="/ai-chat" className="quick-nav-item">{t('quicknav.aiChat')}</Link>
+      </section>
+
       <section className="home-section oc-section">
         <div className="home-section-header">
-          <h2>Complete Education Pathway</h2>
-          <p>Click any node to expand/collapse and view full details below the chart.</p>
+          <h2>{t('home.pathway.title')}</h2>
+          <p>{t('home.pathway.subtitle')}</p>
         </div>
 
         <div className="oc-flow-wrap">
@@ -784,7 +798,7 @@ export default function Home() {
       </section>
 
       <div className="disclaimer-bar" style={{ marginTop: 20 }}>
-        <strong>Important:</strong> All information is indicative and based on data as of 2025. Fees and criteria change every year. Please verify all details from official websites before making decisions.
+        <strong>{t('common.important')}:</strong> {t('home.disclaimer')}
       </div>
     </div>
   )

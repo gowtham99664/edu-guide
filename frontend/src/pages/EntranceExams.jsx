@@ -1,26 +1,36 @@
-import { useState, useMemo } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import engineeringExams from '../data/engineeringExams'
-import { medicalExams, lawExams, managementExams } from '../data/otherExams'
-import { designExams, architectureExams, agricultureExams, teachingExams, professionalExams, researchExams, culinaryExams, horticultureExams } from '../data/moreExams'
+import { useState, useMemo } from "react"
+import { Link, useSearchParams } from "react-router-dom"
+import engineeringExams from "../data/engineeringExams"
+import { medicalExams, lawExams, managementExams } from "../data/otherExams"
+import { designExams, architectureExams, agricultureExams, teachingExams, professionalExams, researchExams, culinaryExams, horticultureExams } from "../data/moreExams"
+import schoolEntranceExams from "../data/schoolEntranceExams"
 
-const allExams = [
+const higherExams = [
   ...engineeringExams, ...medicalExams, ...lawExams, ...managementExams,
   ...designExams, ...architectureExams,
   ...agricultureExams, ...teachingExams, ...professionalExams,
   ...researchExams, ...culinaryExams, ...horticultureExams
 ]
 
+// Normalize school exams to have category and level fields
+const normalizedSchool = schoolEntranceExams.map(e => ({
+  ...e,
+  category: "School Entrance",
+  level: "School",
+}))
+
+const allExams = [...normalizedSchool, ...higherExams]
+
 const categories = [...new Set(allExams.map(e => e.category))].sort()
 const levels = [...new Set(allExams.map(e => e.level).filter(Boolean))].sort()
 
 export default function EntranceExams() {
   const [searchParams] = useSearchParams()
-  const initialCat = searchParams.get('category') || ''
-  const [search, setSearch] = useState('')
+  const initialCat = searchParams.get("category") || ""
+  const [search, setSearch] = useState("")
   const [category, setCategory] = useState(initialCat)
-  const [level, setLevel] = useState('')
-  const [examId, setExamId] = useState('')
+  const [level, setLevel] = useState("")
+  const [examId, setExamId] = useState("")
   const [page, setPage] = useState(1)
   const perPage = 12
 
@@ -33,7 +43,7 @@ export default function EntranceExams() {
         const s = search.toLowerCase()
         return (e.name?.toLowerCase().includes(s) || e.category?.toLowerCase().includes(s) ||
                 e.conductedBy?.toLowerCase().includes(s) || e.subcategory?.toLowerCase().includes(s) ||
-                e.id?.toLowerCase().includes(s))
+                e.id?.toLowerCase().includes(s) || e.forClass?.toLowerCase().includes(s))
       }
       return true
     })
@@ -42,36 +52,36 @@ export default function EntranceExams() {
   const totalPages = Math.ceil(filtered.length / perPage)
   const paged = filtered.slice((page - 1) * perPage, page * perPage)
 
-  const clearFilters = () => { setSearch(''); setCategory(''); setLevel(''); setExamId(''); setPage(1); }
+  const clearFilters = () => { setSearch(""); setCategory(""); setLevel(""); setExamId(""); setPage(1) }
 
   return (
     <div>
       <div className="section-header">
         <h1>Entrance Exams</h1>
-        <p>Comprehensive database of {allExams.length}+ entrance exams across all categories - Engineering, Medical, Law, Management, Design, Architecture, Agriculture, Teaching, and more.</p>
+        <p>Comprehensive database of {allExams.length}+ entrance exams - School level (Navodaya, Sainik, NTSE, Olympiads), Engineering, Medical, Law, Management, Design, Architecture, Agriculture, Teaching, and more.</p>
       </div>
 
       <div className="filters-bar">
         <div className="search-box">
-          <input type="text" placeholder="Search exams by name, category, conducting body..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
+          <input type="text" placeholder="Search exams by name, category, conducting body..." value={search} onChange={e => { setSearch(e.target.value); setPage(1) }} />
         </div>
         <div className="filter-group">
           <label>Category</label>
-          <select className="filter-select" value={category} onChange={e => { setCategory(e.target.value); setPage(1); }}>
+          <select className="filter-select" value={category} onChange={e => { setCategory(e.target.value); setPage(1) }}>
             <option value="">All Categories</option>
             {categories.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         <div className="filter-group">
           <label>Level</label>
-          <select className="filter-select" value={level} onChange={e => { setLevel(e.target.value); setPage(1); }}>
+          <select className="filter-select" value={level} onChange={e => { setLevel(e.target.value); setPage(1) }}>
             <option value="">All Levels</option>
             {levels.map(l => <option key={l} value={l}>{l}</option>)}
           </select>
         </div>
         <div className="filter-group">
           <label>Exam</label>
-          <select className="filter-select" value={examId} onChange={e => { setExamId(e.target.value); setPage(1); }}>
+          <select className="filter-select" value={examId} onChange={e => { setExamId(e.target.value); setPage(1) }}>
             <option value="">All Exams</option>
             {allExams.map(ex => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
           </select>
@@ -86,17 +96,30 @@ export default function EntranceExams() {
           <div key={exam.id} className="card exam-card">
             <div className="exam-name">{exam.name}</div>
             <div className="exam-body">{exam.conductedBy}</div>
+            {exam.forClass && <p style={{fontSize:"0.85rem", marginBottom:6}}><strong>For:</strong> {exam.forClass}</p>}
             <div className="exam-meta">
               <span className="badge badge-primary">{exam.category}</span>
               {exam.subcategory && <span className="badge badge-info">{exam.subcategory}</span>}
               {exam.level && <span className="badge badge-purple">{exam.level}</span>}
               {exam.frequency && <span className="badge badge-success">{exam.frequency}</span>}
+              {exam.statesCovered && <span className="badge badge-info">{exam.statesCovered}</span>}
             </div>
-            {exam.eligibility && <p style={{fontSize:'0.85rem', marginTop:10, color:'var(--text-light)'}}><strong>Eligibility:</strong> {typeof exam.eligibility === 'string' ? exam.eligibility.substring(0, 120) + (exam.eligibility.length > 120 ? '...' : '') : ''}</p>}
-            {exam.examMonth && <p style={{fontSize:'0.85rem', marginTop:4}}><strong>Exam Month:</strong> {exam.examMonth}</p>}
+            {exam.eligibility && <p style={{fontSize:"0.85rem", marginTop:10, color:"var(--text-light)"}}><strong>Eligibility:</strong> {typeof exam.eligibility === "string" ? exam.eligibility.substring(0, 120) + (exam.eligibility.length > 120 ? "..." : "") : ""}</p>}
+            {exam.examMonth && <p style={{fontSize:"0.85rem", marginTop:4}}><strong>Exam Month:</strong> {exam.examMonth}</p>}
+
+            {/* School exam extra details */}
+            {exam.category === "School Entrance" && exam.examPattern && (
+              <div style={{marginTop:12, paddingTop:10, borderTop:"1px solid var(--border)"}}>
+                <p style={{fontSize:"0.85rem"}}><strong>Pattern:</strong> {exam.examPattern.substring(0, 150)}{exam.examPattern.length > 150 ? "..." : ""}</p>
+                {exam.schools && <p style={{fontSize:"0.85rem", marginTop:4}}><strong>Schools:</strong> {exam.schools.substring(0, 150)}{exam.schools.length > 150 ? "..." : ""}</p>}
+                {exam.scholarship && <p style={{fontSize:"0.85rem", marginTop:4, color:"var(--success)"}}><strong>Scholarship:</strong> {exam.scholarship}</p>}
+                {exam.importantNotes && <p style={{fontSize:"0.8rem", marginTop:6, padding:8, background:"#fffbeb", borderRadius:6}}>{exam.importantNotes}</p>}
+              </div>
+            )}
+
             <div className="exam-link">
-              <Link to={`/entrance-exams/${exam.id}`}>View Full Details &rarr;</Link>
-              {exam.website && <> | <a href={exam.website} target="_blank" rel="noopener noreferrer">Official Website</a></>}
+              {exam.category !== "School Entrance" && <Link to={`/entrance-exams/${exam.id}`}>View Full Details &rarr;</Link>}
+              {exam.website && <>{exam.category !== "School Entrance" && " | "}<a href={exam.website} target="_blank" rel="noopener noreferrer">Official Website</a></>}
             </div>
           </div>
         ))}

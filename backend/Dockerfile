@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY .env .
 COPY main.py .
+COPY cutoffs.json .
 
 EXPOSE 8000
 

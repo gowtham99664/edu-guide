@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
@@ -193,6 +194,36 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_mentorship_requests_mentor ON mentorship_requests(mentor_user_id);
         CREATE INDEX IF NOT EXISTS idx_admin_audit_admin ON admin_audit_logs(admin_user_id);
         CREATE INDEX IF NOT EXISTS idx_admin_audit_target ON admin_audit_logs(target_type, target_id);
+
+        CREATE TABLE IF NOT EXISTS exam_calendar (
+            id SERIAL PRIMARY KEY,
+            exam_name TEXT NOT NULL,
+            exam_category TEXT CHECK (exam_category IN ('Engineering','Medical','Law','Management','School','Other')),
+            event_type TEXT CHECK (event_type IN ('application_start','application_end','exam_date','result_date','counselling')),
+            event_date DATE NOT NULL,
+            event_end_date DATE,
+            description TEXT,
+            website_url TEXT,
+            is_tentative BOOLEAN DEFAULT FALSE,
+            created_by INTEGER REFERENCES users(id),
+            created_at TIMESTAMP DEFAULT NOW(),
+            updated_at TIMESTAMP DEFAULT NOW()
+        );
+
+        CREATE TABLE IF NOT EXISTS subscriptions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            exam_name TEXT NOT NULL,
+            subscribe_type TEXT DEFAULT 'all',
+            created_at TIMESTAMP DEFAULT NOW(),
+            UNIQUE(user_id, exam_name)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_exam_calendar_date ON exam_calendar(event_date);
+        CREATE INDEX IF NOT EXISTS idx_exam_calendar_category ON exam_calendar(exam_category);
+        CREATE INDEX IF NOT EXISTS idx_exam_calendar_name ON exam_calendar(exam_name);
+        CREATE INDEX IF NOT EXISTS idx_subscriptions_user ON subscriptions(user_id);
+
     """)
 
     cur.execute("""
@@ -2006,3 +2037,343 @@ Based on your qualification (**{req.highest_qualification}**), you are at a stro
 - **Institute Merit Scholarships** - Available at most central institutions
 - **Private Scholarships** - Tata, Reliance, Wipro, Infosys foundations
 """
+
+
+# ─── Cutoffs Data (loaded once) ─────────────────────────────────────────────────
+_CUTOFFS_DATA = []
+try:
+    with open(os.path.join(os.path.dirname(__file__) if "__file__" in dir() else ".", "cutoffs.json")) as _cf:
+        _CUTOFFS_DATA = json.load(_cf)
+except Exception:
+    try:
+        with open("cutoffs.json") as _cf:
+            _CUTOFFS_DATA = json.load(_cf)
+    except Exception:
+        pass
+
+# ─── Pydantic Models for Exam Calendar ──────────────────────────────────────────
+class ExamCalendarCreate(BaseModel):
+    exam_name: str
+    exam_category: Optional[str] = None
+    event_type: Optional[str] = None
+    event_date: str
+    event_end_date: Optional[str] = None
+    description: Optional[str] = None
+    website_url: Optional[str] = None
+    is_tentative: bool = False
+
+class ExamCalendarUpdate(BaseModel):
+    exam_name: Optional[str] = None
+    exam_category: Optional[str] = None
+    event_type: Optional[str] = None
+    event_date: Optional[str] = None
+    event_end_date: Optional[str] = None
+    description: Optional[str] = None
+    website_url: Optional[str] = None
+    is_tentative: Optional[bool] = None
+
+class CollegePredictRequest(BaseModel):
+    exam: str
+    rank: Optional[float] = None
+    percentile: Optional[float] = None
+    score: Optional[float] = None
+    category: str = "General"
+
+class SubscribeRequest(BaseModel):
+    exam_name: str
+    subscribe_type: str = "all"
+
+class ChatRequest(BaseModel):
+    message: str
+
+# ─── Admin Exam Calendar CRUD ───────────────────────────────────────────────────
+
+@app.post("/api/admin/exam-calendar", status_code=201)
+def admin_create_exam_event(payload: dict, current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    _require_role(user_id, "admin", db)
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Support single object or array
+    items = payload.get("events") if "events" in payload else ([payload] if "exam_name" in payload else [payload])
+    if isinstance(items, dict):
+        items = [items]
+
+    created = []
+    for item in items:
+        cur.execute("""
+            INSERT INTO exam_calendar (exam_name, exam_category, event_type, event_date, event_end_date,
+                                       description, website_url, is_tentative, created_by)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id, exam_name, event_date
+        """, (
+            item.get("exam_name"), item.get("exam_category"), item.get("event_type"),
+            item.get("event_date"), item.get("event_end_date"),
+            item.get("description"), item.get("website_url"),
+            item.get("is_tentative", False), user_id
+        ))
+        row = cur.fetchone()
+        created.append({"id": row["id"], "exam_name": row["exam_name"], "event_date": str(row["event_date"])})
+    db.commit()
+    return {"created": created, "count": len(created)}
+
+@app.post("/api/admin/exam-calendar/bulk", status_code=201)
+def admin_bulk_create_events(events: List[ExamCalendarCreate], current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    _require_role(user_id, "admin", db)
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    created = []
+    for ev in events:
+        cur.execute("""
+            INSERT INTO exam_calendar (exam_name, exam_category, event_type, event_date, event_end_date,
+                                       description, website_url, is_tentative, created_by)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id
+        """, (ev.exam_name, ev.exam_category, ev.event_type, ev.event_date, ev.event_end_date,
+              ev.description, ev.website_url, ev.is_tentative, user_id))
+        created.append(cur.fetchone()["id"])
+    db.commit()
+    return {"created_ids": created, "count": len(created)}
+
+@app.put("/api/admin/exam-calendar/{event_id}")
+def admin_update_exam_event(event_id: int, req: ExamCalendarUpdate, current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    _require_role(user_id, "admin", db)
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    fields, vals = [], []
+    for field in ["exam_name","exam_category","event_type","event_date","event_end_date","description","website_url","is_tentative"]:
+        v = getattr(req, field, None)
+        if v is not None:
+            fields.append(f"{field} = %s")
+            vals.append(v)
+    if not fields:
+        raise HTTPException(400, "No fields to update")
+    fields.append("updated_at = NOW()")
+    vals.append(event_id)
+    cur.execute(f"UPDATE exam_calendar SET {', '.join(fields)} WHERE id = %s RETURNING id", vals)
+    if not cur.fetchone():
+        raise HTTPException(404, "Event not found")
+    db.commit()
+    return {"message": "Updated", "id": event_id}
+
+@app.delete("/api/admin/exam-calendar/{event_id}")
+def admin_delete_exam_event(event_id: int, current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    _require_role(user_id, "admin", db)
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("DELETE FROM exam_calendar WHERE id = %s RETURNING id", (event_id,))
+    if not cur.fetchone():
+        raise HTTPException(404, "Event not found")
+    db.commit()
+    return {"message": "Deleted", "id": event_id}
+
+# ─── Public Exam Calendar Endpoints ─────────────────────────────────────────────
+
+@app.get("/api/exam-calendar")
+def list_exam_events(category: Optional[str] = None, month: Optional[int] = None,
+                     year: Optional[int] = None, event_type: Optional[str] = None,
+                     exam_name: Optional[str] = None, db=Depends(get_db)):
+    cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    where, params = [], []
+    if category:
+        where.append("exam_category = %s"); params.append(category)
+    if month:
+        where.append("EXTRACT(MONTH FROM event_date) = %s"); params.append(month)
+    if year:
+        where.append("EXTRACT(YEAR FROM event_date) = %s"); params.append(year)
+    if event_type:
+        where.append("event_type = %s"); params.append(event_type)
+    if exam_name:
+        where.append("LOWER(exam_name) LIKE LOWER(%s)"); params.append(f"%{exam_name}%")
+    clause = (" WHERE " + " AND ".join(where)) if where else ""
+    cur.execute(f"SELECT id, exam_name, exam_category, event_type, event_date, event_end_date, description, website_url, is_tentative, created_at FROM exam_calendar{clause} ORDER BY event_date ASC", params)
+    rows = cur.fetchall()
+    for r in rows:
+        for k in ("event_date", "event_end_date", "created_at"):
+            if r.get(k):
+                r[k] = str(r[k])
+    return {"events": rows, "count": len(rows)}
+
+@app.get("/api/exam-calendar/upcoming")
+def upcoming_exam_events(days: int = 30, db=Depends(get_db)):
+    cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("""
+        SELECT id, exam_name, exam_category, event_type, event_date, event_end_date,
+               description, website_url, is_tentative
+        FROM exam_calendar
+        WHERE event_date >= CURRENT_DATE AND event_date <= CURRENT_DATE + %s * INTERVAL '1 day'
+        ORDER BY event_date ASC
+    """, (days,))
+    rows = cur.fetchall()
+    for r in rows:
+        for k in ("event_date", "event_end_date"):
+            if r.get(k):
+                r[k] = str(r[k])
+    return {"events": rows, "count": len(rows)}
+
+# ─── College Predictor ──────────────────────────────────────────────────────────
+
+@app.post("/api/predict-college")
+def predict_college(req: CollegePredictRequest):
+    exam_key = req.exam.lower().replace(" ", "_").replace("-", "_")
+    matched_exam = None
+    for ex in _CUTOFFS_DATA:
+        if exam_key in ex.get("id", "").lower() or exam_key in ex.get("examName", "").lower().replace(" ", "_"):
+            matched_exam = ex
+            break
+    if not matched_exam:
+        available = [e["id"] for e in _CUTOFFS_DATA]
+        raise HTTPException(404, f"Exam '{req.exam}' not found. Available: {available}")
+
+    results = []
+    for entry in matched_exam.get("data", []):
+        if entry.get("category", "").lower() != req.category.lower():
+            continue
+        # JEE Advanced uses rank (lower is better)
+        if "closeRank" in entry and req.rank is not None:
+            if req.rank <= entry["closeRank"]:
+                results.append({
+                    "college": entry.get("college"),
+                    "branch": entry.get("branch"),
+                    "category": entry.get("category"),
+                    "closeRank": entry.get("closeRank"),
+                    "openRank": entry.get("openRank"),
+                    "chance": "High" if req.rank <= entry.get("openRank", 0) else "Moderate"
+                })
+        # JEE Main / NEET / CAT use percentile (higher is better)
+        elif "cutoffPercentile" in entry and req.percentile is not None:
+            if req.percentile >= entry["cutoffPercentile"]:
+                results.append({
+                    "college": entry.get("college"),
+                    "branch": entry.get("branch"),
+                    "category": entry.get("category"),
+                    "quota": entry.get("quota"),
+                    "cutoffPercentile": entry.get("cutoffPercentile"),
+                    "chance": "High" if req.percentile >= entry["cutoffPercentile"] + 1 else "Moderate"
+                })
+        # CLAT / NEET / CA use score (higher is better for CLAT/NEET, check context)
+        elif "cutoffScore" in entry and req.score is not None:
+            if req.score >= entry["cutoffScore"]:
+                results.append({
+                    "college": entry.get("college"),
+                    "branch": entry.get("branch"),
+                    "category": entry.get("category"),
+                    "cutoffScore": entry.get("cutoffScore"),
+                    "notes": entry.get("notes"),
+                    "chance": "High" if req.score >= entry["cutoffScore"] + 5 else "Moderate"
+                })
+
+    results.sort(key=lambda x: x.get("closeRank") or x.get("cutoffPercentile") or x.get("cutoffScore") or 0,
+                 reverse=("closeRank" not in (results[0] if results else {})))
+
+    return {
+        "exam": matched_exam.get("examName"),
+        "year": matched_exam.get("year"),
+        "source": matched_exam.get("source"),
+        "input": {"rank": req.rank, "percentile": req.percentile, "score": req.score, "category": req.category},
+        "matches": results,
+        "count": len(results),
+        "notes": matched_exam.get("notes")
+    }
+
+# ─── Subscription Endpoints ─────────────────────────────────────────────────────
+
+@app.post("/api/subscribe", status_code=201)
+def subscribe_exam(req: SubscribeRequest, current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    try:
+        cur.execute("""
+            INSERT INTO subscriptions (user_id, exam_name, subscribe_type)
+            VALUES (%s, %s, %s) RETURNING id
+        """, (user_id, req.exam_name, req.subscribe_type))
+        db.commit()
+        return {"message": "Subscribed", "id": cur.fetchone()["id"]}
+    except psycopg2.errors.UniqueViolation:
+        db.rollback()
+        raise HTTPException(409, "Already subscribed to this exam")
+
+@app.delete("/api/subscribe/{exam_name}")
+def unsubscribe_exam(exam_name: str, current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    cur = db.cursor()
+    cur.execute("DELETE FROM subscriptions WHERE user_id = %s AND exam_name = %s RETURNING id", (user_id, exam_name))
+    if not cur.fetchone():
+        raise HTTPException(404, "Subscription not found")
+    db.commit()
+    return {"message": "Unsubscribed", "exam_name": exam_name}
+
+@app.get("/api/subscriptions")
+def list_subscriptions(current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("SELECT id, exam_name, subscribe_type, created_at FROM subscriptions WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
+    rows = cur.fetchall()
+    for r in rows:
+        if r.get("created_at"):
+            r["created_at"] = str(r["created_at"])
+    return {"subscriptions": rows, "count": len(rows)}
+
+@app.get("/api/exam-calendar/my-alerts")
+def my_exam_alerts(current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("""
+        SELECT ec.id, ec.exam_name, ec.exam_category, ec.event_type, ec.event_date,
+               ec.event_end_date, ec.description, ec.website_url, ec.is_tentative
+        FROM exam_calendar ec
+        INNER JOIN subscriptions s ON LOWER(ec.exam_name) = LOWER(s.exam_name)
+        WHERE s.user_id = %s AND ec.event_date >= CURRENT_DATE
+        ORDER BY ec.event_date ASC
+    """, (user_id,))
+    rows = cur.fetchall()
+    for r in rows:
+        for k in ("event_date", "event_end_date"):
+            if r.get(k):
+                r[k] = str(r[k])
+    return {"alerts": rows, "count": len(rows)}
+
+# ─── AI Chat Endpoint ───────────────────────────────────────────────────────────
+
+EDUCATION_SYSTEM_PROMPT = """You are an expert Indian education counselor and career advisor. You help students with:
+- Information about entrance exams (JEE, NEET, CLAT, CAT, GATE, CUET, CA Foundation, etc.)
+- College admissions process and cutoffs
+- Career guidance for Engineering, Medical, Law, Management, and other fields
+- Scholarship information and financial aid
+- Study strategies and preparation tips
+- Comparing colleges and branches
+- Understanding reservation categories and quotas
+- Timeline planning for exam preparation
+
+Be accurate, helpful, and encouraging. Provide specific, actionable advice. If you don't know something, say so rather than guessing.
+Always respond in a clear, structured format. Use markdown for formatting when helpful."""
+
+@app.post("/api/chat")
+async def ai_chat(req: ChatRequest, current=Depends(get_current_user)):
+    async def stream_response():
+        try:
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                async with client.stream("POST", f"{OLLAMA_URL}/api/generate", json={
+                    "model": OLLAMA_MODEL,
+                    "prompt": req.message,
+                    "system": EDUCATION_SYSTEM_PROMPT,
+                    "stream": True,
+                    "options": {"temperature": 0.7, "num_predict": 1500}
+                }) as response:
+                    async for line in response.aiter_lines():
+                        if line.strip():
+                            try:
+                                chunk = json.loads(line)
+                                token = chunk.get("response", "")
+                                if token:
+                                    yield f"data: {json.dumps({'token': token})}\n\n"
+                                if chunk.get("done"):
+                                    yield f"data: {json.dumps({'done': True})}\n\n"
+                                    break
+                            except json.JSONDecodeError:
+                                continue
+        except Exception as e:
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+    return StreamingResponse(stream_response(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})

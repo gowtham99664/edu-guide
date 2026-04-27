@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { LanguageProvider } from './utils/i18n.jsx'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import EntranceExams from './pages/EntranceExams'
@@ -24,6 +25,10 @@ import MentorHub from './pages/MentorHub'
 import MyMentorship from './pages/MyMentorship'
 import AdminMentors from './pages/AdminMentors'
 import AdminMentorship from './pages/AdminMentorship'
+import ExamCalendar from './pages/ExamCalendar'
+import AdminExamCalendar from './pages/AdminExamCalendar'
+import CollegePredictor from './pages/CollegePredictor'
+import AiChat from './pages/AiChat'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -44,34 +49,40 @@ function RoleRoute({ role, children }) {
 export default function App() {
   return (
     <AuthProvider>
-      <Layout>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/school-exams" element={<ProtectedRoute><SchoolExams /></ProtectedRoute>} />
-          <Route path="/entrance-exams" element={<ProtectedRoute><EntranceExams /></ProtectedRoute>} />
-          <Route path="/entrance-exams/:id" element={<ProtectedRoute><ExamDetail /></ProtectedRoute>} />
-          <Route path="/colleges" element={<ProtectedRoute><Colleges /></ProtectedRoute>} />
-          <Route path="/colleges/:id" element={<ProtectedRoute><CollegeDetail /></ProtectedRoute>} />
-          <Route path="/states" element={<ProtectedRoute><StateInfo /></ProtectedRoute>} />
-          <Route path="/states/:id" element={<ProtectedRoute><StateDetail /></ProtectedRoute>} />
-          <Route path="/career-paths" element={<ProtectedRoute><CareerPaths /></ProtectedRoute>} />
-          <Route path="/timeline" element={<ProtectedRoute><Timeline /></ProtectedRoute>} />
-          <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
-          <Route path="/scholarships" element={<ProtectedRoute><Scholarships /></ProtectedRoute>} />
-          <Route path="/govt-jobs" element={<ProtectedRoute><GovtJobs /></ProtectedRoute>} />
-          <Route path="/internships" element={<ProtectedRoute><Internships /></ProtectedRoute>} />
-          <Route path="/build-profile" element={<ProtectedRoute><BuildProfile /></ProtectedRoute>} />
-          <Route path="/my-path" element={<ProtectedRoute><MyPath /></ProtectedRoute>} />
-          <Route path="/mentors" element={<ProtectedRoute><Mentors /></ProtectedRoute>} />
-          <Route path="/mentor-hub" element={<ProtectedRoute><MentorHub /></ProtectedRoute>} />
-          <Route path="/my-mentorship" element={<ProtectedRoute><MyMentorship /></ProtectedRoute>} />
-          <Route path="/admin/mentors" element={<RoleRoute role="admin"><AdminMentors /></RoleRoute>} />
-          <Route path="/admin/mentorship" element={<RoleRoute role="admin"><AdminMentorship /></RoleRoute>} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </Layout>
+      <LanguageProvider>
+        <Layout>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/school-exams" element={<ProtectedRoute><SchoolExams /></ProtectedRoute>} />
+            <Route path="/entrance-exams" element={<ProtectedRoute><EntranceExams /></ProtectedRoute>} />
+            <Route path="/entrance-exams/:id" element={<ProtectedRoute><ExamDetail /></ProtectedRoute>} />
+            <Route path="/colleges" element={<ProtectedRoute><Colleges /></ProtectedRoute>} />
+            <Route path="/colleges/:id" element={<ProtectedRoute><CollegeDetail /></ProtectedRoute>} />
+            <Route path="/states" element={<ProtectedRoute><StateInfo /></ProtectedRoute>} />
+            <Route path="/states/:id" element={<ProtectedRoute><StateDetail /></ProtectedRoute>} />
+            <Route path="/career-paths" element={<ProtectedRoute><CareerPaths /></ProtectedRoute>} />
+            <Route path="/timeline" element={<ProtectedRoute><Timeline /></ProtectedRoute>} />
+            <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+            <Route path="/scholarships" element={<ProtectedRoute><Scholarships /></ProtectedRoute>} />
+            <Route path="/govt-jobs" element={<ProtectedRoute><GovtJobs /></ProtectedRoute>} />
+            <Route path="/internships" element={<ProtectedRoute><Internships /></ProtectedRoute>} />
+            <Route path="/build-profile" element={<ProtectedRoute><BuildProfile /></ProtectedRoute>} />
+            <Route path="/my-path" element={<ProtectedRoute><MyPath /></ProtectedRoute>} />
+            <Route path="/mentors" element={<ProtectedRoute><Mentors /></ProtectedRoute>} />
+            <Route path="/mentor-hub" element={<ProtectedRoute><MentorHub /></ProtectedRoute>} />
+            <Route path="/my-mentorship" element={<ProtectedRoute><MyMentorship /></ProtectedRoute>} />
+            <Route path="/admin/mentors" element={<RoleRoute role="admin"><AdminMentors /></RoleRoute>} />
+            <Route path="/admin/mentorship" element={<RoleRoute role="admin"><AdminMentorship /></RoleRoute>} />
+            <Route path="/exam-calendar" element={<ProtectedRoute><ExamCalendar /></ProtectedRoute>} />
+            <Route path="/admin/exam-calendar" element={<RoleRoute role="admin"><AdminExamCalendar /></RoleRoute>} />
+            <Route path="/college-predictor" element={<ProtectedRoute><CollegePredictor /></ProtectedRoute>} />
+            <Route path="/ai-chat" element={<ProtectedRoute><AiChat /></ProtectedRoute>} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </Layout>
+      </LanguageProvider>
     </AuthProvider>
   )
 }
