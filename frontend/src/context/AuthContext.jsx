@@ -67,7 +67,9 @@ export function AuthProvider({ children }) {
     const tok = res.access_token
     localStorage.setItem('eg_token', tok)
     setToken(tok)
-    setUser(res.user)
+    const me = await api.get('/api/me', tok)
+    if (!me.error) setUser(me)
+    else setUser(res.user)
     return { ok: true }
   }
 

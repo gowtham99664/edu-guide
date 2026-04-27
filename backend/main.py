@@ -139,6 +139,66 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_roadmaps_user ON roadmaps(user_id);
         CREATE INDEX IF NOT EXISTS idx_milestones_roadmap ON milestones(roadmap_id);
         CREATE INDEX IF NOT EXISTS idx_milestones_user ON milestones(user_id);
+
+        CREATE TABLE IF NOT EXISTS user_roles (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            role TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT NOW(),
+            UNIQUE(user_id, role)
+        );
+
+        CREATE TABLE IF NOT EXISTS mentor_profiles (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+            headline TEXT NOT NULL,
+            bio TEXT NOT NULL,
+            expertise JSONB DEFAULT '[]',
+            languages JSONB DEFAULT '[]',
+            experience_years INTEGER DEFAULT 0,
+            verification_status TEXT DEFAULT 'pending',
+            published BOOLEAN DEFAULT FALSE,
+            is_accepting BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT NOW(),
+            updated_at TIMESTAMP DEFAULT NOW()
+        );
+
+        CREATE TABLE IF NOT EXISTS mentorship_requests (
+            id SERIAL PRIMARY KEY,
+            mentee_user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            mentor_user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+            topic TEXT NOT NULL,
+            message TEXT NOT NULL,
+            preferred_mode TEXT DEFAULT 'chat',
+            scheduled_at TIMESTAMP,
+            status TEXT DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT NOW(),
+            updated_at TIMESTAMP DEFAULT NOW()
+        );
+
+        CREATE TABLE IF NOT EXISTS admin_audit_logs (
+            id SERIAL PRIMARY KEY,
+            admin_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+            action TEXT NOT NULL,
+            target_type TEXT NOT NULL,
+            target_id TEXT NOT NULL,
+            note TEXT,
+            created_at TIMESTAMP DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_user_roles_user ON user_roles(user_id);
+        CREATE INDEX IF NOT EXISTS idx_mentor_profiles_user ON mentor_profiles(user_id);
+        CREATE INDEX IF NOT EXISTS idx_mentor_profiles_status ON mentor_profiles(verification_status, published);
+        CREATE INDEX IF NOT EXISTS idx_mentorship_requests_mentee ON mentorship_requests(mentee_user_id);
+        CREATE INDEX IF NOT EXISTS idx_mentorship_requests_mentor ON mentorship_requests(mentor_user_id);
+        CREATE INDEX IF NOT EXISTS idx_admin_audit_admin ON admin_audit_logs(admin_user_id);
+        CREATE INDEX IF NOT EXISTS idx_admin_audit_target ON admin_audit_logs(target_type, target_id);
+    """)
+
+    cur.execute("""
+        INSERT INTO user_roles (user_id, role)
+        SELECT id, 'mentee' FROM users
+        ON CONFLICT (user_id, role) DO NOTHING
     """)
     conn.commit()
     cur.close()
@@ -163,6 +223,17 @@ bearer = HTTPBearer()
 
 def get_current_user(creds: HTTPAuthorizationCredentials = Depends(bearer)):
     return decode_token(creds.credentials)
+
+def _get_roles(user_id: int, db):
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT role FROM user_roles WHERE user_id = %s", (user_id,))
+    return [r["role"] for r in cur.fetchall()]
+
+def _require_role(user_id: int, role: str, db):
+    roles = _get_roles(user_id, db)
+    if role not in roles:
+        raise HTTPException(status_code=403, detail=f"{role} role required")
+    return roles
 
 # ─── Schemas ────────────────────────────────────────────────────────────────────
 class RegisterRequest(BaseModel):
@@ -205,6 +276,33 @@ class SaveRoadmapRequest(BaseModel):
     model: str = ""
     milestones: List[dict] = []
 
+# ─── Mentor-Mentee Schemas ──────────────────────────────────────────────────────
+class MentorApplyRequest(BaseModel):
+    headline: str
+    bio: str
+    expertise: List[str] = []
+    languages: List[str] = []
+    experience_years: int = 0
+    is_accepting: bool = True
+
+class MentorshipRequestCreate(BaseModel):
+    mentor_user_id: int
+    topic: str
+    message: str
+    preferred_mode: str = "chat"
+    scheduled_at: Optional[str] = None
+
+class MentorshipRequestStatusUpdate(BaseModel):
+    status: str
+
+class AdminMentorReviewRequest(BaseModel):
+    status: str
+    published: Optional[bool] = None
+    note: Optional[str] = None
+
+class AdminMentorshipStatusRequest(BaseModel):
+    status: str
+
 # ─── Routes ─────────────────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
@@ -234,6 +332,7 @@ def register(req: RegisterRequest, db=Depends(get_db)):
         hash_password(req.password)
     ))
     user_id = cur.fetchone()["id"]
+    cur.execute("INSERT INTO user_roles (user_id, role) VALUES (%s, 'mentee') ON CONFLICT (user_id, role) DO NOTHING", (user_id,))
     db.commit()
     token = create_access_token({"sub": str(user_id), "email": req.email.lower()})
     return {"access_token": token, "token_type": "bearer", "user_id": user_id}
@@ -259,13 +358,15 @@ def login(req: LoginRequest, db=Depends(get_db)):
 
 @app.get("/api/me")
 def get_me(current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
     cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cur.execute("SELECT * FROM users WHERE id = %s", (int(current["sub"]),))
+    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
     user = cur.fetchone()
     if not user:
         raise HTTPException(404, "User not found")
-    cur.execute("SELECT * FROM profiles WHERE user_id = %s", (int(current["sub"]),))
+    cur.execute("SELECT * FROM profiles WHERE user_id = %s", (user_id,))
     profile = cur.fetchone()
+    roles = _get_roles(user_id, db)
     return {
         "id": user["id"],
         "email": user["email"],
@@ -274,7 +375,359 @@ def get_me(current=Depends(get_current_user), db=Depends(get_db)):
         "dob": decrypt_field(user["dob"]),
         "phone": decrypt_field(user["phone"]),
         "profile": dict(profile) if profile else None,
+        "roles": roles,
     }
+
+@app.get("/api/roles")
+def get_roles(current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    return {"roles": _get_roles(user_id, db)}
+
+# ─── Mentor-Mentee APIs (no payments) ───────────────────────────────────────────
+@app.post("/api/mentor/apply")
+def apply_mentor(req: MentorApplyRequest, current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    cur.execute("INSERT INTO user_roles (user_id, role) VALUES (%s, 'mentee') ON CONFLICT (user_id, role) DO NOTHING", (user_id,))
+    cur.execute("INSERT INTO user_roles (user_id, role) VALUES (%s, 'mentor') ON CONFLICT (user_id, role) DO NOTHING", (user_id,))
+
+    cur.execute("""
+        INSERT INTO mentor_profiles (user_id, headline, bio, expertise, languages, experience_years, verification_status, published, is_accepting, updated_at)
+        VALUES (%s, %s, %s, %s::jsonb, %s::jsonb, %s, 'pending', FALSE, %s, NOW())
+        ON CONFLICT (user_id) DO UPDATE
+        SET headline = EXCLUDED.headline,
+            bio = EXCLUDED.bio,
+            expertise = EXCLUDED.expertise,
+            languages = EXCLUDED.languages,
+            experience_years = EXCLUDED.experience_years,
+            is_accepting = EXCLUDED.is_accepting,
+            verification_status = 'pending',
+            published = FALSE,
+            updated_at = NOW()
+    """, (
+        user_id,
+        req.headline.strip(),
+        req.bio.strip(),
+        json.dumps(req.expertise or []),
+        json.dumps(req.languages or []),
+        max(0, req.experience_years),
+        req.is_accepting,
+    ))
+
+    db.commit()
+    return {"message": "Mentor application submitted", "status": "pending"}
+
+@app.get("/api/mentors")
+def list_mentors(q: Optional[str] = "", expertise: Optional[str] = "", db=Depends(get_db)):
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    params = []
+    sql = """
+        SELECT mp.*, u.first_name, u.last_name
+        FROM mentor_profiles mp
+        JOIN users u ON u.id = mp.user_id
+        WHERE mp.published = TRUE
+          AND mp.verification_status = 'approved'
+          AND mp.is_accepting = TRUE
+    """
+    if q:
+        sql += " AND (LOWER(mp.headline) LIKE %s OR LOWER(mp.bio) LIKE %s)"
+        like = f"%{q.lower()}%"
+        params.extend([like, like])
+    if expertise:
+        sql += " AND mp.expertise::text ILIKE %s"
+        params.append(f"%{expertise}%")
+    sql += " ORDER BY mp.updated_at DESC LIMIT 100"
+
+    cur.execute(sql, tuple(params))
+    rows = cur.fetchall()
+    data = []
+    for r in rows:
+        data.append({
+            "user_id": r["user_id"],
+            "name": f"{decrypt_field(r['first_name'])} {decrypt_field(r['last_name'])}",
+            "headline": r["headline"],
+            "bio": r["bio"],
+            "expertise": r["expertise"] or [],
+            "languages": r["languages"] or [],
+            "experience_years": r["experience_years"],
+            "verification_status": r["verification_status"],
+            "is_accepting": r["is_accepting"],
+        })
+    return {"mentors": data}
+
+@app.get("/api/mentor/profile")
+def my_mentor_profile(current=Depends(get_current_user), db=Depends(get_db)):
+    user_id = int(current["sub"])
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT * FROM mentor_profiles WHERE user_id = %s", (user_id,))
+    p = cur.fetchone()
+    if not p:
+        return {"profile": None}
+    return {"profile": {
+        "headline": p["headline"],
+        "bio": p["bio"],
+        "expertise": p["expertise"] or [],
+        "languages": p["languages"] or [],
+        "experience_years": p["experience_years"],
+        "verification_status": p["verification_status"],
+        "published": p["published"],
+        "is_accepting": p["is_accepting"],
+    }}
+
+@app.post("/api/mentorship-requests")
+def create_mentorship_request(req: MentorshipRequestCreate, current=Depends(get_current_user), db=Depends(get_db)):
+    mentee_id = int(current["sub"])
+    if req.mentor_user_id == mentee_id:
+        raise HTTPException(400, "You cannot request mentorship from yourself")
+
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("""
+        SELECT user_id FROM mentor_profiles
+        WHERE user_id = %s AND published = TRUE AND verification_status = 'approved' AND is_accepting = TRUE
+    """, (req.mentor_user_id,))
+    if not cur.fetchone():
+        raise HTTPException(404, "Mentor not available")
+
+    scheduled = None
+    if req.scheduled_at:
+        try:
+            scheduled = datetime.fromisoformat(req.scheduled_at.replace("Z", "+00:00"))
+        except Exception:
+            raise HTTPException(400, "scheduled_at must be ISO datetime")
+
+    cur.execute("""
+        INSERT INTO mentorship_requests (mentee_user_id, mentor_user_id, topic, message, preferred_mode, scheduled_at, status, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, 'pending', NOW())
+        RETURNING id
+    """, (mentee_id, req.mentor_user_id, req.topic.strip(), req.message.strip(), req.preferred_mode, scheduled))
+    req_id = cur.fetchone()["id"]
+    db.commit()
+    return {"request_id": req_id, "status": "pending", "message": "Mentorship request submitted"}
+
+@app.get("/api/mentorship-requests/mine")
+def my_mentorship_requests(current=Depends(get_current_user), db=Depends(get_db)):
+    mentee_id = int(current["sub"])
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("""
+        SELECT mr.*, u.first_name, u.last_name, mp.headline
+        FROM mentorship_requests mr
+        JOIN users u ON u.id = mr.mentor_user_id
+        LEFT JOIN mentor_profiles mp ON mp.user_id = mr.mentor_user_id
+        WHERE mr.mentee_user_id = %s
+        ORDER BY mr.created_at DESC
+    """, (mentee_id,))
+    rows = cur.fetchall()
+    items = []
+    for r in rows:
+        items.append({
+            "id": r["id"],
+            "mentor_user_id": r["mentor_user_id"],
+            "mentor_name": f"{decrypt_field(r['first_name'])} {decrypt_field(r['last_name'])}",
+            "mentor_headline": r["headline"],
+            "topic": r["topic"],
+            "message": r["message"],
+            "preferred_mode": r["preferred_mode"],
+            "scheduled_at": str(r["scheduled_at"]) if r["scheduled_at"] else None,
+            "status": r["status"],
+            "created_at": str(r["created_at"]),
+            "updated_at": str(r["updated_at"]),
+        })
+    return {"requests": items}
+
+@app.get("/api/mentor/requests")
+def mentor_requests(current=Depends(get_current_user), db=Depends(get_db)):
+    mentor_id = int(current["sub"])
+    _require_role(mentor_id, "mentor", db)
+
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("""
+        SELECT mr.*, u.first_name, u.last_name, u.email
+        FROM mentorship_requests mr
+        JOIN users u ON u.id = mr.mentee_user_id
+        WHERE mr.mentor_user_id = %s
+        ORDER BY mr.created_at DESC
+    """, (mentor_id,))
+    rows = cur.fetchall()
+    items = []
+    for r in rows:
+        items.append({
+            "id": r["id"],
+            "mentee_user_id": r["mentee_user_id"],
+            "mentee_name": f"{decrypt_field(r['first_name'])} {decrypt_field(r['last_name'])}",
+            "mentee_email": r["email"],
+            "topic": r["topic"],
+            "message": r["message"],
+            "preferred_mode": r["preferred_mode"],
+            "scheduled_at": str(r["scheduled_at"]) if r["scheduled_at"] else None,
+            "status": r["status"],
+            "created_at": str(r["created_at"]),
+            "updated_at": str(r["updated_at"]),
+        })
+    return {"requests": items}
+
+@app.post("/api/mentor/requests/{request_id}/status")
+def update_mentor_request_status(request_id: int, req: MentorshipRequestStatusUpdate, current=Depends(get_current_user), db=Depends(get_db)):
+    mentor_id = int(current["sub"])
+    _require_role(mentor_id, "mentor", db)
+
+    valid = {"accepted", "rejected", "completed", "cancelled"}
+    if req.status not in valid:
+        raise HTTPException(400, f"status must be one of: {', '.join(sorted(valid))}")
+
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT id, status FROM mentorship_requests WHERE id = %s AND mentor_user_id = %s", (request_id, mentor_id))
+    row = cur.fetchone()
+    if not row:
+        raise HTTPException(404, "Request not found")
+
+    cur.execute("UPDATE mentorship_requests SET status = %s, updated_at = NOW() WHERE id = %s", (req.status, request_id))
+    db.commit()
+    return {"message": "Request updated", "request_id": request_id, "status": req.status}
+
+# ─── Admin APIs ──────────────────────────────────────────────────────────────────
+@app.get("/api/admin/mentors")
+def admin_list_mentors(status: Optional[str] = "pending", q: Optional[str] = "", current=Depends(get_current_user), db=Depends(get_db)):
+    admin_id = int(current["sub"])
+    _require_role(admin_id, "admin", db)
+
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    params = []
+    sql = """
+        SELECT mp.*, u.email, u.first_name, u.last_name
+        FROM mentor_profiles mp
+        JOIN users u ON u.id = mp.user_id
+        WHERE 1=1
+    """
+    if status and status != "all":
+        sql += " AND mp.verification_status = %s"
+        params.append(status)
+    if q:
+        sql += " AND (LOWER(u.email) LIKE %s OR LOWER(mp.headline) LIKE %s OR LOWER(mp.bio) LIKE %s)"
+        like = f"%{q.lower()}%"
+        params.extend([like, like, like])
+    sql += " ORDER BY mp.updated_at DESC"
+
+    cur.execute(sql, tuple(params))
+    rows = cur.fetchall()
+    items = []
+    for r in rows:
+        items.append({
+            "user_id": r["user_id"],
+            "name": f"{decrypt_field(r['first_name'])} {decrypt_field(r['last_name'])}",
+            "email": r["email"],
+            "headline": r["headline"],
+            "bio": r["bio"],
+            "expertise": r["expertise"] or [],
+            "languages": r["languages"] or [],
+            "experience_years": r["experience_years"],
+            "verification_status": r["verification_status"],
+            "published": r["published"],
+            "is_accepting": r["is_accepting"],
+            "created_at": str(r["created_at"]),
+            "updated_at": str(r["updated_at"]),
+        })
+    return {"mentors": items}
+
+@app.post("/api/admin/mentors/{mentor_user_id}/review")
+def admin_review_mentor(mentor_user_id: int, req: AdminMentorReviewRequest, current=Depends(get_current_user), db=Depends(get_db)):
+    admin_id = int(current["sub"])
+    _require_role(admin_id, "admin", db)
+
+    allowed = {"pending", "approved", "rejected"}
+    if req.status not in allowed:
+        raise HTTPException(400, f"status must be one of: {', '.join(sorted(allowed))}")
+
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT user_id, verification_status, published FROM mentor_profiles WHERE user_id = %s", (mentor_user_id,))
+    row = cur.fetchone()
+    if not row:
+        raise HTTPException(404, "Mentor profile not found")
+
+    published = req.published if req.published is not None else (True if req.status == "approved" else False)
+    cur.execute("""
+        UPDATE mentor_profiles
+        SET verification_status = %s, published = %s, updated_at = NOW()
+        WHERE user_id = %s
+    """, (req.status, published, mentor_user_id))
+
+    cur.execute("""
+        INSERT INTO admin_audit_logs (admin_user_id, action, target_type, target_id, note)
+        VALUES (%s, %s, 'mentor_profile', %s, %s)
+    """, (admin_id, f"mentor_review:{req.status}", str(mentor_user_id), req.note or ""))
+
+    db.commit()
+    return {"message": "Mentor review updated", "mentor_user_id": mentor_user_id, "status": req.status, "published": published}
+
+@app.get("/api/admin/mentorship-requests")
+def admin_list_mentorship_requests(status: Optional[str] = "", current=Depends(get_current_user), db=Depends(get_db)):
+    admin_id = int(current["sub"])
+    _require_role(admin_id, "admin", db)
+
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    params = []
+    sql = """
+        SELECT mr.*, 
+               mu.first_name AS mentee_first_name, mu.last_name AS mentee_last_name, mu.email AS mentee_email,
+               ru.first_name AS mentor_first_name, ru.last_name AS mentor_last_name, ru.email AS mentor_email
+        FROM mentorship_requests mr
+        JOIN users mu ON mu.id = mr.mentee_user_id
+        JOIN users ru ON ru.id = mr.mentor_user_id
+        WHERE 1=1
+    """
+    if status:
+        sql += " AND mr.status = %s"
+        params.append(status)
+    sql += " ORDER BY mr.created_at DESC"
+
+    cur.execute(sql, tuple(params))
+    rows = cur.fetchall()
+    items = []
+    for r in rows:
+        items.append({
+            "id": r["id"],
+            "topic": r["topic"],
+            "message": r["message"],
+            "preferred_mode": r["preferred_mode"],
+            "status": r["status"],
+            "scheduled_at": str(r["scheduled_at"]) if r["scheduled_at"] else None,
+            "created_at": str(r["created_at"]),
+            "updated_at": str(r["updated_at"]),
+            "mentee": {
+                "user_id": r["mentee_user_id"],
+                "name": f"{decrypt_field(r['mentee_first_name'])} {decrypt_field(r['mentee_last_name'])}",
+                "email": r["mentee_email"],
+            },
+            "mentor": {
+                "user_id": r["mentor_user_id"],
+                "name": f"{decrypt_field(r['mentor_first_name'])} {decrypt_field(r['mentor_last_name'])}",
+                "email": r["mentor_email"],
+            },
+        })
+    return {"requests": items}
+
+@app.post("/api/admin/mentorship-requests/{request_id}/status")
+def admin_update_mentorship_status(request_id: int, req: AdminMentorshipStatusRequest, current=Depends(get_current_user), db=Depends(get_db)):
+    admin_id = int(current["sub"])
+    _require_role(admin_id, "admin", db)
+
+    allowed = {"pending", "accepted", "rejected", "completed", "cancelled"}
+    if req.status not in allowed:
+        raise HTTPException(400, f"status must be one of: {', '.join(sorted(allowed))}")
+
+    cur = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT id FROM mentorship_requests WHERE id = %s", (request_id,))
+    if not cur.fetchone():
+        raise HTTPException(404, "Mentorship request not found")
+
+    cur.execute("UPDATE mentorship_requests SET status = %s, updated_at = NOW() WHERE id = %s", (req.status, request_id))
+    cur.execute("""
+        INSERT INTO admin_audit_logs (admin_user_id, action, target_type, target_id, note)
+        VALUES (%s, %s, 'mentorship_request', %s, %s)
+    """, (admin_id, f"mentorship_status:{req.status}", str(request_id), ""))
+    db.commit()
+
+    return {"message": "Mentorship request status updated", "request_id": request_id, "status": req.status}
 
 @app.post("/api/change-password")
 def change_password(req: ChangePasswordRequest, current=Depends(get_current_user), db=Depends(get_db)):

@@ -25,6 +25,8 @@ export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, token, logout } = useAuth()
+  const roles = Array.isArray(user?.roles) ? user.roles : []
+  const isAdmin = roles.includes('admin')
   const isActive = (path) => location.pathname === path ? 'active' : ''
   const dropdownRef = useRef(null)
   const searchRef = useRef(null)
@@ -189,6 +191,11 @@ export default function Layout({ children }) {
           <Link to="/scholarships" className={isActive('/scholarships')} onClick={() => setMenuOpen(false)}>Scholarships</Link>
           <Link to="/govt-jobs" className={isActive('/govt-jobs')} onClick={() => setMenuOpen(false)}>Govt Jobs</Link>
           <Link to="/internships" className={isActive('/internships')} onClick={() => setMenuOpen(false)}>Internships</Link>
+          <Link to="/mentors" className={isActive('/mentors')} onClick={() => setMenuOpen(false)}>Find Mentors</Link>
+          <Link to="/my-mentorship" className={isActive('/my-mentorship')} onClick={() => setMenuOpen(false)}>My Mentorship</Link>
+          <Link to="/mentor-hub" className={isActive('/mentor-hub')} onClick={() => setMenuOpen(false)}>Mentor Hub</Link>
+          {isAdmin && <Link to="/admin/mentors" className={isActive('/admin/mentors')} onClick={() => setMenuOpen(false)}>Admin Mentors</Link>}
+          {isAdmin && <Link to="/admin/mentorship" className={isActive('/admin/mentorship')} onClick={() => setMenuOpen(false)}>Admin Mentorship</Link>}
           <Link to="/build-profile" className={`nav-highlight ${isActive('/build-profile')}`} onClick={() => setMenuOpen(false)}>
             Build Profile
           </Link>

@@ -19,11 +19,25 @@ import Register from './pages/Register'
 import Login from './pages/Login'
 import BuildProfile from './pages/BuildProfile'
 import MyPath from './pages/MyPath'
+import Mentors from './pages/Mentors'
+import MentorHub from './pages/MentorHub'
+import MyMentorship from './pages/MyMentorship'
+import AdminMentors from './pages/AdminMentors'
+import AdminMentorship from './pages/AdminMentorship'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'Poppins,sans-serif',color:'#1a237e'}}>Loading...</div>
   if (!user) return <Navigate to="/login" replace />
+  return children
+}
+
+function RoleRoute({ role, children }) {
+  const { user, loading } = useAuth()
+  if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',fontFamily:'Poppins,sans-serif',color:'#1a237e'}}>Loading...</div>
+  if (!user) return <Navigate to="/login" replace />
+  const roles = Array.isArray(user.roles) ? user.roles : []
+  if (!roles.includes(role)) return <Navigate to="/" replace />
   return children
 }
 
@@ -50,6 +64,11 @@ export default function App() {
           <Route path="/internships" element={<ProtectedRoute><Internships /></ProtectedRoute>} />
           <Route path="/build-profile" element={<ProtectedRoute><BuildProfile /></ProtectedRoute>} />
           <Route path="/my-path" element={<ProtectedRoute><MyPath /></ProtectedRoute>} />
+          <Route path="/mentors" element={<ProtectedRoute><Mentors /></ProtectedRoute>} />
+          <Route path="/mentor-hub" element={<ProtectedRoute><MentorHub /></ProtectedRoute>} />
+          <Route path="/my-mentorship" element={<ProtectedRoute><MyMentorship /></ProtectedRoute>} />
+          <Route path="/admin/mentors" element={<RoleRoute role="admin"><AdminMentors /></RoleRoute>} />
+          <Route path="/admin/mentorship" element={<RoleRoute role="admin"><AdminMentorship /></RoleRoute>} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Layout>
