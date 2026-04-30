@@ -1249,6 +1249,371 @@ SECTION 5: VALIDATION RULES
 11. GATE is ONLY for B.Tech/B.E. graduates (or equivalent). NOT for MBBS, LLB, BA, BCom.
 12. CAT is for ANY bachelor's degree holder. Not restricted to commerce/management.
 13. NEET PG is ONLY for MBBS graduates. Not for B.Tech, B.Sc, BA.
+
+=================================================================
+SECTION 6: PHARMACY & ALLIED HEALTH SCIENCES
+=================================================================
+
+--- PHARMACY ---
+B.Pharm (4 years) or D.Pharm (2 years):
+  Eligibility: Class 12 with PCB/PCM (varies by state)
+  Admission: State Pharmacy CETs, direct merit-based in many states
+  Top colleges: ICT Mumbai, NIPER Mohali/Hyderabad/Ahmedabad, Bombay College of Pharmacy, Manipal, JSS Mysuru, Jamia Hamdard, BITS Pilani (Pharmacy), Birla Institute Pilani
+
+M.Pharm (2 years after B.Pharm):
+  Exam: GPAT (Graduate Pharmacy Aptitude Test) — for AICTE-approved colleges
+  Exam: NIPER JEE — for NIPERs (National Institute of Pharmaceutical Education & Research)
+  Top colleges: NIPER Mohali, NIPER Hyderabad, ICT Mumbai, Jamia Hamdard
+
+Pharm.D (Doctor of Pharmacy — 6 years after Class 12):
+  Clinical pharmacy program, direct patient care
+  Top colleges: Manipal, JSS Mysuru, MCOPS Manipal, Al-Ameen Bangalore
+
+Career: Clinical Pharmacist, Drug Inspector, Pharma R&D, Medical Representative, Regulatory Affairs, QC/QA, Pharmacovigilance, Drug Safety
+Salary: INR 3-15 LPA (R&D/regulatory roles higher)
+
+--- VETERINARY SCIENCE ---
+B.V.Sc & AH (5.5 years including 1 year internship):
+  ONLY EXAM: NEET-UG (same as MBBS, separate counselling for veterinary)
+  Counselling: VCI (Veterinary Council of India) + State counselling
+  Top colleges: IVRI Bareilly, Bombay Veterinary College, Madras Veterinary College, GADVASU Ludhiana, TANUVAS Chennai, KVAFSU Bidar
+  Eligibility: Class 12 with PCB, minimum 50%
+  Career: Veterinary Doctor, Animal Husbandry Officer (Govt), Livestock Inspector, Poultry/Dairy Scientist, Wildlife Veterinarian, Pet Clinic Owner
+  Salary: INR 4-12 LPA (Govt vets: 6-10 LPA + allowances)
+  PG: M.V.Sc via ICAR AIEEA PG or state exams
+
+--- NURSING & PARAMEDICAL ---
+B.Sc Nursing (4 years):
+  Exams: AIIMS Nursing Entrance, JIPMER Nursing, PGIMER Nursing, State Nursing CETs
+  Top colleges: AIIMS (all campuses), JIPMER, PGIMER Chandigarh, CMC Vellore, NIMHANS, Armed Forces Nursing (MH)
+  Also: GNM (3.5 years), ANM (2 years) — diploma level
+
+BPT - Physiotherapy (4.5 years):
+  Admission: State CETs, university entrance exams, some via NEET score
+  Top colleges: CMC Vellore, AIIMS, Manipal, MAHE, Kasturba, SRMC Chennai
+  Career: Physiotherapist (hospital/sports/neuro), own clinic, sports rehab
+
+BOT - Occupational Therapy (4.5 years):
+  Similar admission as BPT
+  Career: Rehabilitation specialist, mental health OT, pediatric OT
+
+BASLP - Audiology & Speech Language Pathology (4 years):
+  Top colleges: AIISH Mysuru (All India Institute of Speech & Hearing), NIMHANS, Ali Yavar Jung Mumbai
+  Career: Audiologist, Speech Therapist, Hearing Aid Specialist
+
+B.Sc MLT - Medical Lab Technology (3 years):
+  Career: Lab Technician, Pathology Lab, Diagnostic Centers
+  
+B.Sc Radiology / Medical Imaging (3 years):
+  Career: Radiographer, CT/MRI Technician, Sonographer
+
+Salary range: INR 2.5-10 LPA (Govt nursing: 4-8 LPA. Abroad nursing: 15-40 LPA)
+
+--- YOGA & NATUROPATHY ---
+BNYS (Bachelor of Naturopathy & Yogic Sciences — 5.5 years):
+  Regulated by AYUSH Ministry
+  Admission: Some states via NEET, others via state entrance/merit
+  Top colleges: SDM Ujire, BNYS Govt colleges in Karnataka/Tamil Nadu, Morarji Desai National Institute of Yoga Delhi
+  Career: Naturopathic Doctor, Yoga Therapist, Wellness Consultant, AYUSH Health Officer (Govt)
+  Also: BAMS (Ayurveda, 5.5 years via NEET), BHMS (Homeopathy, 5.5 years via NEET), BUMS (Unani, 5.5 years via NEET)
+
+=================================================================
+SECTION 7: LIFE SCIENCES, BIOTECHNOLOGY & FOOD SCIENCE
+=================================================================
+
+--- BIOTECHNOLOGY / MICROBIOLOGY / BIOCHEMISTRY / GENETICS ---
+B.Sc/B.Tech Biotechnology (3-4 years):
+  Exams: CUET (for Central Universities), ICAR AIEEA (Agri biotech), JEE Main (B.Tech Biotech at NITs/IITs), state CETs
+  Top colleges for B.Tech Biotech: IIT Delhi, IIT Madras, IIT Kharagpur, IIT Guwahati, NIT Warangal, Anna University
+  Top colleges for B.Sc: JNU, DU, BHU, HCU, Pune University, Madras University
+  Also covers: B.Sc Microbiology, B.Sc Biochemistry, B.Sc Genetics, B.Sc Life Sciences, B.Sc Molecular Biology
+
+M.Sc (2 years):
+  Exam: IIT JAM (for M.Sc Biotech at IITs), CUET PG, BHU PET, JNU CEEB, university entrances
+  Top colleges: IISc Bangalore, IITs, JNU, HCU, BHU, Pune University
+
+PhD:
+  Exams: CSIR NET/JRF (Life Sciences), DBT JRF, ICMR JRF, GATE Biotechnology, institute-specific entrance
+  Top research: IISc, NCBS, TIFR, CCMB, CDFD, InSTEM, IITs
+
+Career: Biotechnologist, Microbiologist, Biochemist, Geneticist, Bioinformatics Scientist, Clinical Research Associate, QA/QC (Pharma), Patent Analyst, Bioprocess Engineer, Forensic Scientist
+Salary: INR 3-20 LPA (Pharma/Biotech R&D higher)
+
+--- FOOD SCIENCE & NUTRITION ---
+B.Tech Food Technology (4 years):
+  Exams: JEE Main (for NIFTEM, NITs), ICAR AIEEA, State CETs
+  Top colleges: NIFTEM Sonepat/Thanjavur, CFTRI Mysuru (M.Sc/PhD), IIT Kharagpur (Food Process Engg), HBTI Kanpur
+
+B.Sc Food Science & Nutrition / Clinical Nutrition & Dietetics (3 years):
+  Exams: CUET, State university entrances
+  Top colleges: Lady Irwin College DU, Institute of Home Economics DU, SNDT Mumbai, MS University Baroda, Avinashilingam University
+
+M.Sc Food Technology:
+  Exams: GATE Food Technology, CFTRI entrance, CUET PG
+  Top: CFTRI Mysuru, NIFTEM, IIT Kharagpur
+
+Career: Food Technologist, Clinical Dietitian, Sports Nutritionist, FSSAI Food Safety Officer, QC Manager (Food industry), R&D Scientist, Hospital Dietitian
+Salary: INR 3-15 LPA
+
+=================================================================
+SECTION 8: PSYCHOLOGY & BEHAVIOURAL SCIENCES
+=================================================================
+
+B.A/B.Sc Psychology (3 years):
+  Exams: CUET (for DU, JNU, BHU etc.), Christ University entrance, Jamia entrance
+  Top colleges: Lady Shri Ram (DU), Christ University, Fergusson Pune, Presidency Kolkata, Ambedkar University Delhi
+
+M.A/M.Sc Psychology (2 years):
+  Exams: CUET PG, DU PG entrance, JNU, BHU, Jamia, TISS
+  Specializations: Clinical Psychology, Counselling Psychology, Industrial/Organizational Psychology, Forensic Psychology
+
+M.Phil Clinical Psychology (2 years — mandatory for clinical practice):
+  Regulated by RCI (Rehabilitation Council of India)
+  Top colleges: NIMHANS Bangalore, CIP Ranchi, IHBAS Delhi, LGBRIMH Tezpur, RINPAS Kanke
+  Extremely competitive (limited seats: 5-15 per institute)
+
+PhD Psychology:
+  Via UGC NET JRF, institute entrance
+
+Career: Clinical Psychologist (RCI licensed), Counselling Psychologist, School Counsellor, Industrial/Organizational Psychologist, Forensic Psychologist, Neuropsychologist, UX Researcher, HR/OD Consultant
+Salary: INR 3-15 LPA (Clinical private practice: 5-25 LPA. Corporate I/O: 8-20 LPA)
+
+=================================================================
+SECTION 9: ANIMATION, VFX, GAMING & MULTIMEDIA
+=================================================================
+
+B.Sc Animation / B.Des Animation (3-4 years):
+  Top colleges: NID (Animation Film Design), FTII (Film & TV Institute), DSK International Pune, Whistling Woods Mumbai, MAAC, Arena Animation, Frameboxx
+  Also: B.Sc Multimedia, B.Sc Game Design, B.Des Interaction Design (at IITs via UCEED)
+  Admission: Portfolio + entrance test (NID DAT for NID), portfolio-based for private institutes
+
+Career: 2D/3D Animator, VFX Artist, Game Designer, Game Developer, Motion Graphics Designer, Character Artist, Storyboard Artist, UI/UX Designer, AR/VR Developer
+Salary: INR 3-20 LPA (VFX studios: 4-15 LPA. Gaming: 5-25 LPA. International studios: much higher)
+Top employers: DNEG, Prime Focus, Technicolor, Red Chillies VFX, Rockstar Games India, Ubisoft Pune, EA Sports
+
+=================================================================
+SECTION 10: CYBER SECURITY & DATA SCIENCE
+=================================================================
+
+--- CYBER SECURITY ---
+B.Tech Cyber Security / Information Security (4 years):
+  Exams: JEE Main (some NITs offer it), State CETs, university entrance
+  Also: B.Sc Cyber Security (3 years), PG Diploma in Cyber Security
+  Top colleges: IIT Kanpur (interdisciplinary), IIIT Allahabad, NIT Warangal, C-DAC (PG Diploma), DIAT Pune
+  Certifications: CEH (Certified Ethical Hacker), OSCP, CISSP, CompTIA Security+, CCNA Security
+  Career: Ethical Hacker/Penetration Tester, SOC Analyst, Cyber Forensic Expert, Information Security Manager, CISO, Bug Bounty Hunter, GRC Analyst
+  Salary: INR 5-30 LPA (CISO level: 30-80 LPA)
+
+--- DATA SCIENCE & AI/ML ---
+B.Tech AI & Data Science (4 years):
+  Exams: JEE Main, JEE Advanced (IITs now offer B.Tech AI), State CETs
+  Top colleges: IIT Hyderabad (first B.Tech AI), IIT Madras, IIT Delhi, IIT Bombay, IIIT Hyderabad, NIT Trichy
+  Also: B.Sc Data Science (3 years), Integrated M.Sc at IISERs, ISI Kolkata (B.Stat/B.Math)
+
+M.Tech AI/ML/Data Science:
+  Exams: GATE (CS/DA paper), IIT entrance
+  Top: IIT Madras, IIT Delhi, IIT Bombay, IISc, IIIT Hyderabad (MSIT + M.Tech programs)
+
+Career: Data Scientist, ML Engineer, AI Researcher, NLP Engineer, Computer Vision Engineer, Data Engineer, Business Analyst, Quantitative Analyst
+Salary: INR 8-50 LPA (IIT/IIIT placements in AI: 20-50 LPA)
+
+--- STATISTICS & ACTUARIAL SCIENCE ---
+B.Stat / B.Math at ISI Kolkata (3 years):
+  Exam: ISI Admission Test — extremely competitive
+  Also: B.Sc Statistics at DU, BHU, Pune University, Osmania
+
+Actuarial Science:
+  Professional exams by IAI (Institute of Actuaries of India) or IFoA (UK)
+  Can start after Class 12 or graduation
+  Career: Actuary (Insurance/Finance), Risk Analyst, Pricing Specialist
+  Salary: INR 8-50 LPA (Qualified actuaries: 20-50+ LPA)
+
+=================================================================
+SECTION 11: DESIGN, FASHION & CREATIVE ARTS
+=================================================================
+
+--- FASHION DESIGN ---
+B.Des Fashion Design (4 years):
+  Exam: NIFT Entrance (CAT + GAT + Situation Test)
+  Top colleges: NIFT (16 campuses), Pearl Academy, NID (Textile/Accessory Design)
+  Also: B.F.Tech (Fashion Technology — technical/production side, at NIFT)
+  Career: Fashion Designer, Textile Designer, Merchandiser, Stylist, Pattern Maker, Boutique Owner
+  Salary: INR 3-20 LPA
+
+--- PERFORMING & FINE ARTS ---
+BFA (Bachelor of Fine Arts — 4 years):
+  Exams: BHU BFA/BPA entrance, MSU Baroda entrance, state university tests
+  Top colleges: BHU (Faculty of Visual Arts), MSU Baroda, JJ School Mumbai, Government College of Art Chandigarh, Delhi College of Art
+  NSD (National School of Drama): For theatre — typically after graduation, 3-year diploma
+  FTII (Film & TV Institute of India, Pune): For film — typically after graduation, 2-3 year courses
+  Career: Artist, Sculptor, Theatre Actor/Director, Film Director, Art Teacher, Gallery Curator
+
+--- FOREIGN LANGUAGES ---
+BA in Foreign Languages (3 years):
+  Exams: JNU CEEB (for BA/MA in French, German, Spanish, Japanese, Korean, Chinese, Arabic, Russian, Persian), DU entrance, CUET
+  Top colleges: JNU (School of Language), EFL University Hyderabad, DU, BHU, Jamia Millia
+  Certifications: DELF/DALF (French), Goethe-Zertifikat (German), DELE (Spanish), JLPT (Japanese), HSK (Chinese), TOPIK (Korean)
+  Career: Translator/Interpreter, Embassy Staff, BPO/KPO language roles, Tourism, International Business, UN organizations
+  Salary: INR 3-15 LPA (UN/Embassy: 10-25 LPA)
+
+=================================================================
+SECTION 12: LOGISTICS, EVENT MANAGEMENT & EMERGING FIELDS
+=================================================================
+
+--- LOGISTICS & SUPPLY CHAIN ---
+BBA/B.Sc Logistics & Supply Chain (3 years):
+  Also: MBA Logistics (after graduation), PG Diploma from NITIE Mumbai (now IIM Mumbai)
+  Career: Supply Chain Manager, Logistics Planner, Warehouse Manager, Procurement Specialist, E-commerce Operations
+  Salary: INR 4-20 LPA (Supply chain at top companies: 10-25 LPA)
+
+--- EVENT MANAGEMENT ---
+BBA/B.Sc Event Management (3 years):
+  Top colleges: NIEM (National Institute of Event Management), EMDI, Amity, various private colleges
+  Career: Event Planner, Wedding Planner, Corporate Event Manager, Exhibition Designer, Concert/Festival Manager
+  Salary: INR 3-15 LPA
+
+--- DIGITAL MARKETING & E-COMMERCE ---
+BBA Digital Marketing (3 years), MBA Digital Marketing:
+  Also: Certifications — Google Digital Marketing, Meta Blueprint, HubSpot, AWS Digital Marketing
+  Career: Digital Marketing Manager, SEO/SEM Specialist, Social Media Manager, Content Strategist, Growth Hacker, Performance Marketer
+  Salary: INR 3-20 LPA (Growth/Performance roles: 10-25 LPA)
+
+--- FIRE & SAFETY MANAGEMENT ---
+B.Tech Fire & Safety / B.Sc Fire Safety (3-4 years):
+  Top colleges: NIFS (National Institute of Fire & Safety Engineering), Anna University, University of Madras
+  Also: Diploma in Fire Safety (1-2 years), NEBOSH certification (international)
+  Career: Fire Safety Officer, HSE Manager, Safety Auditor, Industrial Safety Engineer
+  Salary: INR 4-15 LPA (Oil & Gas/Construction: 8-20 LPA)
+
+--- BEAUTY, COSMETOLOGY & WELLNESS ---
+Diploma/B.Voc in Cosmetology & Beauty (1-3 years):
+  Top: VLCC Institute, Lakme Academy, Shahnaz Husain, CIDESCO-affiliated schools, B.Voc at universities
+  Career: Makeup Artist, Hair Stylist, Skin Care Specialist, Salon Owner, Beauty Blogger/Influencer, Spa Therapist
+  Salary: INR 2-15 LPA (Celebrity/bridal MUA: much higher)
+
+--- GEM & JEWELLERY ---
+Diploma/B.Des in Jewellery Design (1-4 years):
+  Top colleges: IIGJ Mumbai/Jaipur (Indian Institute of Gems & Jewellery), GIA India (Gemological Institute of America), JD Institute
+  Career: Jewellery Designer, Gemologist, Diamond Grader, Goldsmith, CAD Designer (Jewellery), Retail Manager
+  Salary: INR 3-15 LPA (Diamond industry in Surat: highly lucrative)
+
+--- LIBRARY & INFORMATION SCIENCE ---
+B.Lib.I.Sc (1 year after graduation):
+  Exams: DU entrance, BHU entrance, CUET PG (for integrated courses)
+  Top colleges: DU, BHU, Aligarh Muslim University, Jadavpur
+  M.Lib.I.Sc (1 year after B.Lib)
+  UGC NET Library Science for Assistant Professor/JRF
+  Career: Librarian (School/College/Public), Digital Archivist, Information Officer, KVS/NVS Librarian (Govt)
+  Salary: INR 3-8 LPA (Govt librarian: 5-10 LPA + DA)
+
+--- FORENSIC SCIENCE & CRIMINOLOGY ---
+B.Sc Forensic Science (3 years):
+  Top colleges: GFSU Gandhinagar (Gujarat Forensic Sciences University), LNJN NICFS Delhi, Amity, Bundelkhand University
+  M.Sc Forensic Science: GFSU, LNJN, Punjabi University
+  Career: Forensic Scientist, Crime Scene Investigator, Cyber Forensics, Forensic Toxicologist, Document Examiner
+  Salary: INR 4-12 LPA (Govt forensic labs: 6-12 LPA)
+
+--- RURAL MANAGEMENT & COOPERATIVES ---
+MBA/PGDM Rural Management (2 years):
+  Top: IRMA Anand (Institute of Rural Management), TISS, XIMB (RM program), KIIT
+  Exam: IRMA own entrance (IRMASAT) or CAT/XAT score
+  Career: Rural Development Manager, Microfinance Officer, Cooperative Manager, Agri-business Manager, CSR Head, NABARD Officer
+  Salary: INR 5-15 LPA (IRMA placements: 8-15 LPA)
+
+--- PUBLIC POLICY & GOVERNANCE ---
+BA/MA Public Policy (3+2 years or 5 year integrated):
+  Top: NLSIU Bangalore (MPP), Ashoka University, Jindal, TISS, IIM Bangalore (PGPPM), IGIDR Mumbai
+  Also: B.A. Public Administration at DU, Presidency, Jadavpur
+  Career: Policy Researcher, Think Tank Analyst, Government Consultant, UN/World Bank, Advocacy Officer
+  Salary: INR 5-20 LPA (International orgs: 15-40 LPA)
+
+--- RENEWABLE ENERGY & SUSTAINABILITY ---
+B.Tech Energy Engineering / Renewable Energy (4 years):
+  Exams: JEE Main (some colleges), State CETs
+  Top colleges: IIT Bombay (Energy Science), IIT Delhi (Energy Studies), TERI SAS, Amrita, SRM
+  Also: M.Tech Energy Systems, PG Diploma in Solar Energy
+  Career: Solar Engineer, Wind Energy Specialist, Sustainability Consultant, ESG Analyst, Carbon Auditor, Green Building Expert
+  Salary: INR 5-18 LPA (ESG/Corporate sustainability: 10-25 LPA)
+
+=================================================================
+SECTION 6-12 GOAL PATHWAYS
+=================================================================
+
+GOAL: "Become a Pharmacist / Pharma Career"
+  Required: Class 12 with PCB (or PCM for some states)
+  Path: B.Pharm (4 years) via state pharmacy CETs → GPAT for M.Pharm → NIPER JEE for NIPERs
+  Alternative: Pharm.D (6-year clinical) or D.Pharm (2-year diploma)
+  IRRELEVANT: JEE, NEET (NEET is for MBBS/BDS/BVSc, not pharmacy in most states)
+
+GOAL: "Become a Veterinary Doctor"
+  Required: Class 12 with PCB, minimum 50%
+  ONLY EXAM: NEET-UG (same exam as MBBS, separate counselling)
+  Duration: B.V.Sc & AH (5.5 years)
+  Top colleges: IVRI Bareilly, GADVASU, Bombay Vet College, TANUVAS
+
+GOAL: "Become a Psychologist"
+  Path: B.A/B.Sc Psychology (3 years via CUET/entrance) → M.A/M.Sc Psychology → M.Phil Clinical Psychology (for clinical practice, RCI mandatory)
+  Key institutes: NIMHANS, CIP Ranchi, IHBAS Delhi
+  Note: Cannot practice as Clinical Psychologist without M.Phil from RCI-recognized program
+  IRRELEVANT: NEET, JEE, GATE
+
+GOAL: "Career in Animation / VFX / Gaming"
+  Path 1: B.Sc/B.Des Animation (3-4 years) from NID/FTII/private institutes
+  Path 2: Short diploma courses (1-2 years) at MAAC, Arena, Frameboxx + portfolio building
+  Key: Portfolio matters more than degree. Learn industry tools (Maya, Blender, Unreal Engine, Unity)
+  IRRELEVANT: JEE, NEET, CAT
+
+GOAL: "Cyber Security Expert"
+  Path 1: B.Tech CSE/IT (JEE/state CETs) → specialize in security → certifications (CEH, OSCP)
+  Path 2: B.Sc CS/IT → M.Sc Cyber Security → certifications
+  Path 3: Any IT background + self-study + certifications + bug bounties
+  Key certifications: CEH, OSCP, CISSP, CompTIA Security+
+  IRRELEVANT: NEET, CLAT, NATA
+
+GOAL: "Career in Food Science / Nutrition / Dietetics"
+  Path: B.Sc Food Science & Nutrition (3 years) or B.Tech Food Technology (4 years via JEE/ICAR)
+  For Dietitian: B.Sc + internship + registration with state dietetics board
+  Top: NIFTEM, CFTRI Mysuru, Lady Irwin College DU
+  IRRELEVANT: NEET (unless pursuing MBBS→MD Nutrition path)
+
+GOAL: "Become a Nurse / Paramedical Professional"
+  Required: Class 12 with PCB
+  Nursing: B.Sc Nursing (4 years via AIIMS/JIPMER/state entrance) or GNM (3.5 years)
+  Physiotherapy: BPT (4.5 years via state entrance/NEET score)
+  OT: BOT (4.5 years)
+  Audiology: BASLP (4 years, AIISH Mysuru entrance)
+  IRRELEVANT: JEE, CAT, CLAT
+
+GOAL: "Fashion Designer"
+  Required: Class 12 any stream
+  PRIMARY EXAM: NIFT Entrance Test (CAT + GAT + Situation Test)
+  Also: NID DAT (for textile/accessory), Pearl Academy entrance, SOFT entrance
+  Duration: B.Des 4 years
+  Top: NIFT Delhi/Mumbai/Bangalore/Hyderabad (16 campuses)
+  IRRELEVANT: JEE, NEET, CLAT
+
+GOAL: "ITI / Polytechnic / Vocational Skills"
+  After Class 10: ITI (1-2 years, NCVT/SCVT) or Polytechnic Diploma (3 years)
+  Exams: JEECUP (UP), JEXPO (WB), AP/TS POLYCET, state ITI admission tests
+  Key: Choose NCVT over SCVT for national recognition
+  After Diploma: Lateral entry to B.Tech 2nd year (very popular economical path)
+  After ITI: Apprenticeship (1-2 years) at PSU/Govt/private via apprenticeshipindia.gov.in
+  Career: Electrician, Fitter, Mechanic, Welder, COPA, Diploma Engineer, Loco Pilot (Railways)
+
+GOAL: "Foreign Languages / Translator"
+  Path: BA in language (JNU/DU/EFL University, 3 years) or Certificate/Diploma from cultural centers
+  Key exams: JNU CEEB, DU entrance, CUET
+  Certifications: DELF/DALF, Goethe, DELE, JLPT, HSK, TOPIK
+  High demand languages: Japanese, Korean, German, French (for BPO/KPO, tourism, Embassy)
+  IRRELEVANT: JEE, NEET
+
+GOAL: "Career in Renewable Energy / Sustainability / ESG"
+  Path 1: B.Tech Energy/Environmental Engineering (JEE/state CETs) → industry
+  Path 2: B.Sc Environmental Science → M.Sc → Corporate ESG
+  Path 3: Any engineering + MBA with sustainability focus
+  Top: IIT Bombay, IIT Delhi, TERI SAS, IISc
+  Certifications: LEED AP, GRIHA, GRI Standards
+
 """
 
 # ─── Qualification-Goal Validation ──────────────────────────────────────────────
@@ -2335,18 +2700,13 @@ def my_exam_alerts(current=Depends(get_current_user), db=Depends(get_db)):
 
 # ─── AI Chat Endpoint ───────────────────────────────────────────────────────────
 
-EDUCATION_SYSTEM_PROMPT = """You are an expert Indian education counselor and career advisor. You help students with:
-- Information about entrance exams (JEE, NEET, CLAT, CAT, GATE, CUET, CA Foundation, etc.)
-- College admissions process and cutoffs
-- Career guidance for Engineering, Medical, Law, Management, and other fields
-- Scholarship information and financial aid
-- Study strategies and preparation tips
-- Comparing colleges and branches
-- Understanding reservation categories and quotas
-- Timeline planning for exam preparation
+EDUCATION_SYSTEM_PROMPT = """You are an expert Indian education counselor and career advisor covering ALL career streams in India including: Engineering, Medical (MBBS/BDS/AYUSH/Veterinary), Pharmacy, Nursing & Paramedical (BPT/BOT/BASLP/MLT), Law, Management (MBA/BBA), Civil Services, Defence, Design (NID/NIFT/UCEED), Architecture, Arts & Humanities, Commerce (CA/CS/CMA), Pure Sciences, Biotechnology & Life Sciences (Microbiology/Biochemistry/Genetics), Food Science & Nutrition/Dietetics, Psychology (Clinical/Counselling), Data Science & AI/ML, Cyber Security, Animation/VFX/Gaming, Agriculture (Horticulture/Sericulture/Fishery), Veterinary Science, Teaching, Government Jobs (Banking/SSC/Railways), Hotel Management, Media & Journalism, Sports, Aviation & Merchant Navy, Social Work, IT (BCA/MCA), Vocational/ITI/Polytechnic, Environment/Forestry/Wildlife, Fashion Design, Foreign Languages, Logistics, Event Management, Digital Marketing, Fire & Safety, Beauty & Cosmetology, Gem & Jewellery, Library Science, Forensic Science, Rural Management, Public Policy, Renewable Energy/ESG, Yoga & Naturopathy (BNYS), Statistics & Actuarial Science.
 
-Be accurate, helpful, and encouraging. Provide specific, actionable advice. If you don't know something, say so rather than guessing.
-Always respond in a clear, structured format. Use markdown for formatting when helpful."""
+You help with entrance exams (JEE, NEET, CLAT, CAT, GATE, CUET, GPAT, NIPER JEE, NIFT, NID DAT, UCEED, IMU CET, TISSNET, NIMCET, IIT JAM, CSIR NET, UGC NET, UPSC, NDA, SSC, IBPS, ICAR AIEEA, ISI entrance), college admissions, cutoffs, counselling, scholarships, preparation strategies, and career planning.
+
+Key rules: JEE Advanced = IITs only. JEE Main = NITs/IIITs. State CETs = state colleges only. NEET = all medical/dental/AYUSH/veterinary. CLAT = NLUs. CAT = IIMs.
+
+Be accurate, specific, and actionable. Use markdown formatting. If unsure, say so."""
 
 @app.post("/api/chat")
 async def ai_chat(req: ChatRequest, current=Depends(get_current_user)):
