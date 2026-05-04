@@ -238,6 +238,9 @@ def init_db():
 # ─── App ────────────────────────────────────────────────────────────────────────
 app = FastAPI(title="Vidya Maarg API", version="2.0.0")
 
+# Auto-admin emails - these users get admin role automatically on register/login
+ADMIN_EMAILS = ["gowtham206@gmail.com", "tdivyavaani@gmail.com"]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -364,6 +367,8 @@ def register(req: RegisterRequest, db=Depends(get_db)):
     ))
     user_id = cur.fetchone()["id"]
     cur.execute("INSERT INTO user_roles (user_id, role) VALUES (%s, 'mentee') ON CONFLICT (user_id, role) DO NOTHING", (user_id,))
+    if req.email.lower() in ADMIN_EMAILS:
+        cur.execute("INSERT INTO user_roles (user_id, role) VALUES (%s, 'admin') ON CONFLICT (user_id, role) DO NOTHING", (user_id,))
     db.commit()
     token = create_access_token({"sub": str(user_id), "email": req.email.lower()})
     return {"access_token": token, "token_type": "bearer", "user_id": user_id}
@@ -375,6 +380,10 @@ def login(req: LoginRequest, db=Depends(get_db)):
     user = cur.fetchone()
     if not user or not verify_password(req.password, user["password_hash"]):
         raise HTTPException(401, "Invalid email or password")
+    # Auto-grant admin role for admin emails on login
+    if user["email"] in ADMIN_EMAILS:
+        cur.execute("INSERT INTO user_roles (user_id, role) VALUES (%s, 'admin') ON CONFLICT (user_id, role) DO NOTHING", (user["id"],))
+        db.commit()
     token = create_access_token({"sub": str(user["id"]), "email": user["email"]})
     return {
         "access_token": token,
